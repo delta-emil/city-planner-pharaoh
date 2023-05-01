@@ -384,7 +384,9 @@
             // 
             // btnFilterDesire
             // 
+            btnFilterDesire.Checked = true;
             btnFilterDesire.CheckOnClick = true;
+            btnFilterDesire.CheckState = CheckState.Checked;
             btnFilterDesire.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnFilterDesire.Image = (Image)resources.GetObject("btnFilterDesire.Image");
             btnFilterDesire.ImageTransparentColor = Color.Magenta;

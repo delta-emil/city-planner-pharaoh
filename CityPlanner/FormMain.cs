@@ -279,9 +279,9 @@ public partial class FormMain : Form
             options.Converters.Add(new MapCellsJsonConverter());
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             JsonSerializer.Serialize(outputStream, mapModel, options);
-            
+
             mapModel.IsChanged = false;
-            
+
             return true;
         }
         catch (Exception ex)

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Security.Policy;
 
 namespace CityPlanner;
 
@@ -17,6 +18,7 @@ public partial class MapCanvasControl : Control
     private readonly Brush ghostValidBrush;
     private readonly Brush ghostInvalidBrush;
     private readonly Font smallFont;
+    private readonly Font smallFontBold;
     private readonly Brush[] terrainBrushes;
     private readonly Brush[] buildingBrushes;
 
@@ -37,6 +39,7 @@ public partial class MapCanvasControl : Control
         this.borderBuildingSelectedPen = new Pen(Color.LightBlue, BorderWidth);
         this.textBrush = new SolidBrush(Color.Black);
         this.smallFont = new Font("Bahnschrift Condensed", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+        this.smallFontBold = new Font("Bahnschrift Condensed", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
 
         this.ghostValidBrush = new SolidBrush(Color.FromArgb(96, 0, 255, 0));
         this.ghostInvalidBrush = new SolidBrush(Color.FromArgb(96, 255, 0, 0));
@@ -126,7 +129,7 @@ public partial class MapCanvasControl : Control
 
         foreach (MapBuilding building in buildingToPaint)
         {
-            var buildingRect = GetBuildingRectangle(building);
+            var buildingRect = GetBuildingRectangle(building, includingDesire: false);
             
             var buildingCategory = building.BuildingType.GetCategory();
             var brush = this.buildingBrushes[(int)buildingCategory];
@@ -156,6 +159,30 @@ public partial class MapCanvasControl : Control
                     text, this.smallFont, this.textBrush,
                     buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2,
                     buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2);
+            }
+
+            if (this.ShowDesirability && buildingCategory == MapBuildingCategory.House)
+            {
+                var size = building.BuildingType.GetSize();
+
+                int maxDesire = int.MinValue;
+                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+                {
+                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                    {
+                        maxDesire = Math.Max(maxDesire, this.MapModel.Cells[cellX, cellY].Desirability);
+                    }
+                }
+
+                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+                {
+                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                    {
+                        var desire = this.MapModel.Cells[cellX, cellY].Desirability;
+                        var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
+                        graphics.DrawString(desire.ToString(), font, this.textBrush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
+                    }
+                }
             }
         }
     }
@@ -299,7 +326,7 @@ public partial class MapCanvasControl : Control
             if (building != null)
             {
                 this.MapModel.IsChanged = true;
-                var buildingRect = GetBuildingRectangle(building);
+                var buildingRect = GetBuildingRectangle(building, includingDesire: this.ShowDesirability);
                 Invalidate(buildingRect);
             }
         }
@@ -313,7 +340,7 @@ public partial class MapCanvasControl : Control
 
             this.MapModel.IsChanged = true;
             this.MapModel.RemoveBuilding(building);
-            var buildingRect = GetBuildingRectangle(building);
+            var buildingRect = GetBuildingRectangle(building, includingDesire: this.ShowDesirability);
             Invalidate(buildingRect);
         }
         else
@@ -430,7 +457,7 @@ public partial class MapCanvasControl : Control
                         this.selectedBuildings.Add(buildingOnCell);
                     }
 
-                    invalidateRect = GetBuildingRectangle(buildingOnCell);
+                    invalidateRect = GetBuildingRectangle(buildingOnCell, includingDesire: false);
                     invalidate = true;
                 }
             }
@@ -489,7 +516,7 @@ public partial class MapCanvasControl : Control
         else if (this.selectedBuildings.Count == 0)
         {
             this.selectedBuildings.Add(buildingOnCell);
-            invalidateRect = GetBuildingRectangle(buildingOnCell);
+            invalidateRect = GetBuildingRectangle(buildingOnCell, includingDesire: false);
             invalidate = true;
         }
         else
@@ -532,14 +559,26 @@ public partial class MapCanvasControl : Control
         }
     }
 
-    private static Rectangle GetBuildingRectangle(MapBuilding building)
+    private static Rectangle GetBuildingRectangle(MapBuilding building, bool includingDesire)
     {
         var size = building.BuildingType.GetSize();
-        return new Rectangle(
-            building.Left * CellSideLength,
-            building.Top * CellSideLength,
-            size.width * CellSideLength,
-            size.height * CellSideLength);
+        if (includingDesire)
+        {
+            var desireRange = building.BuildingType.GetDesire().range;
+            return new Rectangle(
+                (building.Left - desireRange) * CellSideLength,
+                (building.Top - desireRange) * CellSideLength,
+                (size.width + 2 * desireRange) * CellSideLength,
+                (size.height + 2 * desireRange) * CellSideLength);
+        }
+        else
+        {
+            return new Rectangle(
+                building.Left * CellSideLength,
+                building.Top * CellSideLength,
+                size.width * CellSideLength,
+                size.height * CellSideLength);
+        }
     }
 
     private void PaintTerrainCell(Graphics graphics, int cellX, int cellY, Rectangle cellRect, MapCellModel cellModel)
@@ -561,6 +600,11 @@ public partial class MapCanvasControl : Control
         if (this.ShowCellCoords)
         {
             graphics.DrawString($"{cellX},{cellY}", this.smallFont, this.textBrush, cellRect.Left + 2, cellRect.Top + 2);
+        }
+
+        if (this.ShowDesirability && cellModel.Desirability != 0)
+        {
+            graphics.DrawString(cellModel.Desirability.ToString(), this.smallFont, this.textBrush, cellRect.Left + 2, cellRect.Top + 2);
         }
     }
 }

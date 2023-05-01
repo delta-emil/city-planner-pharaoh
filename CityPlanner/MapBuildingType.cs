@@ -10,17 +10,23 @@ public enum MapBuildingType
 
 public static class MapBuildingTypeExtensions
 {
-    public static (int width, int height) GetSize(this MapBuildingType mapBuildingType)
+    public static (int width, int height) GetSize(this MapBuildingType mapBuildingType) => sizes[(int)mapBuildingType];
+    private static readonly (int width, int height)[] sizes = new[]
     {
-        return mapBuildingType switch
-        {
-            MapBuildingType.Road => (1, 1),
-            MapBuildingType.Plaza => (1, 1),
-            MapBuildingType.House => (1, 1),
-            MapBuildingType.Bazaar => (2, 2),
-            _ => throw new NotImplementedException(),
-        };
-    }
+        (1, 1), // Road
+        (1, 1), // Plaza,
+        (1, 1), // House,
+        (2, 2), // Bazaar,
+    };
+
+    public static (int range, int start, int stepRange, int stepDiff) GetDesire(this MapBuildingType mapBuildingType) => desires[(int)mapBuildingType];
+    private static readonly (int range, int start, int stepRange, int stepDiff)[] desires = new[]
+    {
+        (0, 0, 0 , 0), // Road
+        (2, 4, 1 , -2), // Plaza,
+        (0, 0, 0 , 0), // House, // TODO: improve later
+        (6, -2, 1 , 1), // Bazaar,
+    };
 
     public static MapBuildingCategory GetCategory(this MapBuildingType mapBuildingType)
     {

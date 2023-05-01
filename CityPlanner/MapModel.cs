@@ -34,6 +34,7 @@ public class MapModel
         foreach (var mapBuilding in this.Buildings)
         {
             SetBuildingInCells(mapBuilding);
+            AddDesirabilityEffect(mapBuilding, 1);
         }
     }
 
@@ -59,6 +60,7 @@ public class MapModel
         this.Buildings.Add(mapBuilding);
 
         SetBuildingInCells(mapBuilding);
+        AddDesirabilityEffect(mapBuilding, 1);
 
         return mapBuilding;
     }
@@ -123,6 +125,7 @@ public class MapModel
         }
 
         RemoveBuildingFromCells(mapBuilding);
+        AddDesirabilityEffect(mapBuilding, -1);
     }
 
     private void RemoveBuildingFromCells(MapBuilding mapBuilding)
@@ -169,6 +172,7 @@ public class MapModel
         foreach (var building in selectedBuildings)
         {
             RemoveBuildingFromCells(building);
+            AddDesirabilityEffect(building, -1);
         }
 
         foreach (var building in selectedBuildings)
@@ -176,6 +180,40 @@ public class MapModel
             building.Left += offsetX;
             building.Top += offsetY;
             SetBuildingInCells(building);
+            AddDesirabilityEffect(building, 1);
+        }
+    }
+
+    private void AddDesirabilityEffect(MapBuilding mapBuilding, int multiplier)
+    {
+        var desireConfig = mapBuilding.BuildingType.GetDesire();
+        if (desireConfig.range == 0)
+        {
+            return;
+        }
+
+        var size = mapBuilding.BuildingType.GetSize();
+
+        var minX = Math.Max(0, mapBuilding.Left - desireConfig.range);
+        var maxX = Math.Min(this.MapSideX - 1, mapBuilding.Left + size.width - 1 + desireConfig.range);
+
+        var minY = Math.Max(0, mapBuilding.Top - desireConfig.range);
+        var maxY = Math.Min(this.MapSideY - 1, mapBuilding.Top + size.height - 1 + desireConfig.range);
+
+        for (int cellX = minX; cellX <= maxX; cellX++)
+        {
+            for (int cellY = minY; cellY <= maxY; cellY++)
+            {
+                var distance = desireConfig.range - Math.Min(
+                    Math.Min(Math.Abs(cellX - minX), Math.Abs(cellX - maxX)),
+                    Math.Min(Math.Abs(cellY - minY), Math.Abs(cellY - maxY)));
+                if (distance > 0)
+                {
+                    var delta = (desireConfig.start + (distance - 1) / desireConfig.stepRange * desireConfig.stepDiff) * multiplier;
+
+                    this.Cells[cellX, cellY].Desirability += delta;
+                }
+            }
         }
     }
 }

@@ -9,6 +9,9 @@ public class MapCellModel
     [JsonIgnore]
     public MapBuilding? Building { get; set; }
 
+    [JsonIgnore]
+    public int Desirability { get; set; }
+
     public override string ToString()
     {
         return $"MapCellModel({Terrain})";
