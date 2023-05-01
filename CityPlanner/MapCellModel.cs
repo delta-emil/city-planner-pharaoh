@@ -1,7 +1,16 @@
-﻿namespace CityPlanner;
+﻿using System.Text.Json.Serialization;
 
-public record class MapCellModel
+namespace CityPlanner;
+
+public class MapCellModel
 {
     public MapTerrain Terrain { get; set; }
+
+    [JsonIgnore]
     public MapBuilding? Building { get; set; }
+
+    public override string ToString()
+    {
+        return $"MapCellModel({Terrain})";
+    }
 }

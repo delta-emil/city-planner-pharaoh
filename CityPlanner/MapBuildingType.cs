@@ -34,6 +34,16 @@ public static class MapBuildingTypeExtensions
         };
     }
 
+    public static bool HasSoftBorder(this MapBuildingType mapBuildingType)
+    {
+        return mapBuildingType switch
+        {
+            MapBuildingType.Road => true,
+            MapBuildingType.Plaza => true,
+            _ => false,
+        };
+    }
+
     public static bool ShowName(this MapBuildingType mapBuildingType)
     {
         return mapBuildingType switch
