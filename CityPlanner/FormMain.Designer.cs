@@ -62,6 +62,13 @@
             toolStripSeparator1 = new ToolStripSeparator();
             btnFilterBuildings = new ToolStripButton();
             btnFilterDesire = new ToolStripButton();
+            toolStripLabelRoadLengthLabel = new ToolStripLabel();
+            toolStripLabelRoadLength = new ToolStripLabel();
+            toolStripSeparator2 = new ToolStripSeparator();
+            btnCutBuildings = new ToolStripButton();
+            btnCopyBuildings = new ToolStripButton();
+            toolStripLabelPasteBuildings = new ToolStripLabel();
+            toolStripSeparator3 = new ToolStripSeparator();
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             toolStripMain.SuspendLayout();
@@ -175,6 +182,7 @@
             tool1.IsClearBuilding = false;
             tool1.Terrain = null;
             mapControl.Tool = tool1;
+            mapControl.SelectionChanged += mapControl_SelectionChanged;
             // 
             // toolStripTerrain
             // 
@@ -317,7 +325,7 @@
             // 
             // toolStripTop
             // 
-            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire });
+            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3 });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
             toolStripTop.Size = new Size(850, 25);
@@ -395,6 +403,56 @@
             btnFilterDesire.Text = "Show Desirablility";
             btnFilterDesire.Click += btnFilterDesire_Click;
             // 
+            // toolStripLabelRoadLengthLabel
+            // 
+            toolStripLabelRoadLengthLabel.Name = "toolStripLabelRoadLengthLabel";
+            toolStripLabelRoadLengthLabel.Size = new Size(37, 22);
+            toolStripLabelRoadLengthLabel.Text = "Road:";
+            // 
+            // toolStripLabelRoadLength
+            // 
+            toolStripLabelRoadLength.AutoSize = false;
+            toolStripLabelRoadLength.Name = "toolStripLabelRoadLength";
+            toolStripLabelRoadLength.Size = new Size(25, 22);
+            toolStripLabelRoadLength.Text = "0";
+            toolStripLabelRoadLength.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(6, 25);
+            // 
+            // btnCutBuildings
+            // 
+            btnCutBuildings.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnCutBuildings.Image = (Image)resources.GetObject("btnCutBuildings.Image");
+            btnCutBuildings.ImageTransparentColor = Color.Magenta;
+            btnCutBuildings.Name = "btnCutBuildings";
+            btnCutBuildings.Size = new Size(30, 22);
+            btnCutBuildings.Text = "Cut";
+            btnCutBuildings.Click += btnCutBuildings_Click;
+            // 
+            // btnCopyBuildings
+            // 
+            btnCopyBuildings.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnCopyBuildings.Image = (Image)resources.GetObject("btnCopyBuildings.Image");
+            btnCopyBuildings.ImageTransparentColor = Color.Magenta;
+            btnCopyBuildings.Name = "btnCopyBuildings";
+            btnCopyBuildings.Size = new Size(39, 22);
+            btnCopyBuildings.Text = "Copy";
+            btnCopyBuildings.Click += btnCopyBuildings_Click;
+            // 
+            // toolStripLabelPasteBuildings
+            // 
+            toolStripLabelPasteBuildings.Name = "toolStripLabelPasteBuildings";
+            toolStripLabelPasteBuildings.Size = new Size(114, 22);
+            toolStripLabelPasteBuildings.Text = "(right-click to paste)";
+            // 
+            // toolStripSeparator3
+            // 
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new Size(6, 25);
+            // 
             // openFileDialog
             // 
             openFileDialog.Filter = "City Planner Pharaoh files|*.cityph|All files|*.*";
@@ -464,5 +522,12 @@
         private ToolStripButton btnFilterDesire;
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripButton btnCopyBuildings;
+        private ToolStripButton btnCutBuildings;
+        private ToolStripLabel toolStripLabelPasteBuildings;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripLabel toolStripLabelRoadLengthLabel;
+        private ToolStripLabel toolStripLabelRoadLength;
     }
 }

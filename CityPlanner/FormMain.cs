@@ -153,6 +153,7 @@ public partial class FormMain : Form
     }
 
     #region file operations
+
     private void btnFileNew_Click(object sender, EventArgs e)
     {
         if (this.mapControl.MapModel.IsChanged)
@@ -309,4 +310,23 @@ public partial class FormMain : Form
     }
 
     #endregion
+
+    #region cut-copy-paste
+
+    private void btnCutBuildings_Click(object sender, EventArgs e)
+    {
+        this.mapControl.BuildingsCut();
+    }
+
+    private void btnCopyBuildings_Click(object sender, EventArgs e)
+    {
+        this.mapControl.BuildingsCopy();
+    }
+
+    #endregion
+
+    private void mapControl_SelectionChanged(object sender, MapSelectionChangeEventArgs e)
+    {
+        this.toolStripLabelRoadLength.Text = e.SelectedRoadLength.ToString();
+    }
 }

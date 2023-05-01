@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Security.Policy;
 
 namespace CityPlanner;
 
@@ -23,6 +21,7 @@ public partial class MapCanvasControl : Control
     private readonly Brush[] buildingBrushes;
 
     private readonly HashSet<MapBuilding> selectedBuildings;
+    private readonly HashSet<MapBuilding> clipboardBuildings;
     private Rectangle? ghostLocation;
     private (int x, int y) selectionDragStartCell;
     private (int x, int y) selectionDragEndCell;
@@ -72,6 +71,7 @@ public partial class MapCanvasControl : Control
         this.MapModel = new MapModel(this.DesignMode ? MapModel.DefaultMapSize : 0, this.DesignMode ? MapModel.DefaultMapSize : 0);
         this.tool = new Tool();
         this.selectedBuildings = new();
+        this.clipboardBuildings = new();
     }
 
     public MapModel MapModel { get; set; }
@@ -92,6 +92,8 @@ public partial class MapCanvasControl : Control
     public bool ShowDesirability { get; set; }
 
     public bool ShowCellCoords { get; set; }
+
+    public event Action<object, MapSelectionChangeEventArgs>? SelectionChanged;
 
     public void SetSizeToFullMapSize()
     {
@@ -189,17 +191,21 @@ public partial class MapCanvasControl : Control
 
     protected override void OnMouseDown(MouseEventArgs e)
     {
-        if (e.Button != MouseButtons.Left)
+        if (e.Button == MouseButtons.Left)
         {
-            return;
-        }
+            // looks like this is not needed (?)
+            if (this.Tool.SupportsDrag)
+            {
+                this.Capture = true;
+            }
 
-        if (this.Tool.SupportsDrag)
+            this.ApplyTool(e, isMove: false);
+        }
+        else if (e.Button == MouseButtons.Right)
         {
-            this.Capture = true;
+            var (cellX, cellY) = GetCellCoordidates(e);
+            this.BuildingsPaste(cellX, cellY);
         }
-
-        this.ApplyTool(e, isMove: false);
     }
 
     protected override void OnMouseUp(MouseEventArgs e)
@@ -212,6 +218,7 @@ public partial class MapCanvasControl : Control
             {
                 var offsetX = this.selectionDragEndCell.x - this.selectionDragStartCell.x;
                 var offsetY = this.selectionDragEndCell.y - this.selectionDragStartCell.y;
+                this.MapModel.IsChanged = true;
                 this.MapModel.MoveBuildingsByOffset(this.selectedBuildings, offsetX, offsetY);
             }
 
@@ -388,6 +395,8 @@ public partial class MapCanvasControl : Control
                     this.selectedBuildings.UnionWith(buildings);
                     invalidate = true;
                 }
+
+                this.OnSelectionChanged();
             }
         }
         else if (isMouseMove)
@@ -456,6 +465,8 @@ public partial class MapCanvasControl : Control
                     {
                         this.selectedBuildings.Add(buildingOnCell);
                     }
+
+                    this.OnSelectionChanged();
 
                     invalidateRect = GetBuildingRectangle(buildingOnCell, includingDesire: false);
                     invalidate = true;
@@ -528,6 +539,8 @@ public partial class MapCanvasControl : Control
 
         if (invalidate)
         {
+            this.OnSelectionChanged();
+
             if (invalidateRect != null)
             {
                 this.Invalidate(invalidateRect.Value);
@@ -605,6 +618,87 @@ public partial class MapCanvasControl : Control
         if (this.ShowDesirability && cellModel.Desirability != 0)
         {
             graphics.DrawString(cellModel.Desirability.ToString(), this.smallFont, this.textBrush, cellRect.Left + 2, cellRect.Top + 2);
+        }
+    }
+
+    #region buildings cut-copy-paste
+
+    public void BuildingsCut()
+    {
+        if (this.selectedBuildings.Count > 0)
+        {
+            BuildingsCopy();
+
+            this.MapModel.IsChanged = true;
+            foreach (var building in this.selectedBuildings)
+            {
+                this.MapModel.RemoveBuilding(building);
+            }
+
+            this.Invalidate();
+        }
+    }
+
+    public void BuildingsCopy()
+    {
+        if (this.selectedBuildings.Count > 0)
+        {
+            this.clipboardBuildings.Clear();
+
+            int minX = int.MaxValue;
+            int minY = int.MaxValue;
+            foreach (var building in this.selectedBuildings)
+            {
+                this.clipboardBuildings.Add(building.GetCopy());
+                minX = Math.Min(minX, building.Left);
+                minY = Math.Min(minY, building.Top);
+            }
+
+            // make their Left & Top relative to the top-left of their bounding rect
+            foreach (var building in this.clipboardBuildings)
+            {
+                building.Left -= minX;
+                building.Top -= minY;
+            }
+        }
+    }
+
+    private void BuildingsPaste(int cellX, int cellY)
+    {
+        if (this.clipboardBuildings.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var building in this.clipboardBuildings)
+        {
+            var left = building.Left + cellX;
+            var top = building.Top + cellY;
+            if (!this.MapModel.CanAddBuilding(left, top, building.BuildingType))
+            {
+                return;
+            }
+        }
+
+        foreach (var building in this.clipboardBuildings)
+        {
+            var left = building.Left + cellX;
+            var top = building.Top + cellY;
+            this.MapModel.AddBuilding(left, top, building.BuildingType);
+        }
+
+        this.Invalidate();
+    }
+
+    #endregion
+
+    private void OnSelectionChanged()
+    {
+        if (this.SelectionChanged != null)
+        {
+            var roadLength = this.selectedBuildings.Count(building => building.BuildingType is MapBuildingType.Road or MapBuildingType.Plaza);
+            var args = new MapSelectionChangeEventArgs { SelectedRoadLength = roadLength };
+            this.SelectionChanged(this, args);
         }
     }
 }

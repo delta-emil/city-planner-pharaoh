@@ -4,15 +4,12 @@ A city planner tool for the classic Pharaoh city builder game.
 
 # TODO
 
-- Desirability
-- Add all the building
-- Copy-Paste buildings
-- show road length in selection
+- Add all the buildings
 - undo/redo
-- Copy-Paste Terrain
-- Shift-paint Terrain
 
 Low prio:
 
+- Copy-Paste Terrain
+- hold Shift to paint Terrain in a rectangle
 - keyboard shortcuts
 - button icons
