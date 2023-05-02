@@ -23,7 +23,15 @@ public partial class FormMain : Form
         this.buttonToSecondaryToolbar = new Dictionary<ToolStripButton, ToolStrip>
         {
             { btnTerrain, toolStripTerrain },
-            { btnCommercial, toolStripCommercial },
+            { btnFood, toolStripFood },
+            { btnIndustry, toolStripIndustry },
+            { btnDistribution, toolStripDist },
+            { btnEnt, toolStripEnt },
+            { btnReligious, toolStripReligious },
+            { btnEducation, toolStripEducation },
+            { btnHealth, toolStripHealth },
+            { btnMunicipal, toolStripMunicipal },
+            { btnMilitary, toolStripMilitary },
         };
         foreach (var button in this.buttonToSecondaryToolbar.Keys)
         {
@@ -34,10 +42,81 @@ public partial class FormMain : Form
 
         this.buttonToBuildingTool = new Dictionary<ToolStripButton, MapBuildingType>
         {
+            // main
             { btnRoad, MapBuildingType.Road },
             { btnPlaza, MapBuildingType.Plaza },
             { btnHouse, MapBuildingType.House },
+            // food
+            { btnFarm, MapBuildingType.Farm },
+            { btnCattle, MapBuildingType.Cattle },
+            { btnWaterLift, MapBuildingType.WaterLift },
+            { btnDitch, MapBuildingType.Ditch },
+            { btnHunter, MapBuildingType.Hunter },
+            { btnFisher, MapBuildingType.Fisher },
+            { btnWorkCamp, MapBuildingType.WorkCamp },
+            // querry&mine
+            { btnPlainStone, MapBuildingType.QuarryPlainStone },
+            { btnLimeStone, MapBuildingType.QuarryLimestone },
+            { btnSandStone, MapBuildingType.QuarrySandstone },
+            { btnGranite, MapBuildingType.QuarryGranite },
+            { btnGemstone, MapBuildingType.MineGems },
+            { btnCopper, MapBuildingType.MineCopper },
+            { btnGold, MapBuildingType.MineGold },
+            // other raw materials
+            { btnClay, MapBuildingType.Clay },
+            { btnReed, MapBuildingType.Reed },
+            { btnWood, MapBuildingType.Wood },
+            // workshops
+            { btnPotter, MapBuildingType.Potter },
+            { btnBrewery, MapBuildingType.Brewer },
+            { btnPapyrus, MapBuildingType.Papyrus },
+            { btnWeaver, MapBuildingType.Weaver },
+            { btnJeweler, MapBuildingType.Jeweler },
+            { btnBricks, MapBuildingType.Bricks },
+            { btnLamp, MapBuildingType.Lamps },
+            { btnPaint, MapBuildingType.Paint },
+            { btnShipwright, MapBuildingType.Shipwright },
+            // guilds
+            { btnBricklayers, MapBuildingType.GuildBricklayer },
+            { btnCarpernters, MapBuildingType.GuildCarpenter },
+            { btnStonemasons, MapBuildingType.GuildStonemason },
+            { btnArtisans, MapBuildingType.GuildArtisan },
+            // distribution
             { btnBazaar, MapBuildingType.Bazaar },
+            { btnGranary, MapBuildingType.Granary },
+            { btnStorageYard, MapBuildingType.StorageYard },
+            { btnDock, MapBuildingType.Dock },
+            // entertainment venues
+            { btnBooth1, MapBuildingType.Booth1 },
+            { btnBooth2, MapBuildingType.Booth2 },
+            { btnBooth3, MapBuildingType.Booth3 },
+            { btnBooth4, MapBuildingType.Booth4 },
+            { btnBandstand1, MapBuildingType.Bandstand1 },
+            { btnBandstand2, MapBuildingType.Bandstand2 },
+            { btnBandstand3, MapBuildingType.Bandstand3 },
+            { btnBandstand4, MapBuildingType.Bandstand4 },
+            { btnPavilion1, MapBuildingType.Pavilion1 },
+            { btnPavilion2, MapBuildingType.Pavilion2 },
+            { btnPavilion3, MapBuildingType.Pavilion3 },
+            { btnPavilion4, MapBuildingType.Pavilion4 },
+            { btnPavilion5, MapBuildingType.Pavilion5 },
+            { btnPavilion6, MapBuildingType.Pavilion6 },
+            { btnPavilion7, MapBuildingType.Pavilion7 },
+            { btnPavilion8, MapBuildingType.Pavilion8 },
+            { btnPavilion9, MapBuildingType.Pavilion9 },
+            { btnPavilion10, MapBuildingType.Pavilion10 },
+            { btnPavilion11, MapBuildingType.Pavilion11 },
+            { btnSenet, MapBuildingType.Senet },
+            { btnZoo, MapBuildingType.Zoo },
+            { btnJugglerSchool, MapBuildingType.JuggleSchool },
+            { btnMusicSchool, MapBuildingType.MusicSchool },
+            { btnDanceSchool, MapBuildingType.DanceSchool },
+            // religious
+            { btnShrine, MapBuildingType.Shrine },
+            { btnTemple, MapBuildingType.Temple },
+            { btnTempleComplex1, MapBuildingType.TempleComplex1 },
+            { btnTempleComplex2, MapBuildingType.TempleComplex2 },
+            { btnFestivalSquare, MapBuildingType.FestivalSquare },
         };
         foreach (var button in this.buttonToBuildingTool.Keys)
         {

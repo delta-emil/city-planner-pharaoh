@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace CityPlanner;
 
@@ -45,13 +46,13 @@ public partial class MapCanvasControl : Control
 
         this.terrainBrushes = new Brush[]
         {
-            new SolidBrush(Color.FromArgb(82, 138, 33)), // Grass,
-            new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(255, 216, 0), Color.FromArgb(82, 138, 33)), // GrassFarmland,
-            new SolidBrush(Color.FromArgb(231, 203, 148)), // Sand,
-            new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(153, 127, 0), Color.FromArgb(231, 203, 148)), // SandFarmland,
+            new SolidBrush(Color.FromArgb(157, 198, 121)), // Grass,
+            new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(255, 216, 0), Color.FromArgb(157, 198, 121)), // GrassFarmland,
+            new SolidBrush(Color.FromArgb(224, 205, 170)), // Sand,
+            new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(153, 127, 0), Color.FromArgb(224, 205, 170)), // SandFarmland,
             new SolidBrush(Color.FromArgb(66, 48, 49)), // Rock,
             new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(255, 216, 0), Color.FromArgb(66, 48, 49)), // RockOre,
-            new SolidBrush(Color.FromArgb(160, 140, 104)), // Dune,
+            new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(66, 48, 49), Color.FromArgb(224, 205, 170)), // Dune,
             new SolidBrush(Color.FromArgb(96, 40, 28)), // Floodpain,
             new SolidBrush(Color.FromArgb(94, 75, 71)), // FloodpainEdge,
             new SolidBrush(Color.FromArgb(33, 81, 82)), // Water,
@@ -60,15 +61,26 @@ public partial class MapCanvasControl : Control
 
         this.buildingBrushes = new Brush[]
         {
-            //new SolidBrush(Color.FromArgb(231, 195, 156)), // Path,
             new SolidBrush(Color.FromArgb(191, 181, 166)), // Path,
-            new HatchBrush(HatchStyle.DiagonalCross, Color.FromArgb(216, 132, 255), Color.FromArgb(191, 181, 166)), // Plaza,
-            new SolidBrush(Color.FromArgb(255, 233, 127)), // House,
-            new SolidBrush(Color.FromArgb(255, 106, 0)), // Commercial,
+            new HatchBrush(HatchStyle.HorizontalBrick, Color.FromArgb(158, 255, 33), Color.FromArgb(191, 181, 166)), // Plaza,
+            new SolidBrush(Color.FromArgb(129, 212, 26)), // Beauty,
+            new SolidBrush(Color.FromArgb(255, 255, 215)), // House,
+            new SolidBrush(Color.FromArgb(255, 222, 89)), // Food,
+            new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(255, 222, 89), Color.FromArgb(33, 81, 82)), // Ditch,
+            new SolidBrush(Color.FromArgb(198, 118, 37)), // QuarryMine,
+            new SolidBrush(Color.FromArgb(198, 118, 37)), // RawMaterials,
+            new SolidBrush(Color.FromArgb(255, 151, 47)), // Workshop,
+            new SolidBrush(Color.FromArgb(181, 162, 143)), // Guild,
+            new SolidBrush(Color.FromArgb(255, 219, 182)), // Distribution,
+            new SolidBrush(Color.FromArgb(114, 159, 207)), // VenueStage,
+            new SolidBrush(Color.FromArgb(172, 189, 208)), // Venue,
+            new SolidBrush(Color.FromArgb(50, 115, 181)), // EntSchool,
+            new SolidBrush(Color.FromArgb(191, 129, 158)), // Religious,
         };
 
         // mostly for the designer preview
-        this.MapModel = new MapModel(this.DesignMode ? MapModel.DefaultMapSize : 0, this.DesignMode ? MapModel.DefaultMapSize : 0);
+        //this.MapModel = new MapModel(this.DesignMode ? MapModel.DefaultMapSize : 0, this.DesignMode ? MapModel.DefaultMapSize : 0);
+        this.MapModel = new MapModel(8, 8);
         this.tool = new Tool();
         this.selectedBuildings = new();
         this.clipboardBuildings = new();
@@ -131,59 +143,69 @@ public partial class MapCanvasControl : Control
 
         foreach (MapBuilding building in buildingToPaint)
         {
-            var buildingRect = GetBuildingRectangle(building, includingDesire: false);
-            
-            var buildingCategory = building.BuildingType.GetCategory();
-            var brush = this.buildingBrushes[(int)buildingCategory];
+            PaintBuilding(graphics, building);
+        }
+    }
 
-            // draw border
-            var borderRect = new Rectangle(
-                buildingRect.Left, buildingRect.Top,
-                buildingRect.Width - BorderWidth, buildingRect.Height - BorderWidth);
-            var borderPen
-                = this.selectedBuildings.Contains(building) ? this.borderBuildingSelectedPen
-                : building.BuildingType.HasSoftBorder()     ? this.borderSoftPen
-                : this.borderBuildingPen;
-            graphics.DrawRectangle(borderPen, borderRect);
+    private void PaintBuilding(Graphics graphics, MapBuilding building)
+    {
+        var buildingRect = GetBuildingRectangle(building, includingDesire: false);
 
-            // draw cell insides
-            var innerRect = new Rectangle(
-                buildingRect.Left + BorderWidth, buildingRect.Top + BorderWidth,
-                buildingRect.Width - BorderWidthDouble, buildingRect.Height - BorderWidthDouble);
-            graphics.FillRectangle(brush, innerRect);
+        var buildingCategory = building.BuildingType.GetCategory();
+        var brush = this.buildingBrushes[(int)buildingCategory];
 
-            // draw building name
-            if (building.BuildingType.ShowName())
+        // draw border
+        var borderRect = new Rectangle(
+            buildingRect.Left, buildingRect.Top,
+            buildingRect.Width - BorderWidth, buildingRect.Height - BorderWidth);
+        var borderPen
+            = this.selectedBuildings.Contains(building) ? this.borderBuildingSelectedPen
+            : building.BuildingType.HasSoftBorder()     ? this.borderSoftPen
+            :                                             this.borderBuildingPen;
+        graphics.DrawRectangle(borderPen, borderRect);
+
+        // draw cell insides
+        var innerRect = new Rectangle(
+            buildingRect.Left + BorderWidth, buildingRect.Top + BorderWidth,
+            buildingRect.Width - BorderWidthDouble, buildingRect.Height - BorderWidthDouble);
+        graphics.FillRectangle(brush, innerRect);
+
+        foreach (var subBuilding in building.GetSubBuildings())
+        {
+            PaintBuilding(graphics, subBuilding);
+        }
+
+        // draw building name
+        if (building.BuildingType.ShowName())
+        {
+            string text = building.BuildingType.ToString();
+            var textSize = graphics.MeasureString(text, this.smallFont);
+            graphics.DrawString(
+                text, this.smallFont, this.textBrush,
+                buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2,
+                buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2);
+        }
+
+        if (this.ShowDesirability && buildingCategory == MapBuildingCategory.House)
+        {
+            var size = building.BuildingType.GetSize();
+
+            int maxDesire = int.MinValue;
+            for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
             {
-                string text = building.BuildingType.ToString();
-                var textSize = graphics.MeasureString(text, this.smallFont);
-                graphics.DrawString(
-                    text, this.smallFont, this.textBrush,
-                    buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2,
-                    buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2);
+                for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                {
+                    maxDesire = Math.Max(maxDesire, this.MapModel.Cells[cellX, cellY].Desirability);
+                }
             }
 
-            if (this.ShowDesirability && buildingCategory == MapBuildingCategory.House)
+            for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
             {
-                var size = building.BuildingType.GetSize();
-
-                int maxDesire = int.MinValue;
-                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+                for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
                 {
-                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
-                    {
-                        maxDesire = Math.Max(maxDesire, this.MapModel.Cells[cellX, cellY].Desirability);
-                    }
-                }
-
-                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
-                {
-                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
-                    {
-                        var desire = this.MapModel.Cells[cellX, cellY].Desirability;
-                        var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
-                        graphics.DrawString(desire.ToString(), font, this.textBrush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
-                    }
+                    var desire = this.MapModel.Cells[cellX, cellY].Desirability;
+                    var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
+                    graphics.DrawString(desire.ToString(), font, this.textBrush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
                 }
             }
         }
@@ -577,7 +599,9 @@ public partial class MapCanvasControl : Control
         var size = building.BuildingType.GetSize();
         if (includingDesire)
         {
-            var desireRange = building.BuildingType.GetDesire().range;
+            var desireRange = new[] { building }.Concat(building.GetSubBuildings())
+                .Select(x => x.BuildingType.GetDesire().range)
+                .Max();
             return new Rectangle(
                 (building.Left - desireRange) * CellSideLength,
                 (building.Top - desireRange) * CellSideLength,
