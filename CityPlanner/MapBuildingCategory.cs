@@ -24,4 +24,7 @@ public enum MapBuildingCategory
     Roadblock,
     Bridge,
     Ferry,
+    Wall,
+    GatePath,
+    Military
 }

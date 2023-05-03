@@ -83,6 +83,9 @@ public partial class MapCanvasControl : Control
             new HatchBrush(HatchStyle.DiagonalCross, Color.Red, Color.FromArgb(191, 181, 166)), // Roadblock,
             new HatchBrush(HatchStyle.HorizontalBrick, Color.FromArgb(33, 81, 82), Color.FromArgb(191, 181, 166)), // Bridge,
             new HatchBrush(HatchStyle.HorizontalBrick, Color.FromArgb(191, 181, 166), Color.FromArgb(129, 172, 166)), // Ferry,
+            new SolidBrush(Color.FromArgb(206, 136, 136)), // Wall,
+            new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(255, 79, 79), Color.FromArgb(191, 181, 166)), // GatePath,
+            new SolidBrush(Color.FromArgb(255, 79, 79)), // Military,
         };
 
         // mostly for the designer preview
@@ -159,60 +162,70 @@ public partial class MapCanvasControl : Control
         var buildingRect = GetBuildingRectangle(building, includingDesire: false);
 
         var buildingCategory = building.BuildingType.GetCategory();
-        var brush = this.buildingBrushes[(int)buildingCategory];
+        var ignoreMainBuilding = building.BuildingType.IgnoreMainBuilding();
+        if (!ignoreMainBuilding)
+        {
+            var brush = this.buildingBrushes[(int)buildingCategory];
 
-        // draw border
-        var borderRect = new Rectangle(
-            buildingRect.Left, buildingRect.Top,
-            buildingRect.Width - BorderWidth, buildingRect.Height - BorderWidth);
-        var borderPen
-            = this.selectedBuildings.Contains(building) ? this.borderBuildingSelectedPen
-            : building.BuildingType.HasSoftBorder()     ? this.borderSoftPen
-            :                                             this.borderBuildingPen;
-        graphics.DrawRectangle(borderPen, borderRect);
-
-        // draw cell insides
-        var innerRect = new Rectangle(
-            buildingRect.Left + BorderWidth, buildingRect.Top + BorderWidth,
-            buildingRect.Width - BorderWidthDouble, buildingRect.Height - BorderWidthDouble);
-        graphics.FillRectangle(brush, innerRect);
+            // draw cell insides
+            var innerRect = new Rectangle(
+                buildingRect.Left + BorderWidth, buildingRect.Top + BorderWidth,
+                buildingRect.Width - BorderWidthDouble, buildingRect.Height - BorderWidthDouble);
+            graphics.FillRectangle(brush, innerRect);
+        }
+        else
+        {
+        }
 
         foreach (var subBuilding in building.GetSubBuildings())
         {
             PaintBuilding(graphics, subBuilding);
         }
 
-        // draw building name
-        if (building.BuildingType.ShowName())
+        if (!ignoreMainBuilding)
         {
-            string text = building.BuildingType.ToString();
-            var textSize = graphics.MeasureString(text, this.smallFont);
-            graphics.DrawString(
-                text, this.smallFont, this.textBrush,
-                buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2,
-                buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2);
-        }
+            // draw border
+            var borderRect = new Rectangle(
+                buildingRect.Left, buildingRect.Top,
+                buildingRect.Width - BorderWidth, buildingRect.Height - BorderWidth);
+            var borderPen
+                = this.selectedBuildings.Contains(building) ? this.borderBuildingSelectedPen
+                : building.BuildingType.HasSoftBorder() ? this.borderSoftPen
+                : this.borderBuildingPen;
+            graphics.DrawRectangle(borderPen, borderRect);
 
-        if (this.ShowDesirability && buildingCategory == MapBuildingCategory.House)
-        {
-            var size = building.BuildingType.GetSize();
-
-            int maxDesire = int.MinValue;
-            for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+            // draw building name
+            if (building.BuildingType.ShowName())
             {
-                for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
-                {
-                    maxDesire = Math.Max(maxDesire, this.MapModel.Cells[cellX, cellY].Desirability);
-                }
+                string text = building.BuildingType.ToString();
+                var textSize = graphics.MeasureString(text, this.smallFont);
+                graphics.DrawString(
+                    text, this.smallFont, this.textBrush,
+                    buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2,
+                    buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2);
             }
 
-            for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+            if (this.ShowDesirability && buildingCategory == MapBuildingCategory.House)
             {
-                for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                var size = building.BuildingType.GetSize();
+
+                int maxDesire = int.MinValue;
+                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
                 {
-                    var desire = this.MapModel.Cells[cellX, cellY].Desirability;
-                    var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
-                    graphics.DrawString(desire.ToString(), font, this.textBrush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
+                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                    {
+                        maxDesire = Math.Max(maxDesire, this.MapModel.Cells[cellX, cellY].Desirability);
+                    }
+                }
+
+                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+                {
+                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                    {
+                        var desire = this.MapModel.Cells[cellX, cellY].Desirability;
+                        var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
+                        graphics.DrawString(desire.ToString(), font, this.textBrush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
+                    }
                 }
             }
         }

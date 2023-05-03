@@ -35,6 +35,22 @@ public class MapBuilding
                 new() { Left = this.Left + 2, Top = this.Top + 6, BuildingType = MapBuildingType.TempleComplexBuilding },
             },
 
+            MapBuildingType.Gate1 => new MapBuilding[]
+            {
+                new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.GatePath },
+                new() { Left = this.Left + 2, Top = this.Top + 1, BuildingType = MapBuildingType.GatePath },
+            },
+            MapBuildingType.Gate2 => new MapBuilding[]
+            {
+                new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.GatePath },
+                new() { Left = this.Left + 1, Top = this.Top + 2, BuildingType = MapBuildingType.GatePath },
+            },
+            MapBuildingType.Fort => new MapBuilding[]
+            {
+                new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.FortBuilding },
+                new() { Left = this.Left + 3, Top = this.Top,     BuildingType = MapBuildingType.FortYard },
+            },
+
             MapBuildingType.Booth1 => new MapBuilding[] { new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.JuggleStage } },
             MapBuildingType.Booth2 => new MapBuilding[] { new() { Left = this.Left + 1, Top = this.Top,     BuildingType = MapBuildingType.JuggleStage } },
             MapBuildingType.Booth3 => new MapBuilding[] { new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.JuggleStage } },

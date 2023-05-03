@@ -39,13 +39,6 @@ public partial class FormMain : Form
             button.Click += this.MainToolbarSubbarButtonClick;
         }
 
-        //this.toolStripTop.AutoSize = false;
-        //this.toolStripMain.AutoSize = false;
-        //foreach (var toolStrip in this.buttonToSecondaryToolbar.Values)
-        //{
-        //    toolStrip.AutoSize = false;
-        //}
-
         this.ShowHideToolbars(null);
 
         this.buttonToBuildingTool = new Dictionary<ToolStripButton, MapBuildingType>
@@ -54,6 +47,9 @@ public partial class FormMain : Form
             { btnRoad, MapBuildingType.Road },
             { btnPlaza, MapBuildingType.Plaza },
             { btnHouse, MapBuildingType.House },
+            { btnHouse2, MapBuildingType.House2 },
+            { btnHouse3, MapBuildingType.House3 },
+            { btnHouse4, MapBuildingType.House4 },
             // food
             { btnFarm, MapBuildingType.Farm },
             { btnCattle, MapBuildingType.Cattle },
@@ -155,6 +151,18 @@ public partial class FormMain : Form
             { btnMansionPersonal, MapBuildingType.MansionPersonal },
             { btnMansionFamily, MapBuildingType.MansionFamily },
             { btnMansionDynasty, MapBuildingType.MansionDynasty },
+            // military
+            { btnWall, MapBuildingType.Wall },
+            { btnTower, MapBuildingType.Tower },
+            { btnGate1, MapBuildingType.Gate1 },
+            { btnGate2, MapBuildingType.Gate2 },
+            { btnRecruiter, MapBuildingType.Recruiter },
+            { btnAcademy, MapBuildingType.Academy },
+            { btnWeaponsmith, MapBuildingType.Weaponsmith },
+            { btnChariot, MapBuildingType.Chariot },
+            { btnFort, MapBuildingType.Fort },
+            { btnWarship, MapBuildingType.Warship },
+            { btnTransportShip, MapBuildingType.TransportShip },
         };
         foreach (var button in this.buttonToBuildingTool.Keys)
         {
@@ -245,16 +253,12 @@ public partial class FormMain : Form
     {
         this.SuspendLayout();
 
-        //var scrollPositon = this.canvas.AutoScrollPosition;
-
         foreach (var toolbarStrip in this.buttonToSecondaryToolbar.Values)
         {
             toolbarStrip.Visible = toolbarStrip == toolStripToShow;
         }
 
         this.ResumeLayout(true);
-
-        //this.canvas.AutoScrollPosition = scrollPositon;
     }
 
     private static void UntickOtherToolbarButtons(ToolStrip toolStrip, ToolStripButton activeOne)

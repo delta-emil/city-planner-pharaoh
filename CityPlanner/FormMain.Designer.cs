@@ -189,6 +189,23 @@
             btnMansionFamily = new ToolStripButton();
             btnMansionDynasty = new ToolStripButton();
             toolStripMilitary = new ToolStrip();
+            btnWall = new ToolStripButton();
+            btnTower = new ToolStripButton();
+            btnGate1 = new ToolStripButton();
+            btnGate2 = new ToolStripButton();
+            toolStripSeparator17 = new ToolStripSeparator();
+            btnRecruiter = new ToolStripButton();
+            btnAcademy = new ToolStripButton();
+            toolStripSeparator18 = new ToolStripSeparator();
+            btnWeaponsmith = new ToolStripButton();
+            btnChariot = new ToolStripButton();
+            toolStripSeparator19 = new ToolStripSeparator();
+            btnFort = new ToolStripButton();
+            btnWarship = new ToolStripButton();
+            btnTransportShip = new ToolStripButton();
+            btnHouse4 = new ToolStripButton();
+            btnHouse3 = new ToolStripButton();
+            btnHouse2 = new ToolStripButton();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
             toolStripTerrain.SuspendLayout();
@@ -201,12 +218,13 @@
             toolStripEducation.SuspendLayout();
             toolStripHealth.SuspendLayout();
             toolStripMunicipal.SuspendLayout();
+            toolStripMilitary.SuspendLayout();
             SuspendLayout();
             // 
             // toolStripMain
             // 
             toolStripMain.Dock = DockStyle.Right;
-            toolStripMain.Items.AddRange(new ToolStripItem[] { btnSelect, btnTerrain, btnClear, btnHouse, btnRoad, btnPlaza, btnFood, btnIndustry, btnDistribution, btnEnt, btnReligious, btnEducation, btnHealth, btnMunicipal, btnMilitary });
+            toolStripMain.Items.AddRange(new ToolStripItem[] { btnSelect, btnTerrain, btnClear, btnHouse, btnHouse2, btnHouse3, btnHouse4, btnRoad, btnPlaza, btnFood, btnIndustry, btnDistribution, btnEnt, btnReligious, btnEducation, btnHealth, btnMunicipal, btnMilitary });
             toolStripMain.Location = new Point(1036, 0);
             toolStripMain.Name = "toolStripMain";
             toolStripMain.Size = new Size(39, 743);
@@ -253,7 +271,7 @@
             btnHouse.Name = "btnHouse";
             btnHouse.Size = new Size(36, 19);
             btnHouse.Text = "H";
-            btnHouse.ToolTipText = "Housing";
+            btnHouse.ToolTipText = "Housing 1x1";
             // 
             // btnRoad
             // 
@@ -561,7 +579,7 @@
             toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3 });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
-            toolStripTop.Size = new Size(684, 25);
+            toolStripTop.Size = new Size(673, 25);
             toolStripTop.TabIndex = 4;
             toolStripTop.Text = "toolStrip1";
             // 
@@ -831,7 +849,7 @@
             btnPavilion4.ImageTransparentColor = Color.Magenta;
             btnPavilion4.Name = "btnPavilion4";
             btnPavilion4.Size = new Size(34, 19);
-            btnPavilion4.Text = "Pa6";
+            btnPavilion4.Text = "Pa4";
             btnPavilion4.ToolTipText = "Pavilion4";
             // 
             // btnPavilion5
@@ -841,7 +859,7 @@
             btnPavilion5.ImageTransparentColor = Color.Magenta;
             btnPavilion5.Name = "btnPavilion5";
             btnPavilion5.Size = new Size(34, 19);
-            btnPavilion5.Text = "Pa6";
+            btnPavilion5.Text = "Pa5";
             btnPavilion5.ToolTipText = "Pavilion5";
             // 
             // btnPavilion6
@@ -1689,11 +1707,167 @@
             // toolStripMilitary
             // 
             toolStripMilitary.Dock = DockStyle.Right;
-            toolStripMilitary.Location = new Point(684, 0);
+            toolStripMilitary.Items.AddRange(new ToolStripItem[] { btnWall, btnTower, btnGate1, btnGate2, toolStripSeparator17, btnRecruiter, btnAcademy, toolStripSeparator18, btnWeaponsmith, btnChariot, toolStripSeparator19, btnFort, btnWarship, btnTransportShip });
+            toolStripMilitary.Location = new Point(673, 0);
             toolStripMilitary.Name = "toolStripMilitary";
-            toolStripMilitary.Size = new Size(26, 743);
+            toolStripMilitary.Size = new Size(37, 743);
             toolStripMilitary.TabIndex = 13;
             toolStripMilitary.Text = "toolStrip8";
+            // 
+            // btnWall
+            // 
+            btnWall.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnWall.Image = (Image)resources.GetObject("btnWall.Image");
+            btnWall.ImageTransparentColor = Color.Magenta;
+            btnWall.Name = "btnWall";
+            btnWall.Size = new Size(34, 19);
+            btnWall.Text = "Wal";
+            btnWall.ToolTipText = "Wall";
+            // 
+            // btnTower
+            // 
+            btnTower.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnTower.Image = (Image)resources.GetObject("btnTower.Image");
+            btnTower.ImageTransparentColor = Color.Magenta;
+            btnTower.Name = "btnTower";
+            btnTower.Size = new Size(34, 19);
+            btnTower.Text = "Twr";
+            btnTower.ToolTipText = "Tower";
+            // 
+            // btnGate1
+            // 
+            btnGate1.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnGate1.Image = (Image)resources.GetObject("btnGate1.Image");
+            btnGate1.ImageTransparentColor = Color.Magenta;
+            btnGate1.Name = "btnGate1";
+            btnGate1.Size = new Size(34, 19);
+            btnGate1.Text = "Gt1";
+            btnGate1.ToolTipText = "Gate1";
+            // 
+            // btnGate2
+            // 
+            btnGate2.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnGate2.Image = (Image)resources.GetObject("btnGate2.Image");
+            btnGate2.ImageTransparentColor = Color.Magenta;
+            btnGate2.Name = "btnGate2";
+            btnGate2.Size = new Size(34, 19);
+            btnGate2.Text = "Gt2";
+            btnGate2.ToolTipText = "Gate2";
+            // 
+            // toolStripSeparator17
+            // 
+            toolStripSeparator17.Name = "toolStripSeparator17";
+            toolStripSeparator17.Size = new Size(34, 6);
+            // 
+            // btnRecruiter
+            // 
+            btnRecruiter.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnRecruiter.Image = (Image)resources.GetObject("btnRecruiter.Image");
+            btnRecruiter.ImageTransparentColor = Color.Magenta;
+            btnRecruiter.Name = "btnRecruiter";
+            btnRecruiter.Size = new Size(34, 19);
+            btnRecruiter.Text = "Rcr";
+            btnRecruiter.ToolTipText = "Recruiter";
+            // 
+            // btnAcademy
+            // 
+            btnAcademy.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnAcademy.Image = (Image)resources.GetObject("btnAcademy.Image");
+            btnAcademy.ImageTransparentColor = Color.Magenta;
+            btnAcademy.Name = "btnAcademy";
+            btnAcademy.Size = new Size(34, 19);
+            btnAcademy.Text = "Aca";
+            btnAcademy.ToolTipText = "Academy";
+            // 
+            // toolStripSeparator18
+            // 
+            toolStripSeparator18.Name = "toolStripSeparator18";
+            toolStripSeparator18.Size = new Size(34, 6);
+            // 
+            // btnWeaponsmith
+            // 
+            btnWeaponsmith.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnWeaponsmith.Image = (Image)resources.GetObject("btnWeaponsmith.Image");
+            btnWeaponsmith.ImageTransparentColor = Color.Magenta;
+            btnWeaponsmith.Name = "btnWeaponsmith";
+            btnWeaponsmith.Size = new Size(34, 19);
+            btnWeaponsmith.Text = "Wpn";
+            btnWeaponsmith.ToolTipText = "Weaponsmith";
+            // 
+            // btnChariot
+            // 
+            btnChariot.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnChariot.Image = (Image)resources.GetObject("btnChariot.Image");
+            btnChariot.ImageTransparentColor = Color.Magenta;
+            btnChariot.Name = "btnChariot";
+            btnChariot.Size = new Size(34, 19);
+            btnChariot.Text = "Cha";
+            btnChariot.ToolTipText = "Chariot Maker";
+            // 
+            // toolStripSeparator19
+            // 
+            toolStripSeparator19.Name = "toolStripSeparator19";
+            toolStripSeparator19.Size = new Size(34, 6);
+            // 
+            // btnFort
+            // 
+            btnFort.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnFort.Image = (Image)resources.GetObject("btnFort.Image");
+            btnFort.ImageTransparentColor = Color.Magenta;
+            btnFort.Name = "btnFort";
+            btnFort.Size = new Size(34, 19);
+            btnFort.Text = "Frt";
+            btnFort.ToolTipText = "Fort";
+            // 
+            // btnWarship
+            // 
+            btnWarship.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnWarship.Image = (Image)resources.GetObject("btnWarship.Image");
+            btnWarship.ImageTransparentColor = Color.Magenta;
+            btnWarship.Name = "btnWarship";
+            btnWarship.Size = new Size(34, 19);
+            btnWarship.Text = "WSh";
+            btnWarship.ToolTipText = "Warship";
+            // 
+            // btnTransportShip
+            // 
+            btnTransportShip.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnTransportShip.Image = (Image)resources.GetObject("btnTransportShip.Image");
+            btnTransportShip.ImageTransparentColor = Color.Magenta;
+            btnTransportShip.Name = "btnTransportShip";
+            btnTransportShip.Size = new Size(34, 19);
+            btnTransportShip.Text = "TSh";
+            btnTransportShip.ToolTipText = "Transport Ship";
+            // 
+            // btnHouse4
+            // 
+            btnHouse4.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnHouse4.Image = (Image)resources.GetObject("btnHouse4.Image");
+            btnHouse4.ImageTransparentColor = Color.Magenta;
+            btnHouse4.Name = "btnHouse4";
+            btnHouse4.Size = new Size(36, 19);
+            btnHouse4.Text = "H4";
+            btnHouse4.ToolTipText = "Housing 4x4";
+            // 
+            // btnHouse3
+            // 
+            btnHouse3.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnHouse3.Image = (Image)resources.GetObject("btnHouse3.Image");
+            btnHouse3.ImageTransparentColor = Color.Magenta;
+            btnHouse3.Name = "btnHouse3";
+            btnHouse3.Size = new Size(36, 19);
+            btnHouse3.Text = "H3";
+            btnHouse3.ToolTipText = "Housing 3x3";
+            // 
+            // btnHouse2
+            // 
+            btnHouse2.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnHouse2.Image = (Image)resources.GetObject("btnHouse2.Image");
+            btnHouse2.ImageTransparentColor = Color.Magenta;
+            btnHouse2.Name = "btnHouse2";
+            btnHouse2.Size = new Size(36, 19);
+            btnHouse2.Text = "H2";
+            btnHouse2.ToolTipText = "Housing 2x2";
             // 
             // FormMain
             // 
@@ -1739,6 +1913,8 @@
             toolStripHealth.PerformLayout();
             toolStripMunicipal.ResumeLayout(false);
             toolStripMunicipal.PerformLayout();
+            toolStripMilitary.ResumeLayout(false);
+            toolStripMilitary.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -1904,5 +2080,22 @@
         private ToolStripButton btnMansionPersonal;
         private ToolStripButton btnMansionFamily;
         private ToolStripButton btnMansionDynasty;
+        private ToolStripButton btnWall;
+        private ToolStripButton btnTower;
+        private ToolStripButton btnGate1;
+        private ToolStripSeparator toolStripSeparator17;
+        private ToolStripButton btnRecruiter;
+        private ToolStripButton btnAcademy;
+        private ToolStripSeparator toolStripSeparator18;
+        private ToolStripButton btnWeaponsmith;
+        private ToolStripButton btnChariot;
+        private ToolStripSeparator toolStripSeparator19;
+        private ToolStripButton btnGate2;
+        private ToolStripButton btnFort;
+        private ToolStripButton btnWarship;
+        private ToolStripButton btnTransportShip;
+        private ToolStripButton btnHouse2;
+        private ToolStripButton btnHouse3;
+        private ToolStripButton btnHouse4;
     }
 }

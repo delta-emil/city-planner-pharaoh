@@ -1,4 +1,7 @@
-﻿using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Runtime.InteropServices;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Microsoft.VisualBasic.Devices;
 
 namespace CityPlanner;
 
@@ -8,6 +11,9 @@ public enum MapBuildingType
     Plaza,
     Garden,
     House,
+    House2,
+    House3,
+    House4,
 
     Farm,
     Cattle,
@@ -115,6 +121,21 @@ public enum MapBuildingType
     MansionPersonal,
     MansionFamily,
     MansionDynasty,
+
+    Wall,
+    Tower,
+    GatePath,
+    Gate1,
+    Gate2,
+    Recruiter,
+    Academy,
+    Weaponsmith,
+    Chariot,
+    Fort,
+    FortBuilding,
+    FortYard,
+    Warship,
+    TransportShip,
 }
 
 public static class MapBuildingTypeExtensions
@@ -126,7 +147,10 @@ public static class MapBuildingTypeExtensions
         (1, 1), // Plaza,
         (1, 1), // Garden,
         (1, 1), // House,
-        
+        (2, 2), // House2,
+        (3, 3), // House3,
+        (4, 4), // House4,
+
         (3, 3), // Farm,
         (3, 3), // Cattle,
         (2, 2), // WaterLift,
@@ -233,6 +257,21 @@ public static class MapBuildingTypeExtensions
         (3, 3), // MansionPersonal,
         (4, 4), // MansionFamily,
         (5, 5), // MansionDynasty,
+
+        (1, 1), // Wall,
+        (2, 2), // Tower,
+        (1, 1), // GatePath,
+        (5, 2), // Gate1,
+        (2, 5), // Gate2,
+        (3, 3), // Recruiter,
+        (4, 4), // Academy,
+        (2, 2), // Weaponsmith,
+        (4, 4), // Chariot,
+        (7, 4), // Fort,
+        (3, 3), // FortBuilding,
+        (4, 4), // FortYard,
+        (3, 3), // Warship,
+        (2, 2), // TransportShip,
     };
 
     public static (int range, int start, int stepRange, int stepDiff) GetDesire(this MapBuildingType mapBuildingType) => desires[(int)mapBuildingType];
@@ -242,6 +281,9 @@ public static class MapBuildingTypeExtensions
         (2, 4, 1, -2), // Plaza,
         (3, 3, 1, -1), // Garden,
         (0, 0, 0, 0), // House, // TODO: improve later
+        (0, 0, 0, 0), // House2, // TODO: improve later
+        (0, 0, 0, 0), // House3, // TODO: improve later
+        (0, 0, 0, 0), // House4, // TODO: improve later
         
         (2, -2, 1, 1), // Farm,
         (4, -4, 1, 1), // Cattle,
@@ -349,6 +391,21 @@ public static class MapBuildingTypeExtensions
         (4, 12, 2, -2), // MansionPersonal,
         (5, 20, 2, -3), // MansionFamily,
         (6, 28, 2, -4), // MansionDynasty,
+
+        (0, 0, 0, 0), // Wall,
+        (6, -6, 1, 1), // Tower,
+        (0, 0, 0, 0), // GatePath,
+        (4, -4, 1, 1), // Gate1,
+        (4, -4, 1, 1), // Gate2,
+        (3, -6, 1, 1), // Recruiter,
+        (3, -3, 1, 1), // Academy,
+        (3, -3, 1, 1), // Weaponsmith,
+        (6, -6, 1, 1), // Chariot,
+        (0, 0, 0, 0), // Fort,
+        (6, -20, 2, 2), // FortBuilding,
+        (6, -20, 2, 2), // FortYard,
+        (4, -4, 1, 1), // Warship,
+        (2, -2, 1, 1), // TransportShip,
     };
 
     public static MapBuildingCategory GetCategory(this MapBuildingType mapBuildingType)
@@ -359,6 +416,9 @@ public static class MapBuildingTypeExtensions
             MapBuildingType.Plaza => MapBuildingCategory.Plaza,
             MapBuildingType.Garden => MapBuildingCategory.Beauty,
             MapBuildingType.House => MapBuildingCategory.House,
+            MapBuildingType.House2 => MapBuildingCategory.House,
+            MapBuildingType.House3 => MapBuildingCategory.House,
+            MapBuildingType.House4 => MapBuildingCategory.House,
 
             MapBuildingType.Farm => MapBuildingCategory.Food,
             MapBuildingType.Cattle => MapBuildingCategory.Food,
@@ -467,6 +527,21 @@ public static class MapBuildingTypeExtensions
             MapBuildingType.MansionFamily => MapBuildingCategory.Municipal,
             MapBuildingType.MansionDynasty => MapBuildingCategory.Municipal,
 
+            MapBuildingType.Wall => MapBuildingCategory.Wall,
+            MapBuildingType.Tower => MapBuildingCategory.Military,
+            MapBuildingType.GatePath => MapBuildingCategory.GatePath,
+            MapBuildingType.Gate1 => MapBuildingCategory.Military,
+            MapBuildingType.Gate2 => MapBuildingCategory.Military,
+            MapBuildingType.Recruiter => MapBuildingCategory.Military,
+            MapBuildingType.Academy => MapBuildingCategory.Military,
+            MapBuildingType.Weaponsmith => MapBuildingCategory.Military,
+            MapBuildingType.Chariot => MapBuildingCategory.Military,
+            MapBuildingType.Fort => MapBuildingCategory.Military,
+            MapBuildingType.FortBuilding => MapBuildingCategory.Military,
+            MapBuildingType.FortYard => MapBuildingCategory.Military,
+            MapBuildingType.Warship => MapBuildingCategory.Military,
+            MapBuildingType.TransportShip => MapBuildingCategory.Military,
+
             _ => throw new NotImplementedException(),
         };
     }
@@ -481,6 +556,8 @@ public static class MapBuildingTypeExtensions
             MapBuildingType.Ditch => true,
             MapBuildingType.Roadblock => true,
             MapBuildingType.Bridge => true,
+            MapBuildingType.Wall => true,
+            MapBuildingType.GatePath => true,
             _ => false,
         };
     }
@@ -493,6 +570,9 @@ public static class MapBuildingTypeExtensions
             MapBuildingType.Plaza => false,
             MapBuildingType.Garden => false,
             MapBuildingType.House => false,
+            MapBuildingType.House2 => false,
+            MapBuildingType.House3 => false,
+            MapBuildingType.House4 => false,
             MapBuildingType.Ditch => false,
             MapBuildingType.StorageYardTower => false,
             MapBuildingType.JuggleStage => false,
@@ -501,7 +581,18 @@ public static class MapBuildingTypeExtensions
             MapBuildingType.TempleComplexBuilding => false,
             MapBuildingType.Roadblock => false,
             MapBuildingType.Bridge => false,
+            MapBuildingType.Wall => false,
+            MapBuildingType.GatePath => false,
             _ => true,
+        };
+    }
+
+    public static bool IgnoreMainBuilding(this MapBuildingType mapBuildingType)
+    {
+        return mapBuildingType switch
+        {
+            MapBuildingType.Fort => true,
+            _ => false,
         };
     }
 }

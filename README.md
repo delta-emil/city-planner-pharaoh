@@ -4,8 +4,12 @@ A city planner tool for the classic Pharaoh city builder game.
 
 # TODO
 
-- Add all the buildings
+- fix scolling map view when the main toolbar is touched
+    - maybe don't have separate secondary toolbars?
+    - also happens on selection!
+- nicer display names for buildings
 - undo/redo
+- fix Fort irregular shape
 
 Low prio:
 
