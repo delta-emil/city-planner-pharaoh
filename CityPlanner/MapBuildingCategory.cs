@@ -17,4 +17,11 @@ public enum MapBuildingCategory
     Venue,
     EntSchool,
     Religious,
+    Education,
+    Water,
+    Health,
+    Municipal,
+    Roadblock,
+    Bridge,
+    Ferry,
 }

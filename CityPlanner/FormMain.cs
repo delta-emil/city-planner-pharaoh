@@ -20,6 +20,7 @@ public partial class FormMain : Form
         this.mapControl.MapModel = mapModel;
         this.mapControl.SetSizeToFullMapSize();
 
+
         this.buttonToSecondaryToolbar = new Dictionary<ToolStripButton, ToolStrip>
         {
             { btnTerrain, toolStripTerrain },
@@ -37,6 +38,13 @@ public partial class FormMain : Form
         {
             button.Click += this.MainToolbarSubbarButtonClick;
         }
+
+        //this.toolStripTop.AutoSize = false;
+        //this.toolStripMain.AutoSize = false;
+        //foreach (var toolStrip in this.buttonToSecondaryToolbar.Values)
+        //{
+        //    toolStrip.AutoSize = false;
+        //}
 
         this.ShowHideToolbars(null);
 
@@ -117,6 +125,36 @@ public partial class FormMain : Form
             { btnTempleComplex1, MapBuildingType.TempleComplex1 },
             { btnTempleComplex2, MapBuildingType.TempleComplex2 },
             { btnFestivalSquare, MapBuildingType.FestivalSquare },
+            // education
+            { btnScribeSchool, MapBuildingType.ScribeSchool },
+            { btnLibrary, MapBuildingType.Library },
+            // health
+            { btnWell, MapBuildingType.Well },
+            { btnWaterSupply, MapBuildingType.WaterSupply },
+            { btnPhysician, MapBuildingType.Physician },
+            { btnApothecary, MapBuildingType.Apothecary },
+            { btnDentist, MapBuildingType.Dentist },
+            { btnMortuary, MapBuildingType.Mortuary },
+            // municipal
+            { btnFirehouse, MapBuildingType.Firehouse },
+            { btnArchitect, MapBuildingType.Architect },
+            { btnPolice, MapBuildingType.Police },
+            { btnTax, MapBuildingType.Tax },
+            { btnCourthouse, MapBuildingType.Courthouse },
+            { btnRoadblock, MapBuildingType.Roadblock },
+            { btnBridge, MapBuildingType.Bridge },
+            { btnFerry, MapBuildingType.FerryLanding },
+            { btnGarden, MapBuildingType.Garden },
+            { btnPlaza_another, MapBuildingType.Plaza },
+            { btnStatueSmall, MapBuildingType.StatueSmall },
+            { btnStatueMedium, MapBuildingType.StatueMedium },
+            { btnStatueLarge, MapBuildingType.StatueLarge },
+            { btnPalaceVillage, MapBuildingType.PalaceVillage },
+            { btnPalaceTown, MapBuildingType.PalaceTown },
+            { btnPalaceCity, MapBuildingType.PalaceCity },
+            { btnMansionPersonal, MapBuildingType.MansionPersonal },
+            { btnMansionFamily, MapBuildingType.MansionFamily },
+            { btnMansionDynasty, MapBuildingType.MansionDynasty },
         };
         foreach (var button in this.buttonToBuildingTool.Keys)
         {
@@ -205,10 +243,18 @@ public partial class FormMain : Form
 
     private void ShowHideToolbars(ToolStrip? toolStripToShow)
     {
+        this.SuspendLayout();
+
+        //var scrollPositon = this.canvas.AutoScrollPosition;
+
         foreach (var toolbarStrip in this.buttonToSecondaryToolbar.Values)
         {
             toolbarStrip.Visible = toolbarStrip == toolStripToShow;
         }
+
+        this.ResumeLayout(true);
+
+        //this.canvas.AutoScrollPosition = scrollPositon;
     }
 
     private static void UntickOtherToolbarButtons(ToolStrip toolStrip, ToolStripButton activeOne)
@@ -298,6 +344,17 @@ public partial class FormMain : Form
     private void btnFileSaveAs_Click(object sender, EventArgs e)
     {
         DoSaveDialog();
+    }
+
+    private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        if (this.mapControl.MapModel.IsChanged)
+        {
+            if (!AskToSaveCurrentFile())
+            {
+                e.Cancel = true;
+            }
+        }
     }
 
     private bool AskToSaveCurrentFile()

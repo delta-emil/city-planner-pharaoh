@@ -1,4 +1,6 @@
-﻿namespace CityPlanner;
+﻿using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
+namespace CityPlanner;
 
 public enum MapBuildingType
 {
@@ -82,6 +84,37 @@ public enum MapBuildingType
     TempleComplex2,
     TempleComplexBuilding,
     FestivalSquare,
+
+    ScribeSchool,
+    Library,
+
+    Well,
+    WaterSupply,
+    Physician,
+    Apothecary,
+    Dentist,
+    Mortuary,
+
+    Firehouse,
+    Architect,
+    Police,
+    Tax,
+    Courthouse,
+
+    Roadblock,
+    Bridge,
+    FerryLanding,
+
+    StatueSmall,
+    StatueMedium,
+    StatueLarge,
+
+    PalaceVillage,
+    PalaceTown,
+    PalaceCity,
+    MansionPersonal,
+    MansionFamily,
+    MansionDynasty,
 }
 
 public static class MapBuildingTypeExtensions
@@ -169,6 +202,37 @@ public static class MapBuildingTypeExtensions
         (7, 13), // TempleComplex2,
         (3, 3), // TempleComplexBuilding,
         (5, 5), // FestivalSquare,
+
+        (2, 2), // ScribeSchool,
+        (3, 3), // Library,
+
+        (1, 1), // Well,
+        (2, 2), // WaterSupply,
+        (2, 2), // Physician,
+        (1, 1), // Apothecary,
+        (1, 1), // Dentist,
+        (2, 2), // Mortuary,
+
+        (1, 1), // Firehouse,
+        (1, 1), // Architect,
+        (1, 1), // Police,
+        (2, 2), // Tax,
+        (3, 3), // Courthouse,
+
+        (1, 1), // Roadblock,
+        (1, 1), // Bridge,
+        (2, 2), // FerryLanding,
+
+        (1, 1), // StatueSmall,
+        (2, 2), // StatueMedium,
+        (3, 3), // StatueLarge,
+
+        (4, 4), // PalaceVillage,
+        (5, 5), // PalaceTown,
+        (6, 6), // PalaceCity,
+        (3, 3), // MansionPersonal,
+        (4, 4), // MansionFamily,
+        (5, 5), // MansionDynasty,
     };
 
     public static (int range, int start, int stepRange, int stepDiff) GetDesire(this MapBuildingType mapBuildingType) => desires[(int)mapBuildingType];
@@ -254,6 +318,37 @@ public static class MapBuildingTypeExtensions
         (0, 0, 0, 0), // TempleComplex2,
         (6, 20, 2, -4), // TempleComplexBuilding,
         (5, 16, 2, -3), // FestivalSquare,
+
+        (4, 4, 1, -1), // ScribeSchool,
+        (6, 8, 2, -2), // Library,
+
+        (1, 1, 1, -1), // Well,
+        (4, 4, 1, -1), // WaterSupply,
+        (2, 2, 1, -1), // Physician,
+        (1, 1, 1, -1), // Apothecary,
+        (2, 2, 1, -1), // Dentist,
+        (2, -3, 2, 1), // Mortuary,
+
+        (2, -2, 1, 1), // Firehouse,
+        (0, 0, 0, 0), // Architect,
+        (2, -2, 1, -1), // Police,
+        (3, 3, 1, -1), // Tax,
+        (3, 8, 2, -2), // Courthouse,
+
+        (0, 0, 0, 0), // Roadblock,
+        (0, 0, 0, 0), // Bridge,
+        (4, -5, 2, -2), // FerryLanding,
+
+        (3, 3, 1, -1), // StatueSmall,
+        (4, 10, 1, -2), // StatueMedium,
+        (5, 14, 2, -2), // StatueLarge,
+
+        (4, 20, 2, -4), // PalaceVillage,
+        (5, 22, 2, -5), // PalaceTown,
+        (6, 24, 2, -6), // PalaceCity,
+        (4, 12, 2, -2), // MansionPersonal,
+        (5, 20, 2, -3), // MansionFamily,
+        (6, 28, 2, -4), // MansionDynasty,
     };
 
     public static MapBuildingCategory GetCategory(this MapBuildingType mapBuildingType)
@@ -341,6 +436,37 @@ public static class MapBuildingTypeExtensions
             MapBuildingType.TempleComplexBuilding => MapBuildingCategory.Religious,
             MapBuildingType.FestivalSquare => MapBuildingCategory.Religious,
 
+            MapBuildingType.ScribeSchool => MapBuildingCategory.Education,
+            MapBuildingType.Library => MapBuildingCategory.Education,
+
+            MapBuildingType.Well => MapBuildingCategory.Water,
+            MapBuildingType.WaterSupply => MapBuildingCategory.Water,
+            MapBuildingType.Physician => MapBuildingCategory.Health,
+            MapBuildingType.Apothecary => MapBuildingCategory.Health,
+            MapBuildingType.Dentist => MapBuildingCategory.Health,
+            MapBuildingType.Mortuary => MapBuildingCategory.Health,
+
+            MapBuildingType.Firehouse => MapBuildingCategory.Municipal,
+            MapBuildingType.Architect => MapBuildingCategory.Municipal,
+            MapBuildingType.Police => MapBuildingCategory.Municipal,
+            MapBuildingType.Tax => MapBuildingCategory.Municipal,
+            MapBuildingType.Courthouse => MapBuildingCategory.Municipal,
+
+            MapBuildingType.Roadblock => MapBuildingCategory.Roadblock,
+            MapBuildingType.Bridge => MapBuildingCategory.Bridge,
+            MapBuildingType.FerryLanding => MapBuildingCategory.Ferry,
+
+            MapBuildingType.StatueSmall => MapBuildingCategory.Beauty,
+            MapBuildingType.StatueMedium => MapBuildingCategory.Beauty,
+            MapBuildingType.StatueLarge => MapBuildingCategory.Beauty,
+
+            MapBuildingType.PalaceVillage => MapBuildingCategory.Municipal,
+            MapBuildingType.PalaceTown => MapBuildingCategory.Municipal,
+            MapBuildingType.PalaceCity => MapBuildingCategory.Municipal,
+            MapBuildingType.MansionPersonal => MapBuildingCategory.Municipal,
+            MapBuildingType.MansionFamily => MapBuildingCategory.Municipal,
+            MapBuildingType.MansionDynasty => MapBuildingCategory.Municipal,
+
             _ => throw new NotImplementedException(),
         };
     }
@@ -353,6 +479,8 @@ public static class MapBuildingTypeExtensions
             MapBuildingType.Plaza => true,
             MapBuildingType.Garden => true,
             MapBuildingType.Ditch => true,
+            MapBuildingType.Roadblock => true,
+            MapBuildingType.Bridge => true,
             _ => false,
         };
     }
@@ -371,6 +499,8 @@ public static class MapBuildingTypeExtensions
             MapBuildingType.MusicStage => false,
             MapBuildingType.DanceStage => false,
             MapBuildingType.TempleComplexBuilding => false,
+            MapBuildingType.Roadblock => false,
+            MapBuildingType.Bridge => false,
             _ => true,
         };
     }

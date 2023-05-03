@@ -76,6 +76,13 @@ public partial class MapCanvasControl : Control
             new SolidBrush(Color.FromArgb(172, 189, 208)), // Venue,
             new SolidBrush(Color.FromArgb(50, 115, 181)), // EntSchool,
             new SolidBrush(Color.FromArgb(191, 129, 158)), // Religious,
+            new SolidBrush(Color.FromArgb(212, 234, 107)), // Education,
+            new SolidBrush(Color.FromArgb(170, 220, 247)), // Water,
+            new SolidBrush(Color.FromArgb(247, 209, 213)), // Health,
+            new SolidBrush(Color.FromArgb(129, 172, 166)), // Municipal,
+            new HatchBrush(HatchStyle.DiagonalCross, Color.Red, Color.FromArgb(191, 181, 166)), // Roadblock,
+            new HatchBrush(HatchStyle.HorizontalBrick, Color.FromArgb(33, 81, 82), Color.FromArgb(191, 181, 166)), // Bridge,
+            new HatchBrush(HatchStyle.HorizontalBrick, Color.FromArgb(191, 181, 166), Color.FromArgb(129, 172, 166)), // Ferry,
         };
 
         // mostly for the designer preview
