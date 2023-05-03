@@ -35,6 +35,9 @@
             btnTerrain = new ToolStripButton();
             btnClear = new ToolStripButton();
             btnHouse = new ToolStripButton();
+            btnHouse2 = new ToolStripButton();
+            btnHouse3 = new ToolStripButton();
+            btnHouse4 = new ToolStripButton();
             btnRoad = new ToolStripButton();
             btnPlaza = new ToolStripButton();
             btnFood = new ToolStripButton();
@@ -203,9 +206,6 @@
             btnFort = new ToolStripButton();
             btnWarship = new ToolStripButton();
             btnTransportShip = new ToolStripButton();
-            btnHouse4 = new ToolStripButton();
-            btnHouse3 = new ToolStripButton();
-            btnHouse2 = new ToolStripButton();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
             toolStripTerrain.SuspendLayout();
@@ -272,6 +272,36 @@
             btnHouse.Size = new Size(36, 19);
             btnHouse.Text = "H";
             btnHouse.ToolTipText = "Housing 1x1";
+            // 
+            // btnHouse2
+            // 
+            btnHouse2.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnHouse2.Image = (Image)resources.GetObject("btnHouse2.Image");
+            btnHouse2.ImageTransparentColor = Color.Magenta;
+            btnHouse2.Name = "btnHouse2";
+            btnHouse2.Size = new Size(36, 19);
+            btnHouse2.Text = "H2";
+            btnHouse2.ToolTipText = "Housing 2x2";
+            // 
+            // btnHouse3
+            // 
+            btnHouse3.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnHouse3.Image = (Image)resources.GetObject("btnHouse3.Image");
+            btnHouse3.ImageTransparentColor = Color.Magenta;
+            btnHouse3.Name = "btnHouse3";
+            btnHouse3.Size = new Size(36, 19);
+            btnHouse3.Text = "H3";
+            btnHouse3.ToolTipText = "Housing 3x3";
+            // 
+            // btnHouse4
+            // 
+            btnHouse4.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnHouse4.Image = (Image)resources.GetObject("btnHouse4.Image");
+            btnHouse4.ImageTransparentColor = Color.Magenta;
+            btnHouse4.Name = "btnHouse4";
+            btnHouse4.Size = new Size(36, 19);
+            btnHouse4.Text = "H4";
+            btnHouse4.ToolTipText = "Housing 4x4";
             // 
             // btnRoad
             // 
@@ -576,6 +606,7 @@
             // 
             // toolStripTop
             // 
+            toolStripTop.AutoSize = false;
             toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3 });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
@@ -1838,36 +1869,6 @@
             btnTransportShip.Size = new Size(34, 19);
             btnTransportShip.Text = "TSh";
             btnTransportShip.ToolTipText = "Transport Ship";
-            // 
-            // btnHouse4
-            // 
-            btnHouse4.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            btnHouse4.Image = (Image)resources.GetObject("btnHouse4.Image");
-            btnHouse4.ImageTransparentColor = Color.Magenta;
-            btnHouse4.Name = "btnHouse4";
-            btnHouse4.Size = new Size(36, 19);
-            btnHouse4.Text = "H4";
-            btnHouse4.ToolTipText = "Housing 4x4";
-            // 
-            // btnHouse3
-            // 
-            btnHouse3.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            btnHouse3.Image = (Image)resources.GetObject("btnHouse3.Image");
-            btnHouse3.ImageTransparentColor = Color.Magenta;
-            btnHouse3.Name = "btnHouse3";
-            btnHouse3.Size = new Size(36, 19);
-            btnHouse3.Text = "H3";
-            btnHouse3.ToolTipText = "Housing 3x3";
-            // 
-            // btnHouse2
-            // 
-            btnHouse2.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            btnHouse2.Image = (Image)resources.GetObject("btnHouse2.Image");
-            btnHouse2.ImageTransparentColor = Color.Magenta;
-            btnHouse2.Name = "btnHouse2";
-            btnHouse2.Size = new Size(36, 19);
-            btnHouse2.Text = "H2";
-            btnHouse2.ToolTipText = "Housing 2x2";
             // 
             // FormMain
             // 
