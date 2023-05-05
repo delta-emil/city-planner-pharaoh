@@ -17,7 +17,7 @@ public class MapModel
         {
             for (int cellY = 0; cellY < MapSideY; cellY++)
             {
-                this.Cells[cellX, cellY] = new MapCellModel();
+                this.Cells[cellX, cellY] = new MapCellModel { Terrain = MapTerrain.Grass };
             }
         }
 
@@ -78,7 +78,13 @@ public class MapModel
         {
             for (int cellY = top; cellY < top + size.height; cellY++)
             {
-                var existingBuilding = this.Cells[cellX, cellY].Building;
+                MapCellModel mapCellModel = this.Cells[cellX, cellY];
+                if (mapCellModel.Terrain == MapTerrain.Void)
+                {
+                    return false;
+                }
+
+                var existingBuilding = mapCellModel.Building;
                 if (existingBuilding != null && (ignoredBuildings == null || !ignoredBuildings.Contains(existingBuilding)))
                 {
                     // plaza can overwrite Road

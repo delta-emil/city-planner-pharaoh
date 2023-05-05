@@ -178,6 +178,7 @@ public partial class FormMain : Form
 
         this.buttonToTerrainTool = new Dictionary<ToolStripButton, MapTerrain>
         {
+            { btnTerrainVoid, MapTerrain.Void },
             { btnTerrainGrass, MapTerrain.Grass },
             { btnTerrainGrassFamrland, MapTerrain.GrassFarmland },
             { btnTerrainSand, MapTerrain.Sand },
@@ -189,6 +190,8 @@ public partial class FormMain : Form
             { btnTerrainFloodEdge, MapTerrain.FloodpainEdge },
             { btnTerrainWater, MapTerrain.Water },
             { btnTerrainWaterEdge, MapTerrain.WaterEdge },
+            { btnTerrainTrees, MapTerrain.Trees },
+            { btnTerrainReeds, MapTerrain.Reeds },
         };
         foreach (var button in this.buttonToTerrainTool.Keys)
         {
@@ -468,5 +471,6 @@ public partial class FormMain : Form
     private void mapControl_SelectionChanged(object sender, MapSelectionChangeEventArgs e)
     {
         this.toolStripLabelRoadLength.Text = e.SelectedRoadLength.ToString();
+        this.toolStrip2x2HouseCount.Text = e.Selected2x2HouseCount.ToString();
     }
 }

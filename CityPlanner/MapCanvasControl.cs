@@ -46,6 +46,7 @@ public partial class MapCanvasControl : Control
 
         this.terrainBrushes = new Brush[]
         {
+            new SolidBrush(Color.Black), // Void,
             new SolidBrush(Color.FromArgb(157, 198, 121)), // Grass,
             new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(255, 216, 0), Color.FromArgb(157, 198, 121)), // GrassFarmland,
             new SolidBrush(Color.FromArgb(224, 205, 170)), // Sand,
@@ -57,6 +58,8 @@ public partial class MapCanvasControl : Control
             new SolidBrush(Color.FromArgb(94, 75, 71)), // FloodpainEdge,
             new SolidBrush(Color.FromArgb(33, 81, 82)), // Water,
             new SolidBrush(Color.FromArgb(62, 78, 79)), // WaterEdge,
+            new HatchBrush(HatchStyle.Wave, Color.Brown, Color.Green), // Trees,
+            new HatchBrush(HatchStyle.Wave, Color.Blue, Color.Green), // Reeds,
         };
 
         this.buildingBrushes = new Brush[]
@@ -741,7 +744,12 @@ public partial class MapCanvasControl : Control
         if (this.SelectionChanged != null)
         {
             var roadLength = this.selectedBuildings.Count(building => building.BuildingType is MapBuildingType.Road or MapBuildingType.Plaza);
-            var args = new MapSelectionChangeEventArgs { SelectedRoadLength = roadLength };
+            var house2x2Count = this.selectedBuildings.Count(building => building.BuildingType is MapBuildingType.House2);
+            var args = new MapSelectionChangeEventArgs
+            {
+                SelectedRoadLength = roadLength,
+                Selected2x2HouseCount = house2x2Count,
+            };
             this.SelectionChanged(this, args);
         }
     }

@@ -52,6 +52,7 @@
             canvas = new Panel();
             mapControl = new MapCanvasControl();
             toolStripTerrain = new ToolStrip();
+            btnTerrainVoid = new ToolStripButton();
             btnTerrainGrass = new ToolStripButton();
             btnTerrainGrassFamrland = new ToolStripButton();
             btnTerrainSand = new ToolStripButton();
@@ -63,6 +64,8 @@
             btnTerrainFloodEdge = new ToolStripButton();
             btnTerrainWater = new ToolStripButton();
             btnTerrainWaterEdge = new ToolStripButton();
+            btnTerrainTrees = new ToolStripButton();
+            btnTerrainReeds = new ToolStripButton();
             toolStripDist = new ToolStrip();
             btnBazaar = new ToolStripButton();
             btnGranary = new ToolStripButton();
@@ -78,6 +81,8 @@
             btnFilterDesire = new ToolStripButton();
             toolStripLabelRoadLengthLabel = new ToolStripLabel();
             toolStripLabelRoadLength = new ToolStripLabel();
+            toolStripLabel1 = new ToolStripLabel();
+            toolStrip2x2HouseCount = new ToolStripLabel();
             toolStripSeparator2 = new ToolStripSeparator();
             btnCutBuildings = new ToolStripButton();
             btnCopyBuildings = new ToolStripButton();
@@ -206,6 +211,7 @@
             btnFort = new ToolStripButton();
             btnWarship = new ToolStripButton();
             btnTransportShip = new ToolStripButton();
+            toolStripSeparator20 = new ToolStripSeparator();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
             toolStripTerrain.SuspendLayout();
@@ -225,9 +231,9 @@
             // 
             toolStripMain.Dock = DockStyle.Right;
             toolStripMain.Items.AddRange(new ToolStripItem[] { btnSelect, btnTerrain, btnClear, btnHouse, btnHouse2, btnHouse3, btnHouse4, btnRoad, btnPlaza, btnFood, btnIndustry, btnDistribution, btnEnt, btnReligious, btnEducation, btnHealth, btnMunicipal, btnMilitary });
-            toolStripMain.Location = new Point(1036, 0);
+            toolStripMain.Location = new Point(1285, 0);
             toolStripMain.Name = "toolStripMain";
-            toolStripMain.Size = new Size(39, 743);
+            toolStripMain.Size = new Size(39, 837);
             toolStripMain.TabIndex = 0;
             toolStripMain.Text = "toolStrip1";
             // 
@@ -417,7 +423,7 @@
             canvas.Controls.Add(mapControl);
             canvas.Location = new Point(0, 28);
             canvas.Name = "canvas";
-            canvas.Size = new Size(990, 710);
+            canvas.Size = new Size(1239, 804);
             canvas.TabIndex = 1;
             // 
             // mapControl
@@ -439,12 +445,21 @@
             // toolStripTerrain
             // 
             toolStripTerrain.Dock = DockStyle.Right;
-            toolStripTerrain.Items.AddRange(new ToolStripItem[] { btnTerrainGrass, btnTerrainGrassFamrland, btnTerrainSand, btnTerrainSandFamrland, btnTerrainRock, btnTerrainRockOre, btnTerrainDune, btnTerrainFlood, btnTerrainFloodEdge, btnTerrainWater, btnTerrainWaterEdge });
-            toolStripTerrain.Location = new Point(1000, 0);
+            toolStripTerrain.Items.AddRange(new ToolStripItem[] { btnTerrainVoid, btnTerrainGrass, btnTerrainGrassFamrland, btnTerrainSand, btnTerrainSandFamrland, btnTerrainRock, btnTerrainRockOre, btnTerrainDune, btnTerrainFlood, btnTerrainFloodEdge, btnTerrainWater, btnTerrainWaterEdge, btnTerrainTrees, btnTerrainReeds });
+            toolStripTerrain.Location = new Point(1247, 0);
             toolStripTerrain.Name = "toolStripTerrain";
-            toolStripTerrain.Size = new Size(36, 743);
+            toolStripTerrain.Size = new Size(38, 837);
             toolStripTerrain.TabIndex = 2;
             toolStripTerrain.Text = "toolStrip1";
+            // 
+            // btnTerrainVoid
+            // 
+            btnTerrainVoid.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnTerrainVoid.Image = (Image)resources.GetObject("btnTerrainVoid.Image");
+            btnTerrainVoid.ImageTransparentColor = Color.Magenta;
+            btnTerrainVoid.Name = "btnTerrainVoid";
+            btnTerrainVoid.Size = new Size(35, 19);
+            btnTerrainVoid.Text = "Void";
             // 
             // btnTerrainGrass
             // 
@@ -452,7 +467,7 @@
             btnTerrainGrass.Image = (Image)resources.GetObject("btnTerrainGrass.Image");
             btnTerrainGrass.ImageTransparentColor = Color.Magenta;
             btnTerrainGrass.Name = "btnTerrainGrass";
-            btnTerrainGrass.Size = new Size(33, 19);
+            btnTerrainGrass.Size = new Size(35, 19);
             btnTerrainGrass.Text = "G";
             btnTerrainGrass.ToolTipText = "Grass - free with water";
             // 
@@ -462,7 +477,7 @@
             btnTerrainGrassFamrland.Image = (Image)resources.GetObject("btnTerrainGrassFamrland.Image");
             btnTerrainGrassFamrland.ImageTransparentColor = Color.Magenta;
             btnTerrainGrassFamrland.Name = "btnTerrainGrassFamrland";
-            btnTerrainGrassFamrland.Size = new Size(33, 19);
+            btnTerrainGrassFamrland.Size = new Size(35, 19);
             btnTerrainGrassFamrland.Text = "G+F";
             btnTerrainGrassFamrland.ToolTipText = "Grass Farmland";
             // 
@@ -472,7 +487,7 @@
             btnTerrainSand.Image = (Image)resources.GetObject("btnTerrainSand.Image");
             btnTerrainSand.ImageTransparentColor = Color.Magenta;
             btnTerrainSand.Name = "btnTerrainSand";
-            btnTerrainSand.Size = new Size(33, 19);
+            btnTerrainSand.Size = new Size(35, 19);
             btnTerrainSand.Text = "S";
             btnTerrainSand.ToolTipText = "Sand - free w/o water";
             // 
@@ -482,7 +497,7 @@
             btnTerrainSandFamrland.Image = (Image)resources.GetObject("btnTerrainSandFamrland.Image");
             btnTerrainSandFamrland.ImageTransparentColor = Color.Magenta;
             btnTerrainSandFamrland.Name = "btnTerrainSandFamrland";
-            btnTerrainSandFamrland.Size = new Size(33, 19);
+            btnTerrainSandFamrland.Size = new Size(35, 19);
             btnTerrainSandFamrland.Text = "S+F";
             btnTerrainSandFamrland.ToolTipText = "Sand Farmland";
             // 
@@ -492,7 +507,7 @@
             btnTerrainRock.Image = (Image)resources.GetObject("btnTerrainRock.Image");
             btnTerrainRock.ImageTransparentColor = Color.Magenta;
             btnTerrainRock.Name = "btnTerrainRock";
-            btnTerrainRock.Size = new Size(33, 19);
+            btnTerrainRock.Size = new Size(35, 19);
             btnTerrainRock.Text = "R";
             btnTerrainRock.ToolTipText = "Rocks";
             // 
@@ -502,7 +517,7 @@
             btnTerrainRockOre.Image = (Image)resources.GetObject("btnTerrainRockOre.Image");
             btnTerrainRockOre.ImageTransparentColor = Color.Magenta;
             btnTerrainRockOre.Name = "btnTerrainRockOre";
-            btnTerrainRockOre.Size = new Size(33, 19);
+            btnTerrainRockOre.Size = new Size(35, 19);
             btnTerrainRockOre.Text = "R+O";
             btnTerrainRockOre.ToolTipText = "Rocks with Ore";
             // 
@@ -512,7 +527,7 @@
             btnTerrainDune.Image = (Image)resources.GetObject("btnTerrainDune.Image");
             btnTerrainDune.ImageTransparentColor = Color.Magenta;
             btnTerrainDune.Name = "btnTerrainDune";
-            btnTerrainDune.Size = new Size(33, 19);
+            btnTerrainDune.Size = new Size(35, 19);
             btnTerrainDune.Text = "Du";
             btnTerrainDune.ToolTipText = "Dunes";
             // 
@@ -522,7 +537,7 @@
             btnTerrainFlood.Image = (Image)resources.GetObject("btnTerrainFlood.Image");
             btnTerrainFlood.ImageTransparentColor = Color.Magenta;
             btnTerrainFlood.Name = "btnTerrainFlood";
-            btnTerrainFlood.Size = new Size(33, 19);
+            btnTerrainFlood.Size = new Size(35, 19);
             btnTerrainFlood.Text = "F";
             btnTerrainFlood.ToolTipText = "Floorplains";
             // 
@@ -532,7 +547,7 @@
             btnTerrainFloodEdge.Image = (Image)resources.GetObject("btnTerrainFloodEdge.Image");
             btnTerrainFloodEdge.ImageTransparentColor = Color.Magenta;
             btnTerrainFloodEdge.Name = "btnTerrainFloodEdge";
-            btnTerrainFloodEdge.Size = new Size(33, 19);
+            btnTerrainFloodEdge.Size = new Size(35, 19);
             btnTerrainFloodEdge.Text = "F/e";
             btnTerrainFloodEdge.ToolTipText = "Floorplain bank";
             // 
@@ -542,7 +557,7 @@
             btnTerrainWater.Image = (Image)resources.GetObject("btnTerrainWater.Image");
             btnTerrainWater.ImageTransparentColor = Color.Magenta;
             btnTerrainWater.Name = "btnTerrainWater";
-            btnTerrainWater.Size = new Size(33, 19);
+            btnTerrainWater.Size = new Size(35, 19);
             btnTerrainWater.Text = "W";
             btnTerrainWater.ToolTipText = "Water";
             // 
@@ -552,17 +567,35 @@
             btnTerrainWaterEdge.Image = (Image)resources.GetObject("btnTerrainWaterEdge.Image");
             btnTerrainWaterEdge.ImageTransparentColor = Color.Magenta;
             btnTerrainWaterEdge.Name = "btnTerrainWaterEdge";
-            btnTerrainWaterEdge.Size = new Size(33, 19);
+            btnTerrainWaterEdge.Size = new Size(35, 19);
             btnTerrainWaterEdge.Text = "W/e";
             btnTerrainWaterEdge.ToolTipText = "Water bank";
+            // 
+            // btnTerrainTrees
+            // 
+            btnTerrainTrees.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnTerrainTrees.Image = (Image)resources.GetObject("btnTerrainTrees.Image");
+            btnTerrainTrees.ImageTransparentColor = Color.Magenta;
+            btnTerrainTrees.Name = "btnTerrainTrees";
+            btnTerrainTrees.Size = new Size(35, 19);
+            btnTerrainTrees.Text = "Tree";
+            // 
+            // btnTerrainReeds
+            // 
+            btnTerrainReeds.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnTerrainReeds.Image = (Image)resources.GetObject("btnTerrainReeds.Image");
+            btnTerrainReeds.ImageTransparentColor = Color.Magenta;
+            btnTerrainReeds.Name = "btnTerrainReeds";
+            btnTerrainReeds.Size = new Size(35, 19);
+            btnTerrainReeds.Text = "Reed";
             // 
             // toolStripDist
             // 
             toolStripDist.Dock = DockStyle.Right;
             toolStripDist.Items.AddRange(new ToolStripItem[] { btnBazaar, btnGranary, btnStorageYard, btnDock });
-            toolStripDist.Location = new Point(961, 0);
+            toolStripDist.Location = new Point(1208, 0);
             toolStripDist.Name = "toolStripDist";
-            toolStripDist.Size = new Size(39, 743);
+            toolStripDist.Size = new Size(39, 837);
             toolStripDist.TabIndex = 3;
             toolStripDist.Text = "toolStrip1";
             // 
@@ -607,10 +640,10 @@
             // toolStripTop
             // 
             toolStripTop.AutoSize = false;
-            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3 });
+            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3 });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
-            toolStripTop.Size = new Size(673, 25);
+            toolStripTop.Size = new Size(920, 25);
             toolStripTop.TabIndex = 4;
             toolStripTop.Text = "toolStrip1";
             // 
@@ -699,6 +732,20 @@
             toolStripLabelRoadLength.Text = "0";
             toolStripLabelRoadLength.TextAlign = ContentAlignment.MiddleRight;
             // 
+            // toolStripLabel1
+            // 
+            toolStripLabel1.Name = "toolStripLabel1";
+            toolStripLabel1.Size = new Size(40, 22);
+            toolStripLabel1.Text = "2x2 H:";
+            // 
+            // toolStrip2x2HouseCount
+            // 
+            toolStrip2x2HouseCount.AutoSize = false;
+            toolStrip2x2HouseCount.Name = "toolStrip2x2HouseCount";
+            toolStrip2x2HouseCount.Size = new Size(25, 22);
+            toolStrip2x2HouseCount.Text = "100";
+            toolStrip2x2HouseCount.TextAlign = ContentAlignment.MiddleRight;
+            // 
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
@@ -747,9 +794,9 @@
             // 
             toolStripEnt.Dock = DockStyle.Right;
             toolStripEnt.Items.AddRange(new ToolStripItem[] { btnBooth1, btnBooth2, btnBooth3, btnBooth4, toolStripSeparator4, btnBandstand1, btnBandstand2, btnBandstand3, btnBandstand4, toolStripSeparator5, btnPavilion1, btnPavilion2, btnPavilion3, btnPavilion4, btnPavilion5, btnPavilion6, btnPavilion7, btnPavilion8, btnPavilion9, btnPavilion10, btnPavilion11, toolStripSeparator6, btnJugglerSchool, btnMusicSchool, btnDanceSchool, toolStripSeparator10, btnSenet, btnZoo });
-            toolStripEnt.Location = new Point(924, 0);
+            toolStripEnt.Location = new Point(1171, 0);
             toolStripEnt.Name = "toolStripEnt";
-            toolStripEnt.Size = new Size(37, 743);
+            toolStripEnt.Size = new Size(37, 837);
             toolStripEnt.TabIndex = 5;
             toolStripEnt.Text = "toolStrip1";
             // 
@@ -1016,9 +1063,9 @@
             // 
             toolStripFood.Dock = DockStyle.Right;
             toolStripFood.Items.AddRange(new ToolStripItem[] { btnFarm, btnCattle, btnWaterLift, btnDitch, btnHunter, btnFisher, btnWorkCamp });
-            toolStripFood.Location = new Point(885, 0);
+            toolStripFood.Location = new Point(1132, 0);
             toolStripFood.Name = "toolStripFood";
-            toolStripFood.Size = new Size(39, 743);
+            toolStripFood.Size = new Size(39, 837);
             toolStripFood.TabIndex = 6;
             toolStripFood.Text = "toolStrip1";
             // 
@@ -1095,9 +1142,9 @@
             // 
             toolStripIndustry.Dock = DockStyle.Right;
             toolStripIndustry.Items.AddRange(new ToolStripItem[] { btnPlainStone, btnLimeStone, btnSandStone, btnGranite, btnGemstone, btnCopper, btnGold, toolStripSeparator7, btnClay, btnReed, btnWood, toolStripSeparator8, btnPotter, btnBrewery, btnPapyrus, btnWeaver, btnJeweler, btnBricks, btnLamp, btnPaint, btnShipwright, toolStripSeparator9, btnBricklayers, btnCarpernters, btnStonemasons, btnArtisans });
-            toolStripIndustry.Location = new Point(847, 0);
+            toolStripIndustry.Location = new Point(1094, 0);
             toolStripIndustry.Name = "toolStripIndustry";
-            toolStripIndustry.Size = new Size(38, 743);
+            toolStripIndustry.Size = new Size(38, 837);
             toolStripIndustry.TabIndex = 7;
             toolStripIndustry.Text = "toolStrip2";
             // 
@@ -1350,9 +1397,9 @@
             // 
             toolStripReligious.Dock = DockStyle.Right;
             toolStripReligious.Items.AddRange(new ToolStripItem[] { btnShrine, btnTemple, btnTempleComplex1, btnTempleComplex2, btnFestivalSquare, toolStripSeparator11 });
-            toolStripReligious.Location = new Point(813, 0);
+            toolStripReligious.Location = new Point(1060, 0);
             toolStripReligious.Name = "toolStripReligious";
-            toolStripReligious.Size = new Size(34, 743);
+            toolStripReligious.Size = new Size(34, 837);
             toolStripReligious.TabIndex = 9;
             toolStripReligious.Text = "toolStrip4";
             // 
@@ -1415,9 +1462,9 @@
             // 
             toolStripEducation.Dock = DockStyle.Right;
             toolStripEducation.Items.AddRange(new ToolStripItem[] { btnScribeSchool, btnLibrary });
-            toolStripEducation.Location = new Point(782, 0);
+            toolStripEducation.Location = new Point(1029, 0);
             toolStripEducation.Name = "toolStripEducation";
-            toolStripEducation.Size = new Size(31, 743);
+            toolStripEducation.Size = new Size(31, 837);
             toolStripEducation.TabIndex = 10;
             toolStripEducation.Text = "toolStrip5";
             // 
@@ -1445,9 +1492,9 @@
             // 
             toolStripHealth.Dock = DockStyle.Right;
             toolStripHealth.Items.AddRange(new ToolStripItem[] { btnWell, btnWaterSupply, toolStripSeparator12, btnPhysician, btnApothecary, btnDentist, btnMortuary });
-            toolStripHealth.Location = new Point(747, 0);
+            toolStripHealth.Location = new Point(994, 0);
             toolStripHealth.Name = "toolStripHealth";
-            toolStripHealth.Size = new Size(35, 743);
+            toolStripHealth.Size = new Size(35, 837);
             toolStripHealth.TabIndex = 11;
             toolStripHealth.Text = "toolStrip6";
             // 
@@ -1519,9 +1566,9 @@
             // 
             toolStripMunicipal.Dock = DockStyle.Right;
             toolStripMunicipal.Items.AddRange(new ToolStripItem[] { btnFirehouse, btnArchitect, btnPolice, btnTax, btnCourthouse, toolStripSeparator13, btnRoadblock, btnBridge, btnFerry, toolStripSeparator14, btnGarden, btnPlaza_another, btnStatueSmall, btnStatueMedium, btnStatueLarge, toolStripSeparator15, btnPalaceVillage, btnPalaceTown, btnPalaceCity, toolStripSeparator16, btnMansionPersonal, btnMansionFamily, btnMansionDynasty });
-            toolStripMunicipal.Location = new Point(710, 0);
+            toolStripMunicipal.Location = new Point(957, 0);
             toolStripMunicipal.Name = "toolStripMunicipal";
-            toolStripMunicipal.Size = new Size(37, 743);
+            toolStripMunicipal.Size = new Size(37, 837);
             toolStripMunicipal.TabIndex = 12;
             toolStripMunicipal.Text = "toolStrip7";
             // 
@@ -1739,9 +1786,9 @@
             // 
             toolStripMilitary.Dock = DockStyle.Right;
             toolStripMilitary.Items.AddRange(new ToolStripItem[] { btnWall, btnTower, btnGate1, btnGate2, toolStripSeparator17, btnRecruiter, btnAcademy, toolStripSeparator18, btnWeaponsmith, btnChariot, toolStripSeparator19, btnFort, btnWarship, btnTransportShip });
-            toolStripMilitary.Location = new Point(673, 0);
+            toolStripMilitary.Location = new Point(920, 0);
             toolStripMilitary.Name = "toolStripMilitary";
-            toolStripMilitary.Size = new Size(37, 743);
+            toolStripMilitary.Size = new Size(37, 837);
             toolStripMilitary.TabIndex = 13;
             toolStripMilitary.Text = "toolStrip8";
             // 
@@ -1870,11 +1917,16 @@
             btnTransportShip.Text = "TSh";
             btnTransportShip.ToolTipText = "Transport Ship";
             // 
+            // toolStripSeparator20
+            // 
+            toolStripSeparator20.Name = "toolStripSeparator20";
+            toolStripSeparator20.Size = new Size(6, 25);
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1075, 743);
+            ClientSize = new Size(1324, 837);
             Controls.Add(toolStripTop);
             Controls.Add(toolStripMilitary);
             Controls.Add(toolStripMunicipal);
@@ -2098,5 +2150,11 @@
         private ToolStripButton btnHouse2;
         private ToolStripButton btnHouse3;
         private ToolStripButton btnHouse4;
+        private ToolStripButton btnTerrainVoid;
+        private ToolStripButton btnTerrainTrees;
+        private ToolStripButton btnTerrainReeds;
+        private ToolStripLabel toolStripLabel1;
+        private ToolStripLabel toolStrip2x2HouseCount;
+        private ToolStripSeparator toolStripSeparator20;
     }
 }

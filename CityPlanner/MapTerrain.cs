@@ -2,7 +2,8 @@
 
 public enum MapTerrain
 {
-    Grass = 0,
+    Void = 0, // TODO: add button
+    Grass,
     GrassFarmland,
     Sand,
     SandFarmland,
@@ -13,4 +14,6 @@ public enum MapTerrain
     FloodpainEdge,
     Water,
     WaterEdge,
+    Trees, // TODO: add button
+    Reeds, // TODO: add button
 }
