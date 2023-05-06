@@ -1,4 +1,8 @@
-﻿/*
+﻿// This class is a C# port of a C++ class found here:
+// http://pecunia.nerdcamp.net/downloads/citybuilding
+// With the following license:
+
+/*   Citybuilding Mappers - create minimaps from citybuilding game files
  * This class is a C# port of a C++ class found here:
  * http://pecunia.nerdcamp.net/downloads/citybuilding
  * With the following license:
