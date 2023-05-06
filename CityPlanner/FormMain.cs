@@ -568,4 +568,23 @@ public partial class FormMain : Form
     }
 
     #endregion
+
+    private void canvas_Zoom(object arg1, ZoomEventArgs e)
+    {
+        var newSize = this.mapControl.CellSideLength + e.Delta * 2;
+        this.mapControl.CellSideLength = newSize;
+    }
+
+    private void FormMain_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Escape)
+        {
+            if (!this.mapControl.Tool.IsEmpty)
+            {
+                this.mapControl.Tool = new Tool();
+            }
+            e.Handled = true;
+            e.SuppressKeyPress = true;
+        }
+    }
 }

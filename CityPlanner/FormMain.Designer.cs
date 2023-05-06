@@ -48,10 +48,11 @@
             btnHealth = new ToolStripButton();
             btnMunicipal = new ToolStripButton();
             btnMilitary = new ToolStripButton();
-            canvas = new Panel();
+            canvas = new SanelyScolledPanel();
             mapControl = new MapCanvasControl();
             toolStripTop = new ToolStrip();
             btnFileNew = new ToolStripButton();
+            btnNewFromGameSave = new ToolStripButton();
             btnFileOpen = new ToolStripButton();
             btnFileSave = new ToolStripButton();
             btnFileSaveAs = new ToolStripButton();
@@ -71,7 +72,6 @@
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             toolStripSecondary = new ToolStrip();
-            btnNewFromGameSave = new ToolStripButton();
             openFileDialogImport = new OpenFileDialog();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
@@ -242,9 +242,11 @@
             canvas.Name = "canvas";
             canvas.Size = new Size(1243, 804);
             canvas.TabIndex = 1;
+            canvas.Zoom += canvas_Zoom;
             // 
             // mapControl
             // 
+            mapControl.CellSideLength = 24;
             mapControl.Location = new Point(0, 0);
             mapControl.Name = "mapControl";
             mapControl.ShowBuildings = false;
@@ -276,6 +278,14 @@
             btnFileNew.Size = new Size(35, 22);
             btnFileNew.Text = "New";
             btnFileNew.Click += btnFileNew_Click;
+            // 
+            // btnNewFromGameSave
+            // 
+            btnNewFromGameSave.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnNewFromGameSave.Name = "btnNewFromGameSave";
+            btnNewFromGameSave.Size = new Size(132, 22);
+            btnNewFromGameSave.Text = "New from game save...";
+            btnNewFromGameSave.Click += btnNewFromGameSave_Click;
             // 
             // btnFileOpen
             // 
@@ -358,7 +368,7 @@
             toolStrip2x2HouseCount.AutoSize = false;
             toolStrip2x2HouseCount.Name = "toolStrip2x2HouseCount";
             toolStrip2x2HouseCount.Size = new Size(25, 22);
-            toolStrip2x2HouseCount.Text = "100";
+            toolStrip2x2HouseCount.Text = "0";
             toolStrip2x2HouseCount.TextAlign = ContentAlignment.MiddleRight;
             // 
             // toolStripSeparator2
@@ -411,14 +421,6 @@
             toolStripSecondary.TabIndex = 14;
             toolStripSecondary.Text = "toolStrip5";
             // 
-            // btnNewFromGameSave
-            // 
-            btnNewFromGameSave.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            btnNewFromGameSave.Name = "btnNewFromGameSave";
-            btnNewFromGameSave.Size = new Size(132, 22);
-            btnNewFromGameSave.Text = "New from game save...";
-            btnNewFromGameSave.Click += btnNewFromGameSave_Click;
-            // 
             // openFileDialogImport
             // 
             openFileDialogImport.Filter = "Pharaoh save files|*.sav|All files|*.*";
@@ -432,9 +434,11 @@
             Controls.Add(toolStripSecondary);
             Controls.Add(canvas);
             Controls.Add(toolStripMain);
+            KeyPreview = true;
             Name = "FormMain";
             Text = "City Planner";
             FormClosing += FormMain_FormClosing;
+            KeyDown += FormMain_KeyDown;
             toolStripMain.ResumeLayout(false);
             toolStripMain.PerformLayout();
             canvas.ResumeLayout(false);
@@ -448,7 +452,7 @@
         private ToolStrip toolStripMain;
         private ToolStripButton btnClear;
         private ToolStripButton btnRoad;
-        private Panel canvas;
+        private SanelyScolledPanel canvas;
         private MapCanvasControl mapControl;
         private ToolStripButton btnSelect;
         private ToolStripButton btnTerrain;

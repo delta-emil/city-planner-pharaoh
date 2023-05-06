@@ -2,9 +2,10 @@
 
 namespace CityPlanner;
 
-public partial class MapCanvasControl : Control
+public class MapCanvasControl : Control
 {
-    public const int CellSideLength = 24;
+    public const int MinCellSideLength = 8;
+    public const int MaxCellSideLength = 32;
     public const int BorderWidth = 1;
     public const int BorderWidthDouble = 2 * BorderWidth;
 
@@ -19,6 +20,7 @@ public partial class MapCanvasControl : Control
     private readonly Brush[] terrainBrushes;
     private readonly Brush[] buildingBrushes;
 
+    private int cellSideLength = 24;
     private readonly HashSet<MapBuilding> selectedBuildings;
     private readonly HashSet<MapBuilding> clipboardBuildings;
     private Rectangle? ghostLocation;
@@ -28,8 +30,6 @@ public partial class MapCanvasControl : Control
 
     public MapCanvasControl()
     {
-        InitializeComponent();
-
         this.DoubleBuffered = true;
 
         this.borderSoftPen = new Pen(Color.Gray, BorderWidth);
@@ -90,7 +90,7 @@ public partial class MapCanvasControl : Control
         };
 
         // mostly for the designer preview
-        //this.MapModel = new MapModel(this.DesignMode ? MapModel.DefaultMapSize : 0, this.DesignMode ? MapModel.DefaultMapSize : 0);
+        this.cellSideLength = 24;
         this.MapModel = new MapModel(8, 8);
         this.tool = new Tool();
         this.selectedBuildings = new();
@@ -115,6 +115,22 @@ public partial class MapCanvasControl : Control
     public bool ShowDesirability { get; set; }
 
     public bool ShowCellCoords { get; set; }
+
+    public int CellSideLength
+    {
+        get => this.cellSideLength;
+        set
+        {
+            var boundedValue = Math.Max(MinCellSideLength, Math.Min(MaxCellSideLength, value));
+            if (this.cellSideLength == boundedValue)
+            {
+                return;
+            }
+            this.cellSideLength = boundedValue;
+            this.SetSizeToFullMapSize();
+            this.Invalidate();
+        }
+    }
 
     public event Action<object, MapSelectionChangeEventArgs>? SelectionChanged;
 
@@ -595,7 +611,7 @@ public partial class MapCanvasControl : Control
         }
     }
 
-    private static (int x, int y) GetCellCoordidates(MouseEventArgs e)
+    private (int x, int y) GetCellCoordidates(MouseEventArgs e)
     {
         var clientLocation = e.Location;
         var cellX = clientLocation.X / CellSideLength;
@@ -615,7 +631,7 @@ public partial class MapCanvasControl : Control
         }
     }
 
-    private static Rectangle GetBuildingRectangle(MapBuilding building, bool includingDesire)
+    private Rectangle GetBuildingRectangle(MapBuilding building, bool includingDesire)
     {
         var size = building.BuildingType.GetSize();
         if (includingDesire)
