@@ -6,7 +6,7 @@ public class MapModel
 {
     public const int DefaultMapSize = 200;
 
-    public MapModel(int mapSideX, int mapSideY)
+    public MapModel(int mapSideX, int mapSideY, MapTerrain initTerrainType = MapTerrain.Grass)
     {
         this.MapSideX = mapSideX;
         this.MapSideY = mapSideY;
@@ -17,7 +17,7 @@ public class MapModel
         {
             for (int cellY = 0; cellY < MapSideY; cellY++)
             {
-                this.Cells[cellX, cellY] = new MapCellModel { Terrain = MapTerrain.Grass };
+                this.Cells[cellX, cellY] = new MapCellModel { Terrain = initTerrainType };
             }
         }
 

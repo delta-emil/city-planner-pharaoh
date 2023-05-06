@@ -1,12 +1,10 @@
-﻿using System.Diagnostics;
-using System.Drawing.Drawing2D;
-using System.Linq;
+﻿using System.Drawing.Drawing2D;
 
 namespace CityPlanner;
 
 public partial class MapCanvasControl : Control
 {
-    public const int CellSideLength = 32;
+    public const int CellSideLength = 24;
     public const int BorderWidth = 1;
     public const int BorderWidthDouble = 2 * BorderWidth;
 

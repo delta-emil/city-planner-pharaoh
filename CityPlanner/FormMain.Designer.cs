@@ -71,6 +71,8 @@
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             toolStripSecondary = new ToolStrip();
+            btnNewFromGameSave = new ToolStripButton();
+            openFileDialogImport = new OpenFileDialog();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
             toolStripTop.SuspendLayout();
@@ -78,6 +80,7 @@
             // 
             // toolStripMain
             // 
+            toolStripMain.AutoSize = false;
             toolStripMain.Dock = DockStyle.Right;
             toolStripMain.Items.AddRange(new ToolStripItem[] { btnSelect, btnTerrain, btnClear, btnHouse, btnHouse2, btnHouse3, btnHouse4, btnRoad, btnPlaza, btnFood, btnIndustry, btnDistribution, btnEnt, btnReligious, btnEducation, btnHealth, btnMunicipal, btnMilitary });
             toolStripMain.Location = new Point(1285, 0);
@@ -90,7 +93,7 @@
             // 
             btnSelect.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnSelect.Name = "btnSelect";
-            btnSelect.Size = new Size(36, 19);
+            btnSelect.Size = new Size(37, 19);
             btnSelect.Text = "SEL";
             btnSelect.ToolTipText = "Select";
             btnSelect.Click += MainToolbarToolButtonClick;
@@ -99,7 +102,7 @@
             // 
             btnTerrain.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnTerrain.Name = "btnTerrain";
-            btnTerrain.Size = new Size(36, 19);
+            btnTerrain.Size = new Size(37, 19);
             btnTerrain.Text = "TER";
             btnTerrain.ToolTipText = "Terrain";
             // 
@@ -108,7 +111,7 @@
             btnClear.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnClear.ImageTransparentColor = Color.Magenta;
             btnClear.Name = "btnClear";
-            btnClear.Size = new Size(36, 19);
+            btnClear.Size = new Size(37, 19);
             btnClear.Text = "DEL";
             btnClear.ToolTipText = "Clear";
             btnClear.Click += MainToolbarToolButtonClick;
@@ -117,7 +120,7 @@
             // 
             btnHouse.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnHouse.Name = "btnHouse";
-            btnHouse.Size = new Size(36, 19);
+            btnHouse.Size = new Size(37, 19);
             btnHouse.Text = "H";
             btnHouse.ToolTipText = "Housing 1x1";
             // 
@@ -125,7 +128,7 @@
             // 
             btnHouse2.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnHouse2.Name = "btnHouse2";
-            btnHouse2.Size = new Size(36, 19);
+            btnHouse2.Size = new Size(37, 19);
             btnHouse2.Text = "H2";
             btnHouse2.ToolTipText = "Housing 2x2";
             // 
@@ -133,7 +136,7 @@
             // 
             btnHouse3.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnHouse3.Name = "btnHouse3";
-            btnHouse3.Size = new Size(36, 19);
+            btnHouse3.Size = new Size(37, 19);
             btnHouse3.Text = "H3";
             btnHouse3.ToolTipText = "Housing 3x3";
             // 
@@ -141,7 +144,7 @@
             // 
             btnHouse4.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnHouse4.Name = "btnHouse4";
-            btnHouse4.Size = new Size(36, 19);
+            btnHouse4.Size = new Size(37, 19);
             btnHouse4.Text = "H4";
             btnHouse4.ToolTipText = "Housing 4x4";
             // 
@@ -149,28 +152,28 @@
             // 
             btnRoad.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnRoad.Name = "btnRoad";
-            btnRoad.Size = new Size(36, 19);
+            btnRoad.Size = new Size(37, 19);
             btnRoad.Text = "Road";
             // 
             // btnPlaza
             // 
             btnPlaza.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnPlaza.Name = "btnPlaza";
-            btnPlaza.Size = new Size(36, 19);
+            btnPlaza.Size = new Size(37, 19);
             btnPlaza.Text = "Plaza";
             // 
             // btnFood
             // 
             btnFood.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnFood.Name = "btnFood";
-            btnFood.Size = new Size(36, 19);
+            btnFood.Size = new Size(37, 19);
             btnFood.Text = "Food";
             // 
             // btnIndustry
             // 
             btnIndustry.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnIndustry.Name = "btnIndustry";
-            btnIndustry.Size = new Size(36, 19);
+            btnIndustry.Size = new Size(37, 19);
             btnIndustry.Text = "Ind";
             btnIndustry.ToolTipText = "Industry";
             // 
@@ -178,7 +181,7 @@
             // 
             btnDistribution.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnDistribution.Name = "btnDistribution";
-            btnDistribution.Size = new Size(36, 19);
+            btnDistribution.Size = new Size(37, 19);
             btnDistribution.Text = "Dist";
             btnDistribution.ToolTipText = "Distribution";
             // 
@@ -186,7 +189,7 @@
             // 
             btnEnt.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnEnt.Name = "btnEnt";
-            btnEnt.Size = new Size(36, 19);
+            btnEnt.Size = new Size(37, 19);
             btnEnt.Text = "Ent";
             btnEnt.ToolTipText = "Entertainment";
             // 
@@ -194,7 +197,7 @@
             // 
             btnReligious.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnReligious.Name = "btnReligious";
-            btnReligious.Size = new Size(36, 19);
+            btnReligious.Size = new Size(37, 19);
             btnReligious.Text = "Rel";
             btnReligious.ToolTipText = "Religious";
             // 
@@ -202,7 +205,7 @@
             // 
             btnEducation.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnEducation.Name = "btnEducation";
-            btnEducation.Size = new Size(36, 19);
+            btnEducation.Size = new Size(37, 19);
             btnEducation.Text = "Edu";
             btnEducation.ToolTipText = "Education";
             // 
@@ -210,7 +213,7 @@
             // 
             btnHealth.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnHealth.Name = "btnHealth";
-            btnHealth.Size = new Size(36, 19);
+            btnHealth.Size = new Size(37, 19);
             btnHealth.Text = "Hlth";
             btnHealth.ToolTipText = "Health";
             // 
@@ -218,7 +221,7 @@
             // 
             btnMunicipal.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnMunicipal.Name = "btnMunicipal";
-            btnMunicipal.Size = new Size(36, 19);
+            btnMunicipal.Size = new Size(37, 19);
             btnMunicipal.Text = "Mun";
             btnMunicipal.ToolTipText = "Municipal";
             // 
@@ -226,7 +229,7 @@
             // 
             btnMilitary.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnMilitary.Name = "btnMilitary";
-            btnMilitary.Size = new Size(36, 19);
+            btnMilitary.Size = new Size(37, 19);
             btnMilitary.Text = "Mil";
             btnMilitary.ToolTipText = "Military";
             // 
@@ -237,7 +240,7 @@
             canvas.Controls.Add(mapControl);
             canvas.Location = new Point(0, 28);
             canvas.Name = "canvas";
-            canvas.Size = new Size(1246, 804);
+            canvas.Size = new Size(1243, 804);
             canvas.TabIndex = 1;
             // 
             // mapControl
@@ -259,7 +262,7 @@
             // toolStripTop
             // 
             toolStripTop.AutoSize = false;
-            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3 });
+            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3 });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
             toolStripTop.Size = new Size(1246, 25);
@@ -408,6 +411,18 @@
             toolStripSecondary.TabIndex = 14;
             toolStripSecondary.Text = "toolStrip5";
             // 
+            // btnNewFromGameSave
+            // 
+            btnNewFromGameSave.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnNewFromGameSave.Name = "btnNewFromGameSave";
+            btnNewFromGameSave.Size = new Size(132, 22);
+            btnNewFromGameSave.Text = "New from game save...";
+            btnNewFromGameSave.Click += btnNewFromGameSave_Click;
+            // 
+            // openFileDialogImport
+            // 
+            openFileDialogImport.Filter = "Pharaoh save files|*.sav|All files|*.*";
+            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -426,7 +441,6 @@
             toolStripTop.ResumeLayout(false);
             toolStripTop.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -473,5 +487,7 @@
         private ToolStripLabel toolStrip2x2HouseCount;
         private ToolStripSeparator toolStripSeparator20;
         private ToolStrip toolStripSecondary;
+        private ToolStripButton btnNewFromGameSave;
+        private OpenFileDialog openFileDialogImport;
     }
 }

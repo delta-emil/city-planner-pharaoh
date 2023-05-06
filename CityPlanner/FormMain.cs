@@ -1,3 +1,4 @@
+using CityPlanner.FileDataExtraction;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -175,6 +176,39 @@ public partial class FormMain : Form
         }
 
         InitEmptyFile();
+    }
+
+    private void btnNewFromGameSave_Click(object sender, EventArgs e)
+    {
+        if (this.mapControl.MapModel.IsChanged)
+        {
+            if (!AskToSaveCurrentFile())
+            {
+                return;
+            }
+        }
+
+        var openDialogResult = this.openFileDialogImport.ShowDialog();
+        if (openDialogResult == DialogResult.OK)
+        {
+            MapModel? mapModel;
+            {
+                using var saveFile = new PharaohFile(this.openFileDialogImport.FileName);
+                mapModel = saveFile.GetMapModelFromFile();
+            }
+
+            if (mapModel != null)
+            {
+                this.fileName = null;
+                this.mapControl.MapModel = mapModel;
+                this.mapControl.SetSizeToFullMapSize();
+                this.mapControl.Invalidate();
+            }
+            else
+            {
+                MessageBox.Show("Error reading map from save file", "Error");
+            }
+        }
     }
 
     private void btnFileOpen_Click(object sender, EventArgs e)
