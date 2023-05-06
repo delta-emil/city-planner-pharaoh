@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace CityPlanner;
+namespace CityPlannerPharaoh;
 
 public class SanelyScolledPanel : Panel
 {

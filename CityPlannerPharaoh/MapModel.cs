@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CityPlanner;
+namespace CityPlannerPharaoh;
 
 public class MapModel
 {

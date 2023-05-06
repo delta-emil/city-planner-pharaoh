@@ -1,4 +1,4 @@
-﻿namespace CityPlanner
+﻿namespace CityPlannerPharaoh
 {
     partial class FormMain
     {

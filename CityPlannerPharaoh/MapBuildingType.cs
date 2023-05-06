@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Microsoft.VisualBasic.Devices;
 
-namespace CityPlanner;
+namespace CityPlannerPharaoh;
 
 public enum MapBuildingType
 {

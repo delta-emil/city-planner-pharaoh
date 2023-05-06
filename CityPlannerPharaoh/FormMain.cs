@@ -1,8 +1,8 @@
-using CityPlanner.FileDataExtraction;
+using CityPlannerPharaoh.FileDataExtraction;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace CityPlanner;
+namespace CityPlannerPharaoh;
 
 public partial class FormMain : Form
 {
@@ -45,9 +45,9 @@ public partial class FormMain : Form
         this.mapControl.ShowDesirability = btnFilterDesire.Checked;
     }
 
-    private void MainToolbarSubbarButtonClick(object sender, EventArgs e)
+    private void MainToolbarSubbarButtonClick(object? sender, EventArgs e)
     {
-        var currentButton = (ToolStripButton)sender;
+        var currentButton = (ToolStripButton)sender!;
 
         UntickOtherToolbarButtons(toolStripMain, currentButton);
 
@@ -89,9 +89,9 @@ public partial class FormMain : Form
         this.mapControl.Tool = new Tool();
     }
 
-    private void MainToolbarToolButtonClick(object sender, EventArgs e)
+    private void MainToolbarToolButtonClick(object? sender, EventArgs e)
     {
-        var currentButton = (ToolStripButton)sender;
+        var currentButton = (ToolStripButton)sender!;
 
         UntickOtherToolbarButtons(toolStripMain, currentButton);
         this.ClearSecondaryToolbar();
@@ -122,9 +122,9 @@ public partial class FormMain : Form
         }
     }
 
-    private void SecondaryToolbarButtonClick(object sender, EventArgs e)
+    private void SecondaryToolbarButtonClick(object? sender, EventArgs e)
     {
-        var currentButton = (ToolStripButton)sender;
+        var currentButton = (ToolStripButton)sender!;
         var toolStrip = currentButton.GetCurrentParent();
 
         UntickOtherToolbarButtons(toolStrip, currentButton);

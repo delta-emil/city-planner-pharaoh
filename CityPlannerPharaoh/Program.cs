@@ -1,4 +1,4 @@
-namespace CityPlanner;
+namespace CityPlannerPharaoh;
 
 internal static class Program
 {

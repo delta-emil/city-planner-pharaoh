@@ -1,6 +1,6 @@
 ﻿using System.Drawing.Drawing2D;
 
-namespace CityPlanner;
+namespace CityPlannerPharaoh;
 
 public class MapCanvasControl : Control
 {

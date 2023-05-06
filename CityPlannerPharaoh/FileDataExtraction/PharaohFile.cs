@@ -23,7 +23,7 @@
 using System.Text;
 using System.Diagnostics;
 
-namespace CityPlanner.FileDataExtraction;
+namespace CityPlannerPharaoh.FileDataExtraction;
 
 public class PharaohFile : GameFile
 {
@@ -101,7 +101,7 @@ public class PharaohFile : GameFile
             end = (y < half) ? (half + y + 1 - border) : (3 * half - y - border);
             for (int x = start; x < end; x++)
             {
-                t_terrain = terrain[x, y];
+                t_terrain = terrain![x, y];
                 var mapTerrain = translateTerrain(t_terrain, unknownCodes);
 
                 // Set pixel colours

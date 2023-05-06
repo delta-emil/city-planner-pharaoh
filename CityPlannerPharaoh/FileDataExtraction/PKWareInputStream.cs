@@ -47,7 +47,7 @@ SOFTWARE.
 
 using System.Diagnostics;
 
-namespace CityPlanner.FileDataExtraction;
+namespace CityPlannerPharaoh.FileDataExtraction;
 
 public class PKWareInputStream : IDisposable
 {
@@ -117,7 +117,7 @@ public class PKWareInputStream : IDisposable
             {
                 read_copying = false;
             }
-            return dictionary.get(read_offset);
+            return dictionary!.get(read_offset);
         }
         else
         {
@@ -125,7 +125,7 @@ public class PKWareInputStream : IDisposable
             {
                 // Copy byte verbatim
                 int result = readBits(8);
-                dictionary.put((byte)result);
+                dictionary!.put((byte)result);
                 return (byte)result;
             }
             // Needs to copy stuff from the dictionary
@@ -139,7 +139,7 @@ public class PKWareInputStream : IDisposable
             read_offset = getCopyOffset(read_length);
             read_length--;
             read_copying = true;
-            return dictionary.get(read_offset);
+            return dictionary!.get(read_offset);
         }
     }
 
@@ -166,7 +166,7 @@ public class PKWareInputStream : IDisposable
                 while (current < length && read_length > 0)
                 {
                     read_length--;
-                    buf[current++] = dictionary.get(read_offset);
+                    buf[current++] = dictionary!.get(read_offset);
                 }
                 if (read_length <= 0)
                 {
@@ -177,7 +177,7 @@ public class PKWareInputStream : IDisposable
             {
                 // Copy byte verbatim
                 int result = readBits(8);
-                dictionary.put((byte)result);
+                dictionary!.put((byte)result);
                 buf[current++] = (byte)result;
             }
             else
@@ -191,7 +191,7 @@ public class PKWareInputStream : IDisposable
                 }
 
                 read_offset = getCopyOffset(read_length);
-                buf[current++] = dictionary.get(read_offset);
+                buf[current++] = dictionary!.get(read_offset);
                 read_length--;
                 read_copying = true;
             }
@@ -256,7 +256,7 @@ public class PKWareInputStream : IDisposable
                 while (current < length && read_length > 0)
                 {
                     read_length--;
-                    dictionary.get(read_offset);
+                    dictionary!.get(read_offset);
                     current++;
                 }
                 if (read_length <= 0)
@@ -267,7 +267,7 @@ public class PKWareInputStream : IDisposable
             else if (readBit() == 0)
             {
                 // Copy byte verbatim
-                dictionary.put((byte)readBits(8));
+                dictionary!.put((byte)readBits(8));
                 current++;
             }
             else
@@ -281,7 +281,7 @@ public class PKWareInputStream : IDisposable
                 }
 
                 read_offset = getCopyOffset(read_length);
-                dictionary.get(read_offset);
+                dictionary!.get(read_offset);
                 current++;
                 read_length--;
                 read_copying = true;
@@ -590,13 +590,13 @@ public class PKWareInputStream : IDisposable
         bufOffset = 0;
         if (file_length <= BUFFER_SIZE)
         {
-            input.Read(buffer, 0, file_length);
+            input.Read(buffer!, 0, file_length);
             eof_reached = true;
             eof_position = file_length;
         }
         else
         {
-            input.Read(buffer, 0, BUFFER_SIZE);
+            input.Read(buffer!, 0, BUFFER_SIZE);
             file_length -= BUFFER_SIZE;
         }
     }
@@ -629,7 +629,7 @@ public class PKWareInputStream : IDisposable
         {
             advanceByte();
         }
-        byte b = (byte)((buffer[bufOffset] >> bufBit) & 1);
+        byte b = (byte)((buffer![bufOffset] >> bufBit) & 1);
         bufBit++;
         return b;
     }
@@ -651,7 +651,7 @@ public class PKWareInputStream : IDisposable
         {
             // First take last remaining bits in this byte & put them in place
             // Do "& 0xff" to prevent a negative character from filling with ff's
-            result = ((buffer[bufOffset] & 0xff) >> bufBit);
+            result = ((buffer![bufOffset] & 0xff) >> bufBit);
             int length1 = 8 - bufBit;
             int length2 = length - length1;
             advanceByte();
@@ -663,7 +663,7 @@ public class PKWareInputStream : IDisposable
         else
         {
             // Same byte, easy!
-            result = (buffer[bufOffset] >> bufBit) & ((1 << length) - 1);
+            result = (buffer![bufOffset] >> bufBit) & ((1 << length) - 1);
             bufBit += length;
         }
         return result;
@@ -676,7 +676,7 @@ public class PKWareInputStream : IDisposable
 	    has_error = true;
     }
 
-private class PKDictionary
+    private class PKDictionary
     {
         private int size;
         private int first;

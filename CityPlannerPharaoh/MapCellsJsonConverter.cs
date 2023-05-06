@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace CityPlanner;
+namespace CityPlannerPharaoh;
 
 internal class MapCellsJsonConverter : JsonConverter<MapCellModel[,]>
 {
