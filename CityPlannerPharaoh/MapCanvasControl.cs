@@ -19,6 +19,10 @@ public class MapCanvasControl : Control
     private readonly Font smallFontBold;
     private readonly Brush[] terrainBrushes;
     private readonly Brush[] buildingBrushes;
+    private readonly Brush farmMeadowBrush;
+    private readonly Brush farmIrrigatedTextBrush;
+    private readonly Brush tooCloseToVoidToBuildBrush;
+    private readonly Brush[] desirablityBrushes;
 
     private int cellSideLength = 24;
     private readonly HashSet<MapBuilding> selectedBuildings;
@@ -88,6 +92,11 @@ public class MapCanvasControl : Control
             new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(255, 79, 79), Color.FromArgb(191, 181, 166)), // GatePath,
             new SolidBrush(Color.FromArgb(255, 79, 79)), // Military,
         };
+
+        this.farmMeadowBrush = new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(157, 198, 121), Color.FromArgb(255, 222, 89));
+        this.farmIrrigatedTextBrush = new SolidBrush(Color.Teal);
+        this.tooCloseToVoidToBuildBrush = new HatchBrush(HatchStyle.Percent70, Color.FromArgb(160, 0, 0, 0), Color.FromArgb(0, 0, 0, 0));
+        this.desirablityBrushes = new Brush[110];
 
         // mostly for the designer preview
         this.cellSideLength = 24;
@@ -190,9 +199,6 @@ public class MapCanvasControl : Control
                 buildingRect.Width - BorderWidthDouble, buildingRect.Height - BorderWidthDouble);
             graphics.FillRectangle(brush, innerRect);
         }
-        else
-        {
-        }
 
         foreach (var subBuilding in building.GetSubBuildings())
         {
@@ -211,21 +217,52 @@ public class MapCanvasControl : Control
                 : this.borderBuildingPen;
             graphics.DrawRectangle(borderPen, borderRect);
 
+            bool isMeadowFarm = false;
+            if (building.BuildingType == MapBuildingType.Farm)
+            {
+                var size = building.BuildingType.GetSize();
+
+                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+                {
+                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                    {
+                        var cellModel = this.MapModel.Cells[cellX, cellY];
+                        if (cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland or MapTerrain.Floodpain)
+                        {
+                            var innerRect = new Rectangle(
+                                cellX * CellSideLength + BorderWidth, cellY * CellSideLength + BorderWidth,
+                                CellSideLength - BorderWidthDouble, CellSideLength - BorderWidthDouble);
+                            graphics.FillRectangle(this.farmMeadowBrush, innerRect);
+
+                            isMeadowFarm |= cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland;
+                        }
+                    }
+                }
+            }
+
             // draw building name
             if (building.BuildingType.ShowName())
             {
-                string text = building.BuildingType.ToString();
+                string text = building.BuildingType.GetDisplayString();
                 var textSize = graphics.MeasureString(text, this.smallFont);
+
+                var textBrushToUse = this.textBrush;
+                if (isMeadowFarm && this.MapModel.IsFarmIrrigated(building))
+                {
+                    textBrushToUse = this.farmIrrigatedTextBrush;
+                }
+
                 graphics.DrawString(
-                    text, this.smallFont, this.textBrush,
+                    text, this.smallFont, textBrushToUse,
                     buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2,
                     buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2);
             }
 
-            if (this.ShowDesirability && buildingCategory == MapBuildingCategory.House)
+            if (buildingCategory == MapBuildingCategory.House)
             {
                 var size = building.BuildingType.GetSize();
 
+                // calc max desire
                 int maxDesire = int.MinValue;
                 for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
                 {
@@ -235,15 +272,31 @@ public class MapCanvasControl : Control
                     }
                 }
 
-                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+                // draw desire
+                if (this.ShowDesirability)
                 {
-                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                    for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
                     {
-                        var desire = this.MapModel.Cells[cellX, cellY].Desirability;
-                        var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
-                        graphics.DrawString(desire.ToString(), font, this.textBrush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
+                        for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                        {
+                            var desire = this.MapModel.Cells[cellX, cellY].Desirability;
+                            var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
+                            var brush = this.GetDesirabilityBrush(desire);
+                            graphics.DrawString(desire.ToString(), font, brush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
+                        }
                     }
                 }
+
+                // draw max house level
+                string text = this.MapModel.GetMaxHouseLevelLabel(maxDesire);
+                var textSize = graphics.MeasureString(text, this.smallFont);
+
+                int positionShift = size.width == 1 ? 3 : -3;
+
+                graphics.DrawString(
+                    text, this.smallFontBold, this.textBrush,
+                    buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2 + positionShift,
+                    buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2 + positionShift);
             }
         }
     }
@@ -676,10 +729,48 @@ public class MapCanvasControl : Control
             graphics.DrawString($"{cellX},{cellY}", this.smallFont, this.textBrush, cellRect.Left + 2, cellRect.Top + 2);
         }
 
-        if (this.ShowDesirability && cellModel.Desirability != 0)
+        if (cellModel.Terrain != MapTerrain.Void)
         {
-            graphics.DrawString(cellModel.Desirability.ToString(), this.smallFont, this.textBrush, cellRect.Left + 2, cellRect.Top + 2);
+            if (cellModel.TooCloseToVoidToBuild)
+            {
+                graphics.FillRectangle(this.tooCloseToVoidToBuildBrush, innerRect);
+            }
+            else if (this.ShowDesirability && cellModel.Desirability != 0)
+            {
+                var brush = this.GetDesirabilityBrush(cellModel.Desirability);
+                graphics.DrawString(cellModel.Desirability.ToString(), this.smallFont, brush, cellRect.Left + 2, cellRect.Top + 2);
+            }
         }
+    }
+
+    private Brush GetDesirabilityBrush(int desirability)
+    {
+        int notableDesirability = Math.Max(this.MapModel.MinNotableDesirability, Math.Min(this.MapModel.MaxNotableDesirability, desirability));
+        int index = notableDesirability - this.MapModel.MinNotableDesirability;
+        var brush = this.desirablityBrushes[index];
+        if (brush != null)
+        {
+            return brush;
+        }
+
+        int midpoint = (this.MapModel.MaxNotableDesirability + this.MapModel.MinNotableDesirability) / 2;
+        var lowColor = desirability <= midpoint ? (160f, 0f, 0f) : (0f, 160f, 90f);
+        var highColor = desirability <= midpoint ? (0f, 160f, 90f) : (60f, 60f, 255f);
+
+        int halfWidth = (this.MapModel.MaxNotableDesirability - this.MapModel.MinNotableDesirability + 1) / 2;
+        float position = (notableDesirability - this.MapModel.MinNotableDesirability) % halfWidth;
+        var color = Color.FromArgb(
+            LerpToInt(lowColor.Item1, highColor.Item1, position, halfWidth),
+            LerpToInt(lowColor.Item2, highColor.Item2, position, halfWidth),
+            LerpToInt(lowColor.Item3, highColor.Item3, position, halfWidth));
+        brush = new SolidBrush(color);
+        this.desirablityBrushes[index] = brush;
+        return brush;
+    }
+
+    private static int LerpToInt(float low, float high, float positon, float range)
+    {
+        return (int)(low + (high - low) * positon / range);
     }
 
     #region buildings cut-copy-paste

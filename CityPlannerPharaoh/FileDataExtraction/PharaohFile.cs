@@ -84,7 +84,7 @@ public class PharaohFile : GameFile
 
         // Transform it to something useful
 
-        var mapModel = new MapModel(mapsize, mapsize, MapTerrain.Void);
+        var mapModel = new MapModel(mapsize, mapsize, MapTerrain.Void, hasTooCloseToVoidToBuild: true);
 
         int half = MAX_MAPSIZE / 2;
         int border = (MAX_MAPSIZE - mapsize) / 2;
@@ -122,6 +122,8 @@ public class PharaohFile : GameFile
         }
 
         CalculateWaterEdges(mapModel);
+
+        mapModel.SetTooCloseToVoidToBuildAfterInit();
 
         return mapModel;
     }

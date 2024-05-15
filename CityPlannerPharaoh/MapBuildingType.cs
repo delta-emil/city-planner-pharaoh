@@ -1,7 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Runtime.InteropServices;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using Microsoft.VisualBasic.Devices;
+﻿using System.Text.RegularExpressions;
 
 namespace CityPlannerPharaoh;
 
@@ -138,7 +135,7 @@ public enum MapBuildingType
     TransportShip,
 }
 
-public static class MapBuildingTypeExtensions
+public static partial class MapBuildingTypeExtensions
 {
     public static (int width, int height) GetSize(this MapBuildingType mapBuildingType) => sizes[(int)mapBuildingType];
     private static readonly (int width, int height)[] sizes = new[]
@@ -379,7 +376,7 @@ public static class MapBuildingTypeExtensions
 
         (0, 0, 0, 0), // Roadblock,
         (0, 0, 0, 0), // Bridge,
-        (4, -5, 2, -2), // FerryLanding,
+        (4, -5, 2, 2), // FerryLanding,
 
         (3, 3, 1, -1), // StatueSmall,
         (4, 10, 1, -2), // StatueMedium,
@@ -586,6 +583,26 @@ public static class MapBuildingTypeExtensions
             _ => true,
         };
     }
+
+    public static string GetDisplayString(this MapBuildingType mapBuildingType)
+    {
+        return mapBuildingType switch
+        {
+            MapBuildingType.Firehouse => "F",
+            MapBuildingType.Architect => "Ar",
+            MapBuildingType.Police => "P",
+            MapBuildingType.Apothecary => "Ap",
+            MapBuildingType.Dentist => "D",
+            MapBuildingType.Shrine => "Sh",
+            MapBuildingType.Well => "W",
+            MapBuildingType.StatueSmall => "St",
+            MapBuildingType.Weaponsmith => "Weapon\r\nsmith",
+            _ => RegexWordBumpBoreder().Replace(mapBuildingType.ToString(), "$1\r\n$2"),
+        };
+    }
+
+    [GeneratedRegex("([a-z])([A-Z])")]
+    private static partial Regex RegexWordBumpBoreder();
 
     public static bool IgnoreMainBuilding(this MapBuildingType mapBuildingType)
     {

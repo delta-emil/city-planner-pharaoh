@@ -245,19 +245,18 @@ public partial class FormMain : Form
 
     private void btnFileSave_Click(object sender, EventArgs e)
     {
+        if (this.fileName == null)
+        {
+            btnFileSaveAs_Click(sender, e);
+            return;
+        }
+
         if (!this.mapControl.MapModel.IsChanged)
         {
             return;
         }
 
-        if (this.fileName == null)
-        {
-            btnFileSaveAs_Click(sender, e);
-        }
-        else
-        {
-            SaveMapModel(this.mapControl.MapModel, this.fileName);
-        }
+        SaveMapModel(this.mapControl.MapModel, this.fileName);
     }
 
     private void btnFileSaveAs_Click(object sender, EventArgs e)
@@ -585,6 +584,10 @@ public partial class FormMain : Form
             }
             e.Handled = true;
             e.SuppressKeyPress = true;
+        }
+        else if (e.KeyCode == Keys.S && ModifierKeys == Keys.Control)
+        {
+            this.btnFileSave_Click(this.btnFileSave, EventArgs.Empty);
         }
     }
 }

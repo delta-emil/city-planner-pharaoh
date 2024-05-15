@@ -7,6 +7,9 @@ public class MapCellModel
     public MapTerrain Terrain { get; set; }
 
     [JsonIgnore]
+    public bool TooCloseToVoidToBuild { get; set; }
+
+    [JsonIgnore]
     public MapBuilding? Building { get; set; }
 
     [JsonIgnore]

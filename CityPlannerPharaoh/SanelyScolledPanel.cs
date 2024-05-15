@@ -21,7 +21,7 @@ public class SanelyScolledPanel : Panel
     {
         if (ModifierKeys == Keys.Control)
         {
-            Debug.WriteLine($"~~~delta:{e.Delta}, clicks:{e.Clicks}");
+            //Debug.WriteLine($"~~~delta:{e.Delta}, clicks:{e.Clicks}");
             if (this.Zoom != null)
             {
                 var args = new ZoomEventArgs { Delta = Math.Sign(e.Delta) };
