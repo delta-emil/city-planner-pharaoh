@@ -187,4 +187,15 @@ public class MapBuilding
             _ => Array.Empty<MapBuilding>(),
         };
     }
+
+    internal bool IsEmptyCell(int cellX, int cellY)
+    {
+        if (this.BuildingType == MapBuildingType.Fort)
+        {
+            return cellY == this.Top
+                && this.Left <= cellX && cellX  < this.Left + 3;
+        }
+
+        return false;
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace CityPlannerPharaoh;
@@ -86,10 +87,16 @@ public class MapModel
         }
 
         // check for existing building
+        var tempMapBuilding = new MapBuilding { Left = left, Top = top, BuildingType = mapBuildingType };
         for (int cellX = left; cellX <= right; cellX++)
         {
             for (int cellY = top; cellY <= bottom; cellY++)
             {
+                if (tempMapBuilding.IsEmptyCell(cellX, cellY))
+                {
+                    continue;
+                }
+
                 MapCellModel mapCellModel = this.Cells[cellX, cellY];
                 if (mapCellModel.Terrain == MapTerrain.Void
                     || mapCellModel.TooCloseToVoidToBuild)
@@ -122,6 +129,11 @@ public class MapModel
         {
             for (int cellY = mapBuilding.Top; cellY < mapBuilding.Top + size.height; cellY++)
             {
+                if (mapBuilding.IsEmptyCell(cellX, cellY))
+                {
+                    continue;
+                }
+
                 var mapCellModel = this.Cells[cellX, cellY];
 
                 // only 1x1 things like roads can be overwritten
@@ -155,6 +167,11 @@ public class MapModel
         {
             for (int cellY = mapBuilding.Top; cellY < mapBuilding.Top + size.height; cellY++)
             {
+                if (mapBuilding.IsEmptyCell(cellX, cellY))
+                {
+                    continue;
+                }
+
                 var mapCellModel = this.Cells[cellX, cellY];
 
                 mapCellModel.Building = null;

@@ -205,9 +205,9 @@ public class MapCanvasControl : Control
             PaintBuilding(graphics, subBuilding);
         }
 
-        if (!ignoreMainBuilding)
+        // draw border
+        if (!ignoreMainBuilding || this.selectedBuildings.Contains(building))
         {
-            // draw border
             var borderRect = new Rectangle(
                 buildingRect.Left, buildingRect.Top,
                 buildingRect.Width - BorderWidth, buildingRect.Height - BorderWidth);
@@ -216,7 +216,10 @@ public class MapCanvasControl : Control
                 : building.BuildingType.HasSoftBorder() ? this.borderSoftPen
                 : this.borderBuildingPen;
             graphics.DrawRectangle(borderPen, borderRect);
+        }
 
+        if (!ignoreMainBuilding)
+        {
             bool isMeadowFarm = false;
             if (building.BuildingType == MapBuildingType.Farm)
             {
@@ -548,9 +551,25 @@ public class MapCanvasControl : Control
                             var isValid = this.MapModel.CanAddBuilding(newCellX, newCellY, building.BuildingType, selectedBuildings);
                             this.moveValid &= isValid;
 
-                            var (width, height) = building.BuildingType.GetSize();
-                            var newGhostRect = new Rectangle(newCellX * CellSideLength, newCellY * CellSideLength, width * CellSideLength, height * CellSideLength);
-                            ShowGhostOnCells(newGhostRect, isValid, graphics, append: true);
+                            if (building.BuildingType.IgnoreMainBuilding())
+                            {
+                                foreach (var subBuilding in building.GetSubBuildings())
+                                {
+                                    var (width, height) = subBuilding.BuildingType.GetSize();
+                                    var newGhostRect = new Rectangle(
+                                        (subBuilding.Left + offsetX) * CellSideLength,
+                                        (subBuilding.Top + offsetY) * CellSideLength,
+                                        width * CellSideLength,
+                                        height * CellSideLength);
+                                    ShowGhostOnCells(newGhostRect, isValid, graphics, append: true);
+                                }
+                            }
+                            else
+                            {
+                                var (width, height) = building.BuildingType.GetSize();
+                                var newGhostRect = new Rectangle(newCellX * CellSideLength, newCellY * CellSideLength, width * CellSideLength, height * CellSideLength);
+                                ShowGhostOnCells(newGhostRect, isValid, graphics, append: true);
+                            }
                         }
                     }
                     else

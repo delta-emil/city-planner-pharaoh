@@ -6,7 +6,6 @@ A city planner tool for the classic Pharaoh city builder game.
 
 - nicer display names for buildings
 - undo/redo
-- fix Fort irregular shape
 
 Low prio:
 
