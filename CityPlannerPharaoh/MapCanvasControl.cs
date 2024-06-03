@@ -265,15 +265,7 @@ public class MapCanvasControl : Control
             {
                 var size = building.BuildingType.GetSize();
 
-                // calc max desire
-                int maxDesire = int.MinValue;
-                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
-                {
-                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
-                    {
-                        maxDesire = Math.Max(maxDesire, this.MapModel.Cells[cellX, cellY].Desirability);
-                    }
-                }
+                int maxDesire = this.MapModel.GetHouseMaxDesirability(building);
 
                 // draw desire
                 if (this.ShowDesirability)
@@ -291,7 +283,7 @@ public class MapCanvasControl : Control
                 }
 
                 // draw max house level
-                string text = this.MapModel.GetMaxHouseLevelLabel(maxDesire);
+                string text = "H" + (building.HouseLevel + 1);
                 var textSize = graphics.MeasureString(text, this.smallFont);
 
                 int positionShift = size.width == 1 ? 3 : -3;
@@ -709,7 +701,7 @@ public class MapCanvasControl : Control
         if (includingDesire)
         {
             var desireRange = new[] { building }.Concat(building.GetSubBuildings())
-                .Select(x => x.BuildingType.GetDesire().range)
+                .Select(x => this.MapModel.GetBuildingDesire(x).Range)
                 .Max();
             return new Rectangle(
                 (building.Left - desireRange) * CellSideLength,
@@ -764,20 +756,20 @@ public class MapCanvasControl : Control
 
     private Brush GetDesirabilityBrush(int desirability)
     {
-        int notableDesirability = Math.Max(this.MapModel.MinNotableDesirability, Math.Min(this.MapModel.MaxNotableDesirability, desirability));
-        int index = notableDesirability - this.MapModel.MinNotableDesirability;
+        int notableDesirability = Math.Max(HouseLevelData.MinNotableDesirability, Math.Min(HouseLevelData.MaxNotableDesirability, desirability));
+        int index = notableDesirability - HouseLevelData.MinNotableDesirability;
         var brush = this.desirablityBrushes[index];
         if (brush != null)
         {
             return brush;
         }
 
-        int midpoint = (this.MapModel.MaxNotableDesirability + this.MapModel.MinNotableDesirability) / 2;
+        int midpoint = (HouseLevelData.MaxNotableDesirability + HouseLevelData.MinNotableDesirability) / 2;
         var lowColor = desirability <= midpoint ? (160f, 0f, 0f) : (0f, 160f, 90f);
         var highColor = desirability <= midpoint ? (0f, 160f, 90f) : (60f, 60f, 255f);
 
-        int halfWidth = (this.MapModel.MaxNotableDesirability - this.MapModel.MinNotableDesirability + 1) / 2;
-        float position = (notableDesirability - this.MapModel.MinNotableDesirability) % halfWidth;
+        int halfWidth = (HouseLevelData.MaxNotableDesirability - HouseLevelData.MinNotableDesirability + 1) / 2;
+        float position = (notableDesirability - HouseLevelData.MinNotableDesirability) % halfWidth;
         var color = Color.FromArgb(
             LerpToInt(lowColor.Item1, highColor.Item1, position, halfWidth),
             LerpToInt(lowColor.Item2, highColor.Item2, position, halfWidth),

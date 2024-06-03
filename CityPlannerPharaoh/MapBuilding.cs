@@ -1,10 +1,15 @@
-﻿namespace CityPlannerPharaoh;
+﻿using System.Text.Json.Serialization;
+
+namespace CityPlannerPharaoh;
 
 public class MapBuilding
 {
     public int Left { get; set; }
     public int Top { get; set; }
     public MapBuildingType BuildingType { get; set; }
+
+    [JsonIgnore]
+    public int HouseLevel { get; set; } = -1;
 
     public override string ToString()
     {

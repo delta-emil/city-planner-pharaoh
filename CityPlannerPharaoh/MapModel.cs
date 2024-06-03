@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace CityPlannerPharaoh;
@@ -43,6 +43,7 @@ public class MapModel
         foreach (var mapBuilding in this.Buildings)
         {
             SetBuildingInCells(mapBuilding);
+            SetHouseLevel(mapBuilding);
             AddDesirabilityEffect(mapBuilding, 1);
         }
     }
@@ -70,6 +71,7 @@ public class MapModel
         this.Buildings.Add(mapBuilding);
 
         SetBuildingInCells(mapBuilding);
+        SetHouseLevel(mapBuilding);
         AddDesirabilityEffect(mapBuilding, 1);
 
         return mapBuilding;
@@ -203,6 +205,23 @@ public class MapModel
         return results;
     }
 
+    public int GetHouseMaxDesirability(MapBuilding building)
+    {
+        Debug.Assert(building.BuildingType.GetCategory() == MapBuildingCategory.House);
+
+        var size = building.BuildingType.GetSize();
+
+        int maxDesire = int.MinValue;
+        for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+        {
+            for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+            {
+                maxDesire = Math.Max(maxDesire, this.Cells[cellX, cellY].Desirability);
+            }
+        }
+        return maxDesire;
+    }
+
     public void MoveBuildingsByOffset(HashSet<MapBuilding> selectedBuildings, int offsetX, int offsetY)
     {
         foreach (var building in selectedBuildings)
@@ -216,26 +235,103 @@ public class MapModel
             building.Left += offsetX;
             building.Top += offsetY;
             SetBuildingInCells(building);
+            SetHouseLevel(building);
             AddDesirabilityEffect(building, 1);
+        }
+    }
+
+    private void SetHouseLevel(MapBuilding mapBuilding)
+    {
+        if (mapBuilding.BuildingType.GetCategory() == MapBuildingCategory.House)
+        {
+            var maxDesire = this.GetHouseMaxDesirability(mapBuilding);
+            mapBuilding.HouseLevel = HouseLevelData.GetHouseLevel(maxDesire);
         }
     }
 
     private void AddDesirabilityEffect(MapBuilding mapBuilding, int multiplier)
     {
-        var desireConfig = mapBuilding.BuildingType.GetDesire();
-        if (desireConfig.range > 0)
+        var desireConfig = GetBuildingDesire(mapBuilding);
+        if (desireConfig.Range > 0)
         {
-            foreach (var (cell, _, _, distance) in EnumerateAroundBuildingToRange(mapBuilding, desireConfig.range, includingInside: false))
+            var affectedHouses = new HashSet<MapBuilding>();
+
+            foreach (var (cell, _, _, distance) in EnumerateAroundBuildingToRange(mapBuilding, desireConfig.Range, includingInside: false))
             {
-                var delta = (desireConfig.start + (distance - 1) / desireConfig.stepRange * desireConfig.stepDiff) * multiplier;
+                var delta = (desireConfig.Start + (distance - 1) / desireConfig.StepRange * desireConfig.StepDiff) * multiplier;
 
                 cell.Desirability += delta;
+
+                if (cell.Building?.BuildingType.GetCategory() == MapBuildingCategory.House)
+                {
+                    affectedHouses.Add(cell.Building);
+                }
+            }
+
+            int loopCount = 0;
+            while (affectedHouses.Count > 0)
+            {
+                if (++loopCount > 10_000)
+                {
+                    throw new Exception("House desirability loop went on for 10k iterations. Probably buggy.");
+                }
+
+                var newlyAffectedHouses = new HashSet<MapBuilding>();
+
+                foreach (var affectedHouse in affectedHouses)
+                {
+                    var oldHouseLevel = affectedHouse.HouseLevel;
+
+                    var maxDesire = this.GetHouseMaxDesirability(affectedHouse);
+                    var newHouseLevel = HouseLevelData.GetHouseLevel(maxDesire);
+                    affectedHouse.HouseLevel = newHouseLevel;
+
+                    if (oldHouseLevel != newHouseLevel)
+                    {
+                        var houseSize = mapBuilding.BuildingType.GetSize().width;
+
+                        var oldDesireConfig = HouseLevelData.GetDesire(oldHouseLevel, houseSize);
+                        var newDesireConfig = HouseLevelData.GetDesire(newHouseLevel, houseSize);
+                        if (!oldDesireConfig.Equals(newDesireConfig))
+                        {
+                            AdjustHouseDesirabilityEffect(affectedHouse, oldDesireConfig, newDesireConfig, newlyAffectedHouses);
+                        }
+                    }
+                }
+
+                affectedHouses = newlyAffectedHouses;
             }
         }
 
         foreach (var subBuilding in mapBuilding.GetSubBuildings())
         {
             AddDesirabilityEffect(subBuilding, multiplier);
+        }
+    }
+
+    private void AdjustHouseDesirabilityEffect(MapBuilding mapBuilding, DesireConfig oldDesireConfig, DesireConfig newDesireConfig, HashSet<MapBuilding> newlyAffectedHouses)
+    {
+        Debug.Assert(mapBuilding.BuildingType.GetCategory() == MapBuildingCategory.House);
+
+        var maxRange = Math.Max(oldDesireConfig.Range, newDesireConfig.Range);
+        if (maxRange <= 0)
+        {
+            return;
+        }
+
+        foreach (var (cell, _, _, distance) in EnumerateAroundBuildingToRange(mapBuilding, maxRange, includingInside: false))
+        {
+            var deltaOld = distance <= oldDesireConfig.Range ? (oldDesireConfig.Start + (distance - 1) / oldDesireConfig.StepRange * oldDesireConfig.StepDiff) : 0;
+            var deltaNew = distance <= newDesireConfig.Range ? (newDesireConfig.Start + (distance - 1) / newDesireConfig.StepRange * newDesireConfig.StepDiff) : 0;
+
+            var delta = deltaNew - deltaOld;
+
+            cell.Desirability += delta;
+
+            if (cell.Building?.BuildingType.GetCategory() == MapBuildingCategory.House)
+            {
+                newlyAffectedHouses.Add(cell.Building);
+            }
         }
     }
 
@@ -303,27 +399,15 @@ public class MapModel
         }
     }
 
-    public int MinNotableDesirability => -17;
-    public int MaxNotableDesirability => 92;
-
-    private static readonly int[] HouseEvolveBoundsHard = new[] { -10, -5, 0, 4, 8, 12, 16, 20, 25, 32, 40, 48, 53, 58, 63, 68, 74, 80, 90 };
-
-    public string GetMaxHouseLevelLabel(int maxDesire)
+    public DesireConfig GetBuildingDesire(MapBuilding mapBuilding)
     {
-        // TODO: this is for Hard, make an option for what difficulty to show
-        int level = 1;
-        for (int bound = 0; bound < HouseEvolveBoundsHard.Length; bound++)
+        if (mapBuilding.BuildingType.GetCategory() == MapBuildingCategory.House)
         {
-            if (maxDesire >= HouseEvolveBoundsHard[bound])
-            {
-                level++;
-            }
-            else
-            {
-                break;
-            }
+            return HouseLevelData.GetDesire(mapBuilding.HouseLevel, mapBuilding.BuildingType.GetSize().width);
         }
-
-        return "H" + level;
+        else
+        {
+            return mapBuilding.BuildingType.GetDesire();
+        }
     }
 }
