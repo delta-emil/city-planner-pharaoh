@@ -1,12 +1,11 @@
-﻿
-namespace CityPlannerPharaoh;
+﻿namespace CityPlannerPharaoh;
 
 public static class HouseLevelData
 {
     public const int MinNotableDesirability = -17;
     public const int MaxNotableDesirability = 92;
 
-    private static readonly int[] HouseEvolveBoundsHard = new[] { -10, -5, 0, 4, 8, 12, 16, 20, 25, 32, 40, 48, 53, 58, 63, 68, 74, 80, 90 };
+    private static readonly int[] HouseEvolveBoundsHard = [-98, -10, -5, 0, 4, 8, 12, 16, 20, 25, 32, 40, 48, 53, 58, 63, 68, 74, 80, 90];
 
     public static int GetHouseLevel(int maxDesire)
     {
@@ -27,31 +26,20 @@ public static class HouseLevelData
         return level;
     }
 
-    public static string GetMaxHouseLevelLabel(int maxDesire)
-    {
-        var level = GetHouseLevel(maxDesire);
-        return "H" + (level + 1);
-    }
-
     public static DesireConfig GetDesire(int houseLevel, int houseSize)
     {
-        if (houseLevel < 0)
-        {
-            return new DesireConfig(0, 0, 0, 0);
-        }
-
         int levelForDesire;
         if (houseSize == 1)
         {
-            levelForDesire = Math.Min(houseLevel, 10 - 1);
+            levelForDesire = Math.Min(houseLevel, 10);
         }
         else if (houseSize == 2)
         {
-            levelForDesire = Math.Min(houseLevel, 14 - 1);
+            levelForDesire = Math.Min(houseLevel, 14);
         }
         else if (houseSize == 3)
         {
-            levelForDesire = Math.Min(houseLevel, 18 - 1);
+            levelForDesire = Math.Min(houseLevel, 18);
         }
         else
         {
@@ -61,8 +49,10 @@ public static class HouseLevelData
         return desires[levelForDesire];
     }
 
-    private static readonly DesireConfig[] desires = new DesireConfig[]
-    {
+    private static readonly DesireConfig[] desires =
+    [
+        new(0, 0, 0, 0),
+
         new(2, -2, 1, 1),
         new(2, -2, 1, 1),
         new(2, -2, 1, 1),
@@ -78,7 +68,7 @@ public static class HouseLevelData
         new(0, 0, 0, 0),
         new(0, 0, 0, 0),
 
-        new(2, 2, 1, -1),
+        new(2, 1, 2, -1),
         new(2, 2, 1, -1),
 
         new(3, 3, 1, -1),
@@ -89,5 +79,5 @@ public static class HouseLevelData
 
         new(6, 5, 2, -1),
         new(6, 5, 2, -1),
-    };
+    ];
 }

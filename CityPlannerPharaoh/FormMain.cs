@@ -106,7 +106,7 @@ public partial class FormMain : Form
         }
         else
         {
-            var tagString = (string)currentButton.Tag;
+            var tagString = (string)currentButton.Tag!;
             var buildingType = Enum.Parse<MapBuildingType>(tagString);
             this.mapControl.Tool = new Tool { BuildingType = buildingType };
         }
@@ -125,11 +125,11 @@ public partial class FormMain : Form
     private void SecondaryToolbarButtonClick(object? sender, EventArgs e)
     {
         var currentButton = (ToolStripButton)sender!;
-        var toolStrip = currentButton.GetCurrentParent();
+        var toolStrip = currentButton.GetCurrentParent()!;
 
         UntickOtherToolbarButtons(toolStrip, currentButton);
 
-        var tagString = (string)currentButton.Tag;
+        var tagString = (string)currentButton.Tag!;
 
         if (tagString.StartsWith(TagPrefixTerrain))
         {

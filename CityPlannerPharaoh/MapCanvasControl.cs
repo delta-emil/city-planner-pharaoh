@@ -283,7 +283,7 @@ public class MapCanvasControl : Control
                 }
 
                 // draw max house level
-                string text = "H" + (building.HouseLevel + 1);
+                string text = "H" + building.HouseLevel;
                 var textSize = graphics.MeasureString(text, this.smallFont);
 
                 int positionShift = size.width == 1 ? 3 : -3;

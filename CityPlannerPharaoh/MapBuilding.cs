@@ -9,7 +9,7 @@ public class MapBuilding
     public MapBuildingType BuildingType { get; set; }
 
     [JsonIgnore]
-    public int HouseLevel { get; set; } = -1;
+    public int HouseLevel { get; set; }
 
     public override string ToString()
     {
