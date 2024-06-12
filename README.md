@@ -4,8 +4,9 @@ A city planner tool for the classic Pharaoh city builder game.
 
 # TODO
 
-- nicer display names for buildings
 - undo/redo
+- copy-paste using clipboard, so that you can paste into another instance
+- nicer display names for buildings
 
 Low prio:
 

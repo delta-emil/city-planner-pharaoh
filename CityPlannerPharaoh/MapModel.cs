@@ -48,7 +48,7 @@ public class MapModel
     }
 
     [JsonIgnore]
-    public bool IsChanged { get; set; }
+    public bool IsChanged { get; private set; }
 
     public int MapSideX { get; }
     public int MapSideY { get; }
@@ -58,14 +58,39 @@ public class MapModel
 
     public List<MapBuilding> Buildings { get; }
 
+    [JsonIgnore]
+    public List<ActionData> UndoStack { get; } = new();
+
+    [JsonIgnore]
+    public List<ActionData> RedoStack { get; } = new();
+
+    // how does this affect undo/redo?
+    public void ClearChanged()
+    {
+        IsChanged = false;
+    }
+
+    // subject to undo
+    public void ChangeTerrain(MapCellModel cellModel, MapTerrain newTerrain)
+    {
+        this.UndoStack.Add(new ActionData { ActionType = ActionType.ChangeTerrain, OldTerrain = cellModel.Terrain });
+        this.IsChanged = true;
+
+        cellModel.Terrain = newTerrain;
+    }
+
+    // subject to undo
     public MapBuilding? AddBuilding(int left, int top, MapBuildingType mapBuildingType)
     {
-        if (!CanAddBuilding(left, top, mapBuildingType))
+        if (!this.CanAddBuilding(left, top, mapBuildingType))
         {
             return null;
         }
 
         var mapBuilding = new MapBuilding { Left = left, Top = top, BuildingType = mapBuildingType };
+
+        this.UndoStack.Add(new ActionData { ActionType = ActionType.ChangeBuildings, AddedBuildings = [mapBuilding.GetCopy()] });
+        this.IsChanged = true;
 
         this.Buildings.Add(mapBuilding);
 
@@ -73,6 +98,37 @@ public class MapModel
         AddDesirabilityEffect(mapBuilding, 1);
 
         return mapBuilding;
+    }
+
+    // subject to undo
+    public void AddBuildingsWithOffset(HashSet<MapBuilding> buildingsToAdd, int cellX, int cellY)
+    {
+        var addedBuildings = new List<MapBuilding>(buildingsToAdd.Count);
+        foreach (var building in buildingsToAdd)
+        {
+            var left = building.Left + cellX;
+            var top = building.Top + cellY;
+
+            if (!this.CanAddBuilding(left, top, building.BuildingType))
+            {
+                continue;
+            }
+
+            var mapBuilding = new MapBuilding { Left = left, Top = top, BuildingType = building.BuildingType };
+
+            addedBuildings.Add(mapBuilding.GetCopy());
+
+            this.Buildings.Add(mapBuilding);
+
+            SetBuildingInCells(mapBuilding);
+            AddDesirabilityEffect(mapBuilding, 1);
+        }
+
+        if (addedBuildings.Count > 0)
+        {
+            this.UndoStack.Add(new ActionData { ActionType = ActionType.ChangeBuildings, AddedBuildings = addedBuildings });
+            this.IsChanged = true;
+        }
     }
 
     public bool CanAddBuilding(int left, int top, MapBuildingType mapBuildingType, HashSet<MapBuilding>? ignoredBuildings = null)
@@ -148,6 +204,7 @@ public class MapModel
         }
     }
 
+    // subject to undo
     public void RemoveBuilding(MapBuilding mapBuilding)
     {
         if (!this.Buildings.Remove(mapBuilding))
@@ -155,8 +212,35 @@ public class MapModel
             return;
         }
 
+        this.UndoStack.Add(new ActionData { ActionType = ActionType.ChangeBuildings, RemovedBuildings = [mapBuilding.GetCopy()] });
+        this.IsChanged = true;
+
         RemoveBuildingFromCells(mapBuilding);
         AddDesirabilityEffect(mapBuilding, -1);
+    }
+
+    // subject to undo
+    public void RemoveBuildings(HashSet<MapBuilding> buildingsToRemove)
+    {
+        var removedBuildings = new List<MapBuilding>(buildingsToRemove.Count);
+        foreach (var mapBuilding in buildingsToRemove)
+        {
+            if (!this.Buildings.Remove(mapBuilding))
+            {
+                continue;
+            }
+
+            removedBuildings.Add(mapBuilding.GetCopy());
+
+            RemoveBuildingFromCells(mapBuilding);
+            AddDesirabilityEffect(mapBuilding, -1);
+        }
+
+        if (removedBuildings.Count > 0)
+        {
+            this.UndoStack.Add(new ActionData { ActionType = ActionType.ChangeBuildings, RemovedBuildings = removedBuildings });
+            this.IsChanged = true;
+        }
     }
 
     private void RemoveBuildingFromCells(MapBuilding mapBuilding)
@@ -220,10 +304,21 @@ public class MapModel
         return maxDesire;
     }
 
+    // subject to undo
     public void MoveBuildingsByOffset(HashSet<MapBuilding> selectedBuildings, int offsetX, int offsetY)
     {
+        if (offsetX == 0 || offsetY == 0)
+        {
+            return;
+        }
+
+        var removedBuildings = new List<MapBuilding>();
+        var addedBuildings = new List<MapBuilding>();
+
         foreach (var building in selectedBuildings)
         {
+            removedBuildings.Add(building.GetCopy());
+            
             RemoveBuildingFromCells(building);
             AddDesirabilityEffect(building, -1);
         }
@@ -232,10 +327,15 @@ public class MapModel
         {
             building.Left += offsetX;
             building.Top += offsetY;
+            addedBuildings.Add(building.GetCopy());
+
             SetBuildingInCells(building);
             building.HouseLevel = 0;
             AddDesirabilityEffect(building, 1);
         }
+
+        this.IsChanged = true;
+        this.UndoStack.Add(new ActionData { ActionType = ActionType.ChangeBuildings, RemovedBuildings = removedBuildings, AddedBuildings = addedBuildings });
     }
 
     private void AddDesirabilityEffect(MapBuilding mapBuilding, int multiplier)
@@ -433,7 +533,7 @@ public class MapModel
         }
     }
 
-    public DesireConfig GetBuildingDesire(MapBuilding mapBuilding)
+    public static DesireConfig GetBuildingDesire(MapBuilding mapBuilding)
     {
         if (mapBuilding.BuildingType.GetCategory() == MapBuildingCategory.House)
         {

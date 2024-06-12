@@ -335,7 +335,7 @@ public partial class FormMain : Form
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
             JsonSerializer.Serialize(outputStream, mapModel, options);
 
-            mapModel.IsChanged = false;
+            mapModel.ClearChanged();
 
             return true;
         }

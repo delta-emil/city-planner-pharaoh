@@ -1,4 +1,5 @@
 ﻿using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 
 namespace CityPlannerPharaoh;
 
@@ -325,7 +326,6 @@ public class MapCanvasControl : Control
             {
                 var offsetX = this.selectionDragEndCell.x - this.selectionDragStartCell.x;
                 var offsetY = this.selectionDragEndCell.y - this.selectionDragStartCell.y;
-                this.MapModel.IsChanged = true;
                 this.MapModel.MoveBuildingsByOffset(this.selectedBuildings, offsetX, offsetY);
             }
 
@@ -424,8 +424,7 @@ public class MapCanvasControl : Control
                 return;
             }
 
-            this.MapModel.IsChanged = true;
-            cellModel.Terrain = this.Tool.Terrain.Value;
+            this.MapModel.ChangeTerrain(cellModel, this.Tool.Terrain.Value);
 
             if (cellModel.Building == null)
             {
@@ -439,7 +438,6 @@ public class MapCanvasControl : Control
             var building = this.MapModel.AddBuilding(cellX, cellY, this.Tool.BuildingType.Value);
             if (building != null)
             {
-                this.MapModel.IsChanged = true;
                 var buildingRect = GetBuildingRectangle(building, includingDesire: this.ShowDesirability);
                 Invalidate(buildingRect);
             }
@@ -452,7 +450,6 @@ public class MapCanvasControl : Control
                 return;
             }
 
-            this.MapModel.IsChanged = true;
             this.MapModel.RemoveBuilding(building);
             var buildingRect = GetBuildingRectangle(building, includingDesire: this.ShowDesirability);
             Invalidate(buildingRect);
@@ -701,7 +698,7 @@ public class MapCanvasControl : Control
         if (includingDesire)
         {
             var desireRange = new[] { building }.Concat(building.GetSubBuildings())
-                .Select(x => this.MapModel.GetBuildingDesire(x).Range)
+                .Select(x => MapModel.GetBuildingDesire(x).Range)
                 .Max();
             return new Rectangle(
                 (building.Left - desireRange) * CellSideLength,
@@ -792,11 +789,7 @@ public class MapCanvasControl : Control
         {
             BuildingsCopy();
 
-            this.MapModel.IsChanged = true;
-            foreach (var building in this.selectedBuildings)
-            {
-                this.MapModel.RemoveBuilding(building);
-            }
+            this.MapModel.RemoveBuildings(this.selectedBuildings);
 
             this.Invalidate();
         }
@@ -843,12 +836,7 @@ public class MapCanvasControl : Control
             }
         }
 
-        foreach (var building in this.clipboardBuildings)
-        {
-            var left = building.Left + cellX;
-            var top = building.Top + cellY;
-            this.MapModel.AddBuilding(left, top, building.BuildingType);
-        }
+        this.MapModel.AddBuildingsWithOffset(this.clipboardBuildings, cellX, cellY);
 
         this.Invalidate();
     }
