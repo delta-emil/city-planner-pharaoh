@@ -17,6 +17,7 @@ public class MapCanvasControl : Control
     private readonly Brush ghostInvalidBrush;
     private readonly Font smallFont;
     private readonly Font smallFontBold;
+    private readonly Font bigHouseFont;
     private readonly Brush[] terrainBrushes;
     private readonly Brush[] buildingBrushes;
     private readonly Brush farmMeadowBrush;
@@ -42,6 +43,7 @@ public class MapCanvasControl : Control
         this.textBrush = new SolidBrush(Color.Black);
         this.smallFont = new Font("Bahnschrift Condensed", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
         this.smallFontBold = new Font("Bahnschrift Condensed", 8.25F, FontStyle.Bold, GraphicsUnit.Point);
+        this.bigHouseFont = new Font("Bahnschrift", 9F, FontStyle.Regular, GraphicsUnit.Point);
 
         this.ghostValidBrush = new SolidBrush(Color.FromArgb(96, 0, 255, 0));
         this.ghostInvalidBrush = new SolidBrush(Color.FromArgb(96, 255, 0, 0));
@@ -284,12 +286,19 @@ public class MapCanvasControl : Control
 
                 // draw max house level
                 string text = "H" + building.HouseLevel;
-                var textSize = graphics.MeasureString(text, this.smallFont);
+                var houseLabelFont = size.width > 1 ? this.bigHouseFont : this.smallFont;
+                var textSize = graphics.MeasureString(text, houseLabelFont);
 
-                int positionShift = size.width == 1 ? 3 : -3;
+                int positionShift
+                    = size.width switch
+                    {
+                        1 => 3,
+                        3 => 9,
+                        _ => -3
+                    };
 
                 graphics.DrawString(
-                    text, this.smallFontBold, this.textBrush,
+                    text, houseLabelFont, this.textBrush,
                     buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2 + positionShift,
                     buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2 + positionShift);
             }

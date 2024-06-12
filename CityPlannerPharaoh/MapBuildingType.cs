@@ -601,12 +601,12 @@ public static partial class MapBuildingTypeExtensions
             MapBuildingType.Well => "W",
             MapBuildingType.StatueSmall => "St",
             MapBuildingType.Weaponsmith => "Weapon\r\nsmith",
-            _ => RegexWordBumpBoreder().Replace(mapBuildingType.ToString(), "$1\r\n$2"),
+            _ => RegexWordBumpBorder().Replace(mapBuildingType.ToString(), "$1\r\n$2"),
         };
     }
 
     [GeneratedRegex("([a-z])([A-Z])")]
-    private static partial Regex RegexWordBumpBoreder();
+    private static partial Regex RegexWordBumpBorder();
 
     public static bool IgnoreMainBuilding(this MapBuildingType mapBuildingType)
     {
