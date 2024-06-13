@@ -4,8 +4,10 @@ A city planner tool for the classic Pharaoh city builder game.
 
 # TODO
 
-- nicer display names for buildings
+- improve double-bufferring: keep the buffer, use in building placement
+- redraw entire view when add/move/delete building, because disireability effects can cascade further through houses
 - undo/redo
+- nicer display names for buildings
 
 Low prio:
 

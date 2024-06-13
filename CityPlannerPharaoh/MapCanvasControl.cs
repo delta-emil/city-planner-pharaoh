@@ -323,6 +323,15 @@ public class MapCanvasControl : Control
             var (cellX, cellY) = GetCellCoordidates(e);
             this.BuildingsPaste(cellX, cellY);
         }
+        else if (e.Button == MouseButtons.Middle)
+        {
+            var (cellX, cellY) = GetCellCoordidates(e);
+            var mapBuilding = this.MapModel.Cells[cellX, cellY].Building;
+            if (mapBuilding != null)
+            {
+                this.Tool = new Tool { BuildingType = mapBuilding.BuildingType };
+            }
+        }
     }
 
     protected override void OnMouseUp(MouseEventArgs e)
@@ -540,6 +549,7 @@ public class MapCanvasControl : Control
                     var offsetY = this.selectionDragEndCell.y - this.selectionDragStartCell.y;
                     
                     using var graphics = this.CreateGraphics();
+                    // TODO: keep the same buffer until a map with a different size is loaded
                     using BufferedGraphics bufferedGraphics = BufferedGraphicsManager.Current.Allocate(graphics, Rectangle.Round(this.ClientRectangle));
                     var screenRect = this.RectangleToScreen(this.ClientRectangle);
                     bufferedGraphics.Graphics.CopyFromScreen(screenRect.Left, screenRect.Top, 0, 0, screenRect.Size);
@@ -801,11 +811,24 @@ public class MapCanvasControl : Control
 
     #region buildings cut-copy-paste
 
+    public void BuildingsDelete()
+    {
+        BuildingsCutOrDelete(putOnClipboard: false);
+    }
+
     public void BuildingsCut()
+    {
+        BuildingsCutOrDelete(putOnClipboard: true);
+    }
+
+    private void BuildingsCutOrDelete(bool putOnClipboard)
     {
         if (this.selectedBuildings.Count > 0)
         {
-            BuildingsCopy();
+            if (putOnClipboard)
+            {
+                BuildingsCopy();
+            }
 
             this.MapModel.IsChanged = true;
             foreach (var building in this.selectedBuildings)

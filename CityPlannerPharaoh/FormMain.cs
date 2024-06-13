@@ -589,5 +589,9 @@ public partial class FormMain : Form
         {
             this.btnFileSave_Click(this.btnFileSave, EventArgs.Empty);
         }
+        else if (e.KeyCode == Keys.Delete)
+        {
+            this.mapControl.BuildingsDelete();
+        }
     }
 }
