@@ -1,4 +1,5 @@
-﻿using System.Drawing.Drawing2D;
+﻿using System.Diagnostics;
+using System.Drawing.Drawing2D;
 
 namespace CityPlannerPharaoh;
 
@@ -537,9 +538,12 @@ public class MapCanvasControl : Control
                     this.selectionDragEndCell = newEndCell;
                     var offsetX = this.selectionDragEndCell.x - this.selectionDragStartCell.x;
                     var offsetY = this.selectionDragEndCell.y - this.selectionDragStartCell.y;
-
+                    
                     using var graphics = this.CreateGraphics();
-                    ClearGhost(graphics);
+                    using BufferedGraphics bufferedGraphics = BufferedGraphicsManager.Current.Allocate(graphics, Rectangle.Round(this.ClientRectangle));
+                    var screenRect = this.RectangleToScreen(this.ClientRectangle);
+                    bufferedGraphics.Graphics.CopyFromScreen(screenRect.Left, screenRect.Top, 0, 0, screenRect.Size);
+                    ClearGhost(bufferedGraphics.Graphics);
 
                     if (offsetX != 0 || offsetY != 0)
                     {
@@ -562,14 +566,14 @@ public class MapCanvasControl : Control
                                         (subBuilding.Top + offsetY) * CellSideLength,
                                         width * CellSideLength,
                                         height * CellSideLength);
-                                    ShowGhostOnCells(newGhostRect, isValid, graphics, append: true);
+                                    ShowGhostOnCells(newGhostRect, isValid, bufferedGraphics.Graphics, append: true);
                                 }
                             }
                             else
                             {
                                 var (width, height) = building.BuildingType.GetSize();
                                 var newGhostRect = new Rectangle(newCellX * CellSideLength, newCellY * CellSideLength, width * CellSideLength, height * CellSideLength);
-                                ShowGhostOnCells(newGhostRect, isValid, graphics, append: true);
+                                ShowGhostOnCells(newGhostRect, isValid, bufferedGraphics.Graphics, append: true);
                             }
                         }
                     }
@@ -577,6 +581,8 @@ public class MapCanvasControl : Control
                     {
                         this.moveValid = false;
                     }
+
+                    bufferedGraphics.Render(graphics);
                 }
             }
         }
