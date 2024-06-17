@@ -907,4 +907,15 @@ public class MapCanvasControl : Control
             this.SelectionChanged(this, args);
         }
     }
+
+    public void SetDifficulty(Difficulty difficulty)
+    {
+        if (this.MapModel.EffectiveDifficulty == difficulty)
+        {
+            return;
+        }
+
+        this.MapModel.SetDifficulty(difficulty);
+        this.Invalidate();
+    }
 }

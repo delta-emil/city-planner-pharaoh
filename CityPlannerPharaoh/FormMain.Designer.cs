@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             Tool tool1 = new Tool();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             toolStripMain = new ToolStrip();
             btnSelect = new ToolStripButton();
             btnTerrain = new ToolStripButton();
@@ -69,6 +70,12 @@
             btnCopyBuildings = new ToolStripButton();
             toolStripLabelPasteBuildings = new ToolStripLabel();
             toolStripSeparator3 = new ToolStripSeparator();
+            ddDifficulty = new ToolStripDropDownButton();
+            btnDifficultyVE = new ToolStripMenuItem();
+            btnDifficultyE = new ToolStripMenuItem();
+            btnDifficultyN = new ToolStripMenuItem();
+            btnDifficultyH = new ToolStripMenuItem();
+            btnDifficultyVH = new ToolStripMenuItem();
             openFileDialog = new OpenFileDialog();
             saveFileDialog = new SaveFileDialog();
             toolStripSecondary = new ToolStrip();
@@ -264,7 +271,7 @@
             // toolStripTop
             // 
             toolStripTop.AutoSize = false;
-            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3 });
+            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3, ddDifficulty });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
             toolStripTop.Size = new Size(1246, 25);
@@ -403,6 +410,53 @@
             toolStripSeparator3.Name = "toolStripSeparator3";
             toolStripSeparator3.Size = new Size(6, 25);
             // 
+            // ddDifficulty
+            // 
+            ddDifficulty.AutoSize = false;
+            ddDifficulty.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            ddDifficulty.DropDownItems.AddRange(new ToolStripItem[] { btnDifficultyVE, btnDifficultyE, btnDifficultyN, btnDifficultyH, btnDifficultyVH });
+            ddDifficulty.Image = (Image)resources.GetObject("ddDifficulty.Image");
+            ddDifficulty.ImageTransparentColor = Color.Magenta;
+            ddDifficulty.Name = "ddDifficulty";
+            ddDifficulty.Size = new Size(71, 22);
+            ddDifficulty.Text = "Hard";
+            ddDifficulty.ToolTipText = "Difficulty";
+            // 
+            // btnDifficultyVE
+            // 
+            btnDifficultyVE.Name = "btnDifficultyVE";
+            btnDifficultyVE.Size = new Size(180, 22);
+            btnDifficultyVE.Text = "Very Easy";
+            btnDifficultyVE.Click += btnDifficulty_Click;
+            // 
+            // btnDifficultyE
+            // 
+            btnDifficultyE.Name = "btnDifficultyE";
+            btnDifficultyE.Size = new Size(180, 22);
+            btnDifficultyE.Text = "Easy";
+            btnDifficultyE.Click += btnDifficulty_Click;
+            // 
+            // btnDifficultyN
+            // 
+            btnDifficultyN.Name = "btnDifficultyN";
+            btnDifficultyN.Size = new Size(180, 22);
+            btnDifficultyN.Text = "Normal";
+            btnDifficultyN.Click += btnDifficulty_Click;
+            // 
+            // btnDifficultyH
+            // 
+            btnDifficultyH.Name = "btnDifficultyH";
+            btnDifficultyH.Size = new Size(180, 22);
+            btnDifficultyH.Text = "Hard";
+            btnDifficultyH.Click += btnDifficulty_Click;
+            // 
+            // btnDifficultyVH
+            // 
+            btnDifficultyVH.Name = "btnDifficultyVH";
+            btnDifficultyVH.Size = new Size(180, 22);
+            btnDifficultyVH.Text = "Very Hard";
+            btnDifficultyVH.Click += btnDifficulty_Click;
+            // 
             // openFileDialog
             // 
             openFileDialog.Filter = "City Planner Pharaoh files|*.cityph|All files|*.*";
@@ -493,5 +547,11 @@
         private ToolStrip toolStripSecondary;
         private ToolStripButton btnNewFromGameSave;
         private OpenFileDialog openFileDialogImport;
+        private ToolStripDropDownButton ddDifficulty;
+        private ToolStripMenuItem btnDifficultyVE;
+        private ToolStripMenuItem btnDifficultyE;
+        private ToolStripMenuItem btnDifficultyN;
+        private ToolStripMenuItem btnDifficultyH;
+        private ToolStripMenuItem btnDifficultyVH;
     }
 }

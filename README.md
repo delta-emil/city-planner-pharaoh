@@ -36,8 +36,12 @@ I'll describe the less obvious parts, which is the mouse and keyboard shortcuts:
 
 Notes:
 
-* At the moment house levels are for Hard difficulty (because I play on Hard). I plan to have it selectable later.
-* The desirabilty effects on houses on each other is also taken into consideration. Sometimes though a house's displayed level might not be updated until redrawn if it's far enough away from the place where you made the change. If you wave a building placement over it, it shoud update. I plan to fix this.
+* The desirabilty effects on houses on each other is also taken into consideration.
+  Sometimes though a house's displayed level might not be updated until redrawn if it's far enough away from the place where you made the change.
+  If you wave a building placement over it, it shoud update. I plan to fix this.
+* House level is shown as the maximum achievable regardless of the placed house size.
+  However the desirability effect of the house is capped at the max level of it size.
+  E.g. a 2x2 house can show H20 (Palatial Estate) but will only have the desirability effect of the top 2x2 house level 14 (Fancy Residence).
 * "New from game save..." lets you select a save file and it loads the terrain from it
 * North is to the upper-left. (as seems to be customary in the forums)
 * Cut/Copy/Paste currently doesn't use the clipboard, so if you start the program twice, you currently can't copy in one then paste in the other. I plan to fix it.
@@ -51,7 +55,6 @@ Notes:
 - cut/copy/paste through clipboard so you can copy to another instance; keyboard shortcuts (Ctrl+X, Ctrl+C)
 - show entertainment shapes in toolbar
 - nicer display names for buildings
-- difficulty drop-down
 
 Low prio:
 

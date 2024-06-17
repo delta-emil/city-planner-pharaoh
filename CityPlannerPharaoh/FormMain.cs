@@ -199,6 +199,7 @@ public partial class FormMain : Form
 
             if (mapModel != null)
             {
+                mapModel.SetDifficulty(this.mapControl.MapModel.EffectiveDifficulty);
                 this.fileName = null;
                 this.mapControl.MapModel = mapModel;
                 this.mapControl.SetSizeToFullMapSize();
@@ -231,6 +232,7 @@ public partial class FormMain : Form
                 this.mapControl.MapModel = mapModel;
                 this.mapControl.SetSizeToFullMapSize();
                 this.mapControl.Invalidate();
+                this.SetShownDifficulty(mapModel.EffectiveDifficulty);
             }
             else
             {
@@ -319,7 +321,9 @@ public partial class FormMain : Form
 
     private void InitEmptyFile()
     {
-        this.mapControl.MapModel = new MapModel(MapModel.DefaultMapSize, MapModel.DefaultMapSize);
+        var mapModel = new MapModel(MapModel.DefaultMapSize, MapModel.DefaultMapSize);
+        mapModel.SetDifficulty(this.mapControl.MapModel.EffectiveDifficulty);
+        this.mapControl.MapModel = mapModel;
         this.mapControl.SetSizeToFullMapSize();
         this.mapControl.Invalidate();
         this.fileName = null;
@@ -593,5 +597,37 @@ public partial class FormMain : Form
         {
             this.mapControl.BuildingsDelete();
         }
+    }
+
+    private void btnDifficulty_Click(object sender, EventArgs e)
+    {
+        var menuItem = (ToolStripMenuItem)sender;
+        Difficulty? difficultyOption
+            = menuItem == btnDifficultyVE ? Difficulty.VeryEasy
+            : menuItem == btnDifficultyE  ? Difficulty.Easy
+            : menuItem == btnDifficultyN  ? Difficulty.Normal
+            : menuItem == btnDifficultyH  ? Difficulty.Hard
+            : menuItem == btnDifficultyVH ? Difficulty.VeryHard
+            : null;
+        if (difficultyOption is not Difficulty difficulty)
+        {
+            return;
+        }
+
+        ddDifficulty.Text = menuItem.Text;
+        this.mapControl.SetDifficulty(difficulty);
+    }
+
+    private void SetShownDifficulty(Difficulty effectiveDifficulty)
+    {
+        ddDifficulty.Text = effectiveDifficulty switch
+        {
+            Difficulty.VeryEasy => "Very Easy",
+            Difficulty.Easy     => "Easy",
+            Difficulty.Normal   => "Normal",
+            Difficulty.Hard     => "Hard",
+            Difficulty.VeryHard => "Very Hard",
+            _                   => "Hard",
+        };
     }
 }

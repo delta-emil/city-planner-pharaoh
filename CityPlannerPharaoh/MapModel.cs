@@ -25,10 +25,11 @@ public class MapModel
         }
 
         this.Buildings = new();
+        this.SavedDifficulty = Difficulty.Hard;
     }
 
     [JsonConstructor]
-    public MapModel(int mapSideX, int mapSideY, bool hasTooCloseToVoidToBuild, MapCellModel[,] cells, List<MapBuilding> buildings)
+    public MapModel(int mapSideX, int mapSideY, bool hasTooCloseToVoidToBuild, MapCellModel[,] cells, List<MapBuilding> buildings, Difficulty? savedDifficulty)
         : this(mapSideX, mapSideY)
     {
         this.Cells = cells;
@@ -38,6 +39,11 @@ public class MapModel
         if (this.HasTooCloseToVoidToBuild)
         {
             this.SetTooCloseToVoidToBuildAfterInit();
+        }
+
+        if (savedDifficulty != null)
+        {
+            this.SavedDifficulty = savedDifficulty.Value;
         }
 
         foreach (var mapBuilding in this.Buildings)
@@ -57,6 +63,12 @@ public class MapModel
     public MapCellModel[,] Cells { get; }
 
     public List<MapBuilding> Buildings { get; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public Difficulty? SavedDifficulty { get; private set; }
+
+    [JsonIgnore]
+    public Difficulty EffectiveDifficulty => SavedDifficulty!.Value;
 
     public MapBuilding? AddBuilding(int left, int top, MapBuildingType mapBuildingType)
     {
@@ -240,7 +252,6 @@ public class MapModel
 
     private void AddDesirabilityEffect(MapBuilding mapBuilding, int multiplier)
     {
-
         if (DoLogging)
         {
             Console.WriteLine(new string('=', 40));
@@ -301,7 +312,7 @@ public class MapModel
                 var oldHouseLevel = affectedHouse.HouseLevel;
 
                 var maxDesire = this.GetHouseMaxDesirability(affectedHouse);
-                var newHouseLevel = HouseLevelData.GetHouseLevel(maxDesire);
+                var newHouseLevel = HouseLevelData.GetHouseLevel(maxDesire, this.EffectiveDifficulty);
                 affectedHouse.HouseLevel = newHouseLevel;
 
                 if (oldHouseLevel != newHouseLevel)
@@ -442,6 +453,27 @@ public class MapModel
         else
         {
             return mapBuilding.BuildingType.GetDesire();
+        }
+    }
+
+    public void SetDifficulty(Difficulty newDifficulty)
+    {
+        var houses = this.Buildings.Where(x => x.BuildingType.GetCategory() == MapBuildingCategory.House).ToList();
+
+        foreach (var building in houses)
+        {
+            RemoveBuildingFromCells(building);
+            AddDesirabilityEffect(building, -1);
+        }
+
+        this.IsChanged = true;
+        this.SavedDifficulty = newDifficulty;
+
+        foreach (var building in houses)
+        {
+            SetBuildingInCells(building);
+            building.HouseLevel = 0;
+            AddDesirabilityEffect(building, 1);
         }
     }
 
