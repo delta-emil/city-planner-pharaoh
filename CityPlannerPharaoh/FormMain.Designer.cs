@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             Tool tool1 = new Tool();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             toolStripMain = new ToolStrip();
             btnSelect = new ToolStripButton();
             btnTerrain = new ToolStripButton();
@@ -415,7 +414,6 @@
             ddDifficulty.AutoSize = false;
             ddDifficulty.DisplayStyle = ToolStripItemDisplayStyle.Text;
             ddDifficulty.DropDownItems.AddRange(new ToolStripItem[] { btnDifficultyVE, btnDifficultyE, btnDifficultyN, btnDifficultyH, btnDifficultyVH });
-            ddDifficulty.Image = (Image)resources.GetObject("ddDifficulty.Image");
             ddDifficulty.ImageTransparentColor = Color.Magenta;
             ddDifficulty.Name = "ddDifficulty";
             ddDifficulty.Size = new Size(71, 22);

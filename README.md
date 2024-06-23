@@ -53,7 +53,6 @@ Notes:
 - redraw entire view when add/move/delete building, because disireability effects can cascade further through houses
 - undo/redo
 - cut/copy/paste through clipboard so you can copy to another instance; keyboard shortcuts (Ctrl+X, Ctrl+C)
-- show entertainment shapes in toolbar
 - nicer display names for buildings
 
 Low prio:

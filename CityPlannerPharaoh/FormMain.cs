@@ -1,4 +1,5 @@
 using CityPlannerPharaoh.FileDataExtraction;
+using CityPlannerPharaoh.Properties;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -6,7 +7,7 @@ namespace CityPlannerPharaoh;
 
 public partial class FormMain : Form
 {
-    private readonly Dictionary<ToolStripButton, (string Tag, string Display)[]> buttonToSecondary;
+    private readonly Dictionary<ToolStripButton, (string Tag, string Display, Image? Image)[]> buttonToSecondary;
 
     private string? fileName;
 
@@ -59,13 +60,19 @@ public partial class FormMain : Form
         foreach (var itemValues in values)
         {
             ToolStripItem toolStripItem;
-            if (itemValues.Display.Length > 0)
+            if (itemValues.Display.Length > 0 || itemValues.Image != null)
             {
                 var item = new ToolStripButton
                 {
-                    DisplayStyle = ToolStripItemDisplayStyle.Text,
+                    DisplayStyle
+                        = itemValues.Display.Length > 0
+                            ? itemValues.Image != null
+                                ? ToolStripItemDisplayStyle.ImageAndText
+                                : ToolStripItemDisplayStyle.Text
+                            : ToolStripItemDisplayStyle.Image,
                     Size = new Size(39, 19),
                     Text = itemValues.Display,
+                    Image = itemValues.Image,
                     ToolTipText = itemValues.Tag, // TODO: improve maybe have a field about it
                     Tag = itemValues.Tag,
                 };
@@ -393,179 +400,179 @@ public partial class FormMain : Form
 
     private const string TagPrefixTerrain = "+";
 
-    private Dictionary<ToolStripButton, (string Tag, string Display)[]> MakeSecondaryToolbars()
+    private Dictionary<ToolStripButton, (string Tag, string Display, Image? Image)[]> MakeSecondaryToolbars()
     {
-        var result = new Dictionary<ToolStripButton, (string Tag, string Display)[]>();
+        var result = new Dictionary<ToolStripButton, (string Tag, string Display, Image? Image)[]>();
 
-        result[btnTerrain] = new[]
-        {
-            (TagPrefixTerrain + nameof(MapTerrain.Void), "Void"),
-            (TagPrefixTerrain + nameof(MapTerrain.Grass), "G"),
-            (TagPrefixTerrain + nameof(MapTerrain.GrassFarmland), "G+F"),
-            (TagPrefixTerrain + nameof(MapTerrain.Sand), "S"),
-            (TagPrefixTerrain + nameof(MapTerrain.SandFarmland), "S+F"),
-            (TagPrefixTerrain + nameof(MapTerrain.Rock), "R"),
-            (TagPrefixTerrain + nameof(MapTerrain.RockOre), "R+O"),
-            (TagPrefixTerrain + nameof(MapTerrain.Dune), "Du"),
-            (TagPrefixTerrain + nameof(MapTerrain.Floodpain), "F"),
-            (TagPrefixTerrain + nameof(MapTerrain.FloodpainEdge), "F/e"),
-            (TagPrefixTerrain + nameof(MapTerrain.Water), "W"),
-            (TagPrefixTerrain + nameof(MapTerrain.WaterEdge), "W/e"),
-            (TagPrefixTerrain + nameof(MapTerrain.Trees), "Tree"),
-            (TagPrefixTerrain + nameof(MapTerrain.Reeds), "Reed"),
-        };
+        result[btnTerrain] =
+        [
+            (TagPrefixTerrain + nameof(MapTerrain.Void), "Void", null),
+            (TagPrefixTerrain + nameof(MapTerrain.Grass), "G", null),
+            (TagPrefixTerrain + nameof(MapTerrain.GrassFarmland), "G+F", null),
+            (TagPrefixTerrain + nameof(MapTerrain.Sand), "S", null),
+            (TagPrefixTerrain + nameof(MapTerrain.SandFarmland), "S+F", null),
+            (TagPrefixTerrain + nameof(MapTerrain.Rock), "R", null),
+            (TagPrefixTerrain + nameof(MapTerrain.RockOre), "R+O", null),
+            (TagPrefixTerrain + nameof(MapTerrain.Dune), "Du", null),
+            (TagPrefixTerrain + nameof(MapTerrain.Floodpain), "F", null),
+            (TagPrefixTerrain + nameof(MapTerrain.FloodpainEdge), "F/e", null),
+            (TagPrefixTerrain + nameof(MapTerrain.Water), "W", null),
+            (TagPrefixTerrain + nameof(MapTerrain.WaterEdge), "W/e", null),
+            (TagPrefixTerrain + nameof(MapTerrain.Trees), "Tree", null),
+            (TagPrefixTerrain + nameof(MapTerrain.Reeds), "Reed", null),
+        ];
 
-        result[btnFood] = new[]
-        {
-            (nameof(MapBuildingType.Farm), "Farm"),
-            (nameof(MapBuildingType.Cattle), "Cttl"),
-            (nameof(MapBuildingType.WaterLift), "Lift"),
-            (nameof(MapBuildingType.Ditch), "Dch"),
-            (nameof(MapBuildingType.Hunter), "Hnt"),
-            (nameof(MapBuildingType.Fisher), "Fish"),
-            (nameof(MapBuildingType.WorkCamp), "Cmp"),
-        };
+        result[btnFood] =
+        [
+            (nameof(MapBuildingType.Farm), "Farm", null),
+            (nameof(MapBuildingType.Cattle), "Cttl", null),
+            (nameof(MapBuildingType.WaterLift), "Lift", null),
+            (nameof(MapBuildingType.Ditch), "Dch", null),
+            (nameof(MapBuildingType.Hunter), "Hnt", null),
+            (nameof(MapBuildingType.Fisher), "Fish", null),
+            (nameof(MapBuildingType.WorkCamp), "Cmp", null),
+        ];
 
-        result[btnIndustry] = new[]
-        {
-            (nameof(MapBuildingType.QuarryPlainStone), "P.St"),
-            (nameof(MapBuildingType.QuarryLimestone), "L.St"),
-            (nameof(MapBuildingType.QuarrySandstone), "S.St"),
-            (nameof(MapBuildingType.QuarryGranite), "Gra"),
-            (nameof(MapBuildingType.MineGems), "Gem"),
-            (nameof(MapBuildingType.MineCopper), "Cop"),
-            (nameof(MapBuildingType.MineGold), "Gold"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Clay), "Clay"),
-            (nameof(MapBuildingType.Reed), "Reed"),
-            (nameof(MapBuildingType.Wood), "Wod"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Potter), "Pot"),
-            (nameof(MapBuildingType.Brewer), "Brw"),
-            (nameof(MapBuildingType.Papyrus), "Pap"),
-            (nameof(MapBuildingType.Weaver), "Wvr"),
-            (nameof(MapBuildingType.Jeweler), "Jwl"),
-            (nameof(MapBuildingType.Bricks), "Bri"),
-            (nameof(MapBuildingType.Lamps), "Lmp"),
-            (nameof(MapBuildingType.Paint), "Pnt"),
-            (nameof(MapBuildingType.Shipwright), "Shp"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.GuildBricklayer), "G.Vr"),
-            (nameof(MapBuildingType.GuildCarpenter), "G.Ca"),
-            (nameof(MapBuildingType.GuildStonemason), "G.St"),
-            (nameof(MapBuildingType.GuildArtisan), "G.Ar"),
-        };
+        result[btnIndustry] =
+        [
+            (nameof(MapBuildingType.QuarryPlainStone), "P.St", null),
+            (nameof(MapBuildingType.QuarryLimestone), "L.St", null),
+            (nameof(MapBuildingType.QuarrySandstone), "S.St", null),
+            (nameof(MapBuildingType.QuarryGranite), "Gra", null),
+            (nameof(MapBuildingType.MineGems), "Gem", null),
+            (nameof(MapBuildingType.MineCopper), "Cop", null),
+            (nameof(MapBuildingType.MineGold), "Gold", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Clay), "Clay", null),
+            (nameof(MapBuildingType.Reed), "Reed", null),
+            (nameof(MapBuildingType.Wood), "Wod", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Potter), "Pot", null),
+            (nameof(MapBuildingType.Brewer), "Brw", null),
+            (nameof(MapBuildingType.Papyrus), "Pap", null),
+            (nameof(MapBuildingType.Weaver), "Wvr", null),
+            (nameof(MapBuildingType.Jeweler), "Jwl", null),
+            (nameof(MapBuildingType.Bricks), "Bri", null),
+            (nameof(MapBuildingType.Lamps), "Lmp", null),
+            (nameof(MapBuildingType.Paint), "Pnt", null),
+            (nameof(MapBuildingType.Shipwright), "Shp", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.GuildBricklayer), "G.Vr", null),
+            (nameof(MapBuildingType.GuildCarpenter), "G.Ca", null),
+            (nameof(MapBuildingType.GuildStonemason), "G.St", null),
+            (nameof(MapBuildingType.GuildArtisan), "G.Ar", null),
+        ];
 
-        result[btnDistribution] = new[]
-        {
-            (nameof(MapBuildingType.Bazaar), "Baz"),
-            (nameof(MapBuildingType.Granary), "Gra"),
-            (nameof(MapBuildingType.StorageYard), "SY"),
-            (nameof(MapBuildingType.Dock), "Dock"),
-        };
+        result[btnDistribution] =
+        [
+            (nameof(MapBuildingType.Bazaar), "Baz", null),
+            (nameof(MapBuildingType.Granary), "Gra", null),
+            (nameof(MapBuildingType.StorageYard), "SY", null),
+            (nameof(MapBuildingType.Dock), "Dock", null),
+        ];
 
-        result[btnEnt] = new[]
-        {
-            (nameof(MapBuildingType.Booth1), "Bo1"),
-            (nameof(MapBuildingType.Booth2), "Bo2"),
-            (nameof(MapBuildingType.Booth3), "Bo3"),
-            (nameof(MapBuildingType.Booth4), "Bo4"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Bandstand1), "Ba1"),
-            (nameof(MapBuildingType.Bandstand2), "Ba2"),
-            (nameof(MapBuildingType.Bandstand3), "Ba3"),
-            (nameof(MapBuildingType.Bandstand4), "Ba4"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Pavilion1), "Pa1"),
-            (nameof(MapBuildingType.Pavilion2), "Pa2"),
-            (nameof(MapBuildingType.Pavilion3), "Pa3"),
-            (nameof(MapBuildingType.Pavilion4), "Pa4"),
-            (nameof(MapBuildingType.Pavilion5), "Pa5"),
-            (nameof(MapBuildingType.Pavilion6), "Pa6"),
-            (nameof(MapBuildingType.Pavilion7), "Pa7"),
-            (nameof(MapBuildingType.Pavilion8), "Pa8"),
-            (nameof(MapBuildingType.Pavilion9), "Pa9"),
-            (nameof(MapBuildingType.Pavilion10), "Pa10"),
-            (nameof(MapBuildingType.Pavilion11), "Pa11"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.JuggleSchool), "JuS"),
-            (nameof(MapBuildingType.MusicSchool), "MuS"),
-            (nameof(MapBuildingType.DanceSchool), "DaS"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Senet), "Sen"),
-            (nameof(MapBuildingType.Zoo), "Zoo"),
-        };
+        result[btnEnt] =
+        [
+            (nameof(MapBuildingType.Booth1), string.Empty, Resources.Booth1),
+            (nameof(MapBuildingType.Booth2), string.Empty, Resources.Booth2),
+            (nameof(MapBuildingType.Booth3), string.Empty, Resources.Booth3),
+            (nameof(MapBuildingType.Booth4), string.Empty, Resources.Booth4),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Bandstand1), string.Empty, Resources.Bandstand1),
+            (nameof(MapBuildingType.Bandstand2), string.Empty, Resources.Bandstand2),
+            (nameof(MapBuildingType.Bandstand3), string.Empty, Resources.Bandstand3),
+            (nameof(MapBuildingType.Bandstand4), string.Empty, Resources.Bandstand4),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Pavilion1),  string.Empty, Resources.Pavilion01),
+            (nameof(MapBuildingType.Pavilion2),  string.Empty, Resources.Pavilion02),
+            (nameof(MapBuildingType.Pavilion3),  string.Empty, Resources.Pavilion03),
+            (nameof(MapBuildingType.Pavilion4),  string.Empty, Resources.Pavilion04),
+            (nameof(MapBuildingType.Pavilion5),  string.Empty, Resources.Pavilion05),
+            (nameof(MapBuildingType.Pavilion6),  string.Empty, Resources.Pavilion06),
+            (nameof(MapBuildingType.Pavilion7),  string.Empty, Resources.Pavilion07),
+            (nameof(MapBuildingType.Pavilion8),  string.Empty, Resources.Pavilion08),
+            (nameof(MapBuildingType.Pavilion9),  string.Empty, Resources.Pavilion09),
+            (nameof(MapBuildingType.Pavilion10), string.Empty, Resources.Pavilion10),
+            (nameof(MapBuildingType.Pavilion11), string.Empty, Resources.Pavilion11),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.JuggleSchool), "JuS", null),
+            (nameof(MapBuildingType.MusicSchool), "MuS", null),
+            (nameof(MapBuildingType.DanceSchool), "DaS", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Senet), "Sen", null),
+            (nameof(MapBuildingType.Zoo), "Zoo", null),
+        ];
 
-        result[btnReligious] = new[]
-        {
-            (nameof(MapBuildingType.Shrine), "Shr"),
-            (nameof(MapBuildingType.Temple), "Tem"),
-            (nameof(MapBuildingType.TempleComplex1), "TC1"),
-            (nameof(MapBuildingType.TempleComplex2), "TC2"),
-            (nameof(MapBuildingType.FestivalSquare), "FSq"),
-        };
+        result[btnReligious] =
+        [
+            (nameof(MapBuildingType.Shrine), "Shr", null),
+            (nameof(MapBuildingType.Temple), "Tem", null),
+            (nameof(MapBuildingType.TempleComplex1), "TC1", null),
+            (nameof(MapBuildingType.TempleComplex2), "TC2", null),
+            (nameof(MapBuildingType.FestivalSquare), "FSq", null),
+        ];
 
-        result[btnEducation] = new[]
-        {
-            (nameof(MapBuildingType.ScribeSchool), "Sch"),
-            (nameof(MapBuildingType.Library), "Lib"),
-        };
+        result[btnEducation] =
+        [
+            (nameof(MapBuildingType.ScribeSchool), "Sch", null),
+            (nameof(MapBuildingType.Library), "Lib", null),
+        ];
 
-        result[btnHealth] = new[]
-        {
-            (nameof(MapBuildingType.Well), "Well"),
-            (nameof(MapBuildingType.WaterSupply), "Wat"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Physician), "Phy"),
-            (nameof(MapBuildingType.Apothecary), "Apo"),
-            (nameof(MapBuildingType.Dentist), "Den"),
-            (nameof(MapBuildingType.Mortuary), "Mor"),
-        };
+        result[btnHealth] =
+        [
+            (nameof(MapBuildingType.Well), "Well", null),
+            (nameof(MapBuildingType.WaterSupply), "Wat", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Physician), "Phy", null),
+            (nameof(MapBuildingType.Apothecary), "Apo", null),
+            (nameof(MapBuildingType.Dentist), "Den", null),
+            (nameof(MapBuildingType.Mortuary), "Mor", null),
+        ];
 
-        result[btnMunicipal] = new[]
-        {
-            (nameof(MapBuildingType.Firehouse), "Fi"),
-            (nameof(MapBuildingType.Architect), "Ar"),
-            (nameof(MapBuildingType.Police), "Po"),
-            (nameof(MapBuildingType.Tax), "Tax"),
-            (nameof(MapBuildingType.Courthouse), "Crt"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Roadblock), "RB"),
-            (nameof(MapBuildingType.Bridge), "Bri"),
-            (nameof(MapBuildingType.FerryLanding), "Fer"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Garden), "Gar"),
-            (nameof(MapBuildingType.Plaza), "Pla"),
-            (nameof(MapBuildingType.StatueSmall), "SSt"),
-            (nameof(MapBuildingType.StatueMedium), "MSt"),
-            (nameof(MapBuildingType.StatueLarge), "LSt"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.PalaceVillage), "PVi"),
-            (nameof(MapBuildingType.PalaceTown), "PTo"),
-            (nameof(MapBuildingType.PalaceCity), "PCi"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.MansionPersonal), "MPe"),
-            (nameof(MapBuildingType.MansionFamily), "MFa"),
-            (nameof(MapBuildingType.MansionDynasty), "MDy"),
-        };
+        result[btnMunicipal] =
+        [
+            (nameof(MapBuildingType.Firehouse), "Fi", null),
+            (nameof(MapBuildingType.Architect), "Ar", null),
+            (nameof(MapBuildingType.Police), "Po", null),
+            (nameof(MapBuildingType.Tax), "Tax", null),
+            (nameof(MapBuildingType.Courthouse), "Crt", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Roadblock), "RB", null),
+            (nameof(MapBuildingType.Bridge), "Bri", null),
+            (nameof(MapBuildingType.FerryLanding), "Fer", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Garden), "Gar", null),
+            (nameof(MapBuildingType.Plaza), "Pla", null),
+            (nameof(MapBuildingType.StatueSmall), "SSt", null),
+            (nameof(MapBuildingType.StatueMedium), "MSt", null),
+            (nameof(MapBuildingType.StatueLarge), "LSt", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.PalaceVillage), "PVi", null),
+            (nameof(MapBuildingType.PalaceTown), "PTo", null),
+            (nameof(MapBuildingType.PalaceCity), "PCi", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.MansionPersonal), "MPe", null),
+            (nameof(MapBuildingType.MansionFamily), "MFa", null),
+            (nameof(MapBuildingType.MansionDynasty), "MDy", null),
+        ];
 
-        result[btnMilitary] = new[]
-        {
-            (nameof(MapBuildingType.Wall), "Wal"),
-            (nameof(MapBuildingType.Tower), "Twr"),
-            (nameof(MapBuildingType.Gate1), "Gt1"),
-            (nameof(MapBuildingType.Gate2), "Gt2"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Recruiter), "Rec"),
-            (nameof(MapBuildingType.Academy), "Aca"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Weaponsmith), "Wpn"),
-            (nameof(MapBuildingType.Chariot), "Cha"),
-            (string.Empty, string.Empty),
-            (nameof(MapBuildingType.Fort), "Frt"),
-            (nameof(MapBuildingType.Warship), "WSh"),
-            (nameof(MapBuildingType.TransportShip), "TSh"),
-        };
+        result[btnMilitary] =
+        [
+            (nameof(MapBuildingType.Wall), "Wal", null),
+            (nameof(MapBuildingType.Tower), "Twr", null),
+            (nameof(MapBuildingType.Gate1), "Gt1", null),
+            (nameof(MapBuildingType.Gate2), "Gt2", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Recruiter), "Rec", null),
+            (nameof(MapBuildingType.Academy), "Aca", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Weaponsmith), "Wpn", null),
+            (nameof(MapBuildingType.Chariot), "Cha", null),
+            (string.Empty, string.Empty, null),
+            (nameof(MapBuildingType.Fort), "Frt", null),
+            (nameof(MapBuildingType.Warship), "WSh", null),
+            (nameof(MapBuildingType.TransportShip), "TSh", null),
+        ];
 
         return result;
     }
