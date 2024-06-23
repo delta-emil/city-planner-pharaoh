@@ -215,10 +215,8 @@ public class MapModel
         return results;
     }
 
-    public int GetHouseMaxDesirability(MapBuilding building)
+    public int GetBuildingMaxDesirability(MapBuilding building)
     {
-        Debug.Assert(building.BuildingType.GetCategory() == MapBuildingCategory.House);
-
         var size = building.BuildingType.GetSize();
 
         int maxDesire = int.MinValue;
@@ -311,7 +309,7 @@ public class MapModel
             {
                 var oldHouseLevel = affectedHouse.HouseLevel;
 
-                var maxDesire = this.GetHouseMaxDesirability(affectedHouse);
+                var maxDesire = this.GetBuildingMaxDesirability(affectedHouse);
                 var newHouseLevel = HouseLevelData.GetHouseLevel(maxDesire, this.EffectiveDifficulty);
                 affectedHouse.HouseLevel = newHouseLevel;
 

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace CityPlannerPharaoh;
@@ -268,22 +269,8 @@ public class MapCanvasControl : Control
             {
                 var size = building.BuildingType.GetSize();
 
-                int maxDesire = this.MapModel.GetHouseMaxDesirability(building);
-
                 // draw desire
-                if (this.ShowDesirability)
-                {
-                    for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
-                    {
-                        for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
-                        {
-                            var desire = this.MapModel.Cells[cellX, cellY].Desirability;
-                            var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
-                            var brush = this.GetDesirabilityBrush(desire);
-                            graphics.DrawString(desire.ToString(), font, brush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
-                        }
-                    }
-                }
+                DrawDesireabilityOnBuilding(graphics, building, size);
 
                 // draw max house level
                 string text = "H" + building.HouseLevel;
@@ -302,6 +289,30 @@ public class MapCanvasControl : Control
                     text, houseLabelFont, this.textBrush,
                     buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2 + positionShift,
                     buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2 + positionShift);
+            }
+
+            if (building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply)
+            {
+                DrawDesireabilityOnBuilding(graphics, building);
+            }
+        }
+    }
+
+    private void DrawDesireabilityOnBuilding(Graphics graphics, MapBuilding building, (int width, int height)? preCalculatedSize = null)
+    {
+        if (this.ShowDesirability)
+        {
+            var size = preCalculatedSize ?? building.BuildingType.GetSize();
+            int maxDesire = this.MapModel.GetBuildingMaxDesirability(building);
+            for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+            {
+                for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+                {
+                    var desire = this.MapModel.Cells[cellX, cellY].Desirability;
+                    var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
+                    var brush = this.GetDesirabilityBrush(desire);
+                    graphics.DrawString(desire.ToString(), font, brush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
+                }
             }
         }
     }
