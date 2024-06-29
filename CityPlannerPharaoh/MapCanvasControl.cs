@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 
 namespace CityPlannerPharaoh;
 
@@ -29,7 +27,6 @@ public class MapCanvasControl : Control
 
     private int cellSideLength = 24;
     private readonly HashSet<MapBuilding> selectedBuildings;
-    private readonly HashSet<MapBuilding> clipboardBuildings;
     private Rectangle? ghostLocation;
     private (int x, int y) selectionDragStartCell;
     private (int x, int y) selectionDragEndCell;
@@ -107,7 +104,6 @@ public class MapCanvasControl : Control
         this.MapModel = new MapModel(8, 8);
         this.tool = new Tool();
         this.selectedBuildings = new();
-        this.clipboardBuildings = new();
     }
 
     public MapModel MapModel { get; set; }
@@ -855,34 +851,37 @@ public class MapCanvasControl : Control
     {
         if (this.selectedBuildings.Count > 0)
         {
-            this.clipboardBuildings.Clear();
+            var clipboardBuildings = new List<MapBuilding>();
 
             int minX = int.MaxValue;
             int minY = int.MaxValue;
             foreach (var building in this.selectedBuildings)
             {
-                this.clipboardBuildings.Add(building.GetCopy());
+                clipboardBuildings.Add(building.GetCopy());
                 minX = Math.Min(minX, building.Left);
                 minY = Math.Min(minY, building.Top);
             }
 
             // make their Left & Top relative to the top-left of their bounding rect
-            foreach (var building in this.clipboardBuildings)
+            foreach (var building in clipboardBuildings)
             {
                 building.Left -= minX;
                 building.Top -= minY;
             }
+
+            ExternalHelper.PutOnClipboard(clipboardBuildings, this);
         }
     }
 
     private void BuildingsPaste(int cellX, int cellY)
     {
-        if (this.clipboardBuildings.Count == 0)
+        var clipboardBuildings = ExternalHelper.GetFromClipboard<List<MapBuilding>>(this);
+        if (clipboardBuildings == null || clipboardBuildings.Count == 0)
         {
             return;
         }
 
-        foreach (var building in this.clipboardBuildings)
+        foreach (var building in clipboardBuildings)
         {
             var left = building.Left + cellX;
             var top = building.Top + cellY;
@@ -892,7 +891,7 @@ public class MapCanvasControl : Control
             }
         }
 
-        foreach (var building in this.clipboardBuildings)
+        foreach (var building in clipboardBuildings)
         {
             var left = building.Left + cellX;
             var top = building.Top + cellY;

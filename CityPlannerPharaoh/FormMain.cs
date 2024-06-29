@@ -1,7 +1,6 @@
 using CityPlannerPharaoh.FileDataExtraction;
 using CityPlannerPharaoh.Properties;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace CityPlannerPharaoh;
 
@@ -341,10 +340,7 @@ public partial class FormMain : Form
         try
         {
             using FileStream outputStream = File.Create(fileName);
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            options.Converters.Add(new MapCellsJsonConverter());
-            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            JsonSerializer.Serialize(outputStream, mapModel, options);
+            JsonSerializer.Serialize(outputStream, mapModel, ExternalHelper.JsonSerializerOptions);
 
             mapModel.IsChanged = false;
 
@@ -362,10 +358,7 @@ public partial class FormMain : Form
         try
         {
             using FileStream inputStream = File.Open(fileName, FileMode.Open);
-            var options = new JsonSerializerOptions();
-            options.Converters.Add(new MapCellsJsonConverter());
-            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-            return JsonSerializer.Deserialize<MapModel>(inputStream, options);
+            return JsonSerializer.Deserialize<MapModel>(inputStream, ExternalHelper.JsonSerializerOptions);
         }
         catch (Exception ex)
         {
@@ -599,6 +592,14 @@ public partial class FormMain : Form
         else if (e.KeyCode == Keys.S && ModifierKeys == Keys.Control)
         {
             this.btnFileSave_Click(this.btnFileSave, EventArgs.Empty);
+        }
+        else if (e.KeyCode == Keys.C && ModifierKeys == Keys.Control)
+        {
+            this.mapControl.BuildingsCopy();
+        }
+        else if (e.KeyCode == Keys.X && ModifierKeys == Keys.Control)
+        {
+            this.mapControl.BuildingsCut();
         }
         else if (e.KeyCode == Keys.Delete)
         {

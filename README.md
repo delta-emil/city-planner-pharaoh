@@ -30,9 +30,10 @@ I'll describe the less obvious parts, which is the mouse and keyboard shortcuts:
   (e.g. if you start from the middle square of a 3x3 building, that building will not be selected)
 * In select mode, **Ctrl-left-click** adds or removes a building to the selection
 * In select mode, you can **drag** (with the left mouse button) the selected building(s) to another location. If not all building can be placed, the move doesn't happen.
-* You can copy or cut the selected building (currently only using the toolbar, keyboard will be added)
+* You can copy or cut the selected building (toolbar, or Ctrl+C / Ctrl+X)
 * You can press **Del** on your keyboard to delete the selected buildings
 * You can **right-click** somewhere to paste the cut/copied building. If there is no room for all building to be placed, nothing will happen.
+* You can save using Ctrl+S
 
 Notes:
 
@@ -44,15 +45,15 @@ Notes:
   E.g. a 2x2 house can show H20 (Palatial Estate) but will only have the desirability effect of the top 2x2 house level 14 (Fancy Residence).
 * "New from game save..." lets you select a save file and it loads the terrain from it
 * North is to the upper-left. (as seems to be customary in the forums)
-* Cut/Copy/Paste currently doesn't use the clipboard, so if you start the program twice, you currently can't copy in one then paste in the other. I plan to fix it.
 * Currently it doesn't check if the building is allowed on the terrain type (i.e. you can place a buildin on a dune, or in the water). It only checks that you're within bounds of the map and not overlapping other buildings.
 
 # TODO
 
 - improve double-bufferring: keep the buffer; use in building placement
 - redraw entire view when add/move/delete building, because disireability effects can cascade further through houses
+- on paste failing because of no space, show ghosts for a moment so user can know the problem (maybe show on key down, resolve on key up?)
+    - alternative idea: have a paste button/Ctrl+V activate placing the buildings from clipboard like when dragging
 - undo/redo
-- cut/copy/paste through clipboard so you can copy to another instance; keyboard shortcuts (Ctrl+X, Ctrl+C)
 - nicer display names for buildings
 
 Low prio:
