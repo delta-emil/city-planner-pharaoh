@@ -8,9 +8,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8CEF4BFB-8F93-44C6-957D-0D8BFEE9DDA5}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		GlyphCode.js = GlyphCode.js
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CityPlannerPharaohTests", "CityPlannerPharaohTests\CityPlannerPharaohTests.csproj", "{5C74B645-AF99-4107-85A8-C52593793C87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CityPlannerPharaohTests", "CityPlannerPharaohTests\CityPlannerPharaohTests.csproj", "{5C74B645-AF99-4107-85A8-C52593793C87}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

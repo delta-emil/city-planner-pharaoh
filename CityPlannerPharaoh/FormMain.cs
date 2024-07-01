@@ -1,6 +1,7 @@
 using CityPlannerPharaoh.FileDataExtraction;
 using CityPlannerPharaoh.Properties;
 using System.Text.Json;
+using System.Windows.Forms;
 
 namespace CityPlannerPharaoh;
 
@@ -637,5 +638,22 @@ public partial class FormMain : Form
             Difficulty.VeryHard => "Very Hard",
             _                   => "Hard",
         };
+    }
+
+    private void btnGlyph_Click(object sender, EventArgs e)
+    {
+        IEnumerable<MapBuilding> buildings
+            = this.mapControl.SelectedBuildings.Count > 0
+                ? this.mapControl.SelectedBuildings
+                : this.mapControl.MapModel.Buildings;
+
+        var (glyphs, error) = Glyphs.GetGlyphs(buildings);
+        if (error != null)
+        {
+            MessageBox.Show(this, error, "Could not create glyphs", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
+        ExternalHelper.PutTextOnClipboard(glyphs, this);
     }
 }

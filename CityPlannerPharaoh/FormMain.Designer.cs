@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Tool tool1 = new Tool();
+            Tool tool2 = new Tool();
             toolStripMain = new ToolStrip();
             btnSelect = new ToolStripButton();
             btnTerrain = new ToolStripButton();
@@ -79,6 +79,8 @@
             saveFileDialog = new SaveFileDialog();
             toolStripSecondary = new ToolStrip();
             openFileDialogImport = new OpenFileDialog();
+            toolStripSeparator4 = new ToolStripSeparator();
+            btnGlyph = new ToolStripButton();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
             toolStripTop.SuspendLayout();
@@ -261,16 +263,16 @@
             mapControl.Size = new Size(200, 200);
             mapControl.TabIndex = 0;
             mapControl.Text = "mapCanvasControl1";
-            tool1.BuildingType = null;
-            tool1.IsClearBuilding = false;
-            tool1.Terrain = null;
-            mapControl.Tool = tool1;
+            tool2.BuildingType = null;
+            tool2.IsClearBuilding = false;
+            tool2.Terrain = null;
+            mapControl.Tool = tool2;
             mapControl.SelectionChanged += mapControl_SelectionChanged;
             // 
             // toolStripTop
             // 
             toolStripTop.AutoSize = false;
-            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3, ddDifficulty });
+            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3, ddDifficulty, toolStripSeparator4, btnGlyph });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
             toolStripTop.Size = new Size(1246, 25);
@@ -423,35 +425,35 @@
             // btnDifficultyVE
             // 
             btnDifficultyVE.Name = "btnDifficultyVE";
-            btnDifficultyVE.Size = new Size(180, 22);
+            btnDifficultyVE.Size = new Size(125, 22);
             btnDifficultyVE.Text = "Very Easy";
             btnDifficultyVE.Click += btnDifficulty_Click;
             // 
             // btnDifficultyE
             // 
             btnDifficultyE.Name = "btnDifficultyE";
-            btnDifficultyE.Size = new Size(180, 22);
+            btnDifficultyE.Size = new Size(125, 22);
             btnDifficultyE.Text = "Easy";
             btnDifficultyE.Click += btnDifficulty_Click;
             // 
             // btnDifficultyN
             // 
             btnDifficultyN.Name = "btnDifficultyN";
-            btnDifficultyN.Size = new Size(180, 22);
+            btnDifficultyN.Size = new Size(125, 22);
             btnDifficultyN.Text = "Normal";
             btnDifficultyN.Click += btnDifficulty_Click;
             // 
             // btnDifficultyH
             // 
             btnDifficultyH.Name = "btnDifficultyH";
-            btnDifficultyH.Size = new Size(180, 22);
+            btnDifficultyH.Size = new Size(125, 22);
             btnDifficultyH.Text = "Hard";
             btnDifficultyH.Click += btnDifficulty_Click;
             // 
             // btnDifficultyVH
             // 
             btnDifficultyVH.Name = "btnDifficultyVH";
-            btnDifficultyVH.Size = new Size(180, 22);
+            btnDifficultyVH.Size = new Size(125, 22);
             btnDifficultyVH.Text = "Very Hard";
             btnDifficultyVH.Click += btnDifficulty_Click;
             // 
@@ -476,6 +478,20 @@
             // openFileDialogImport
             // 
             openFileDialogImport.Filter = "Pharaoh save files|*.sav|All files|*.*";
+            // 
+            // toolStripSeparator4
+            // 
+            toolStripSeparator4.Name = "toolStripSeparator4";
+            toolStripSeparator4.Size = new Size(6, 25);
+            // 
+            // btnGlyph
+            // 
+            btnGlyph.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnGlyph.ImageTransparentColor = Color.Magenta;
+            btnGlyph.Name = "btnGlyph";
+            btnGlyph.Size = new Size(42, 22);
+            btnGlyph.Text = "Glyph";
+            btnGlyph.Click += btnGlyph_Click;
             // 
             // FormMain
             // 
@@ -551,5 +567,7 @@
         private ToolStripMenuItem btnDifficultyN;
         private ToolStripMenuItem btnDifficultyH;
         private ToolStripMenuItem btnDifficultyVH;
+        private ToolStripSeparator toolStripSeparator4;
+        private ToolStripButton btnGlyph;
     }
 }

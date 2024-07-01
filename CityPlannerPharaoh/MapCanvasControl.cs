@@ -26,7 +26,6 @@ public class MapCanvasControl : Control
     private readonly Brush[] desirablityBrushes;
 
     private int cellSideLength = 24;
-    private readonly HashSet<MapBuilding> selectedBuildings;
     private Rectangle? ghostLocation;
     private (int x, int y) selectionDragStartCell;
     private (int x, int y) selectionDragEndCell;
@@ -103,10 +102,11 @@ public class MapCanvasControl : Control
         this.cellSideLength = 24;
         this.MapModel = new MapModel(8, 8);
         this.tool = new Tool();
-        this.selectedBuildings = new();
+        this.SelectedBuildings = new();
     }
 
     public MapModel MapModel { get; set; }
+    public HashSet<MapBuilding> SelectedBuildings { get; }
 
     private Tool tool;
     public Tool Tool
@@ -206,13 +206,13 @@ public class MapCanvasControl : Control
         }
 
         // draw border
-        if (!ignoreMainBuilding || this.selectedBuildings.Contains(building))
+        if (!ignoreMainBuilding || this.SelectedBuildings.Contains(building))
         {
             var borderRect = new Rectangle(
                 buildingRect.Left, buildingRect.Top,
                 buildingRect.Width - BorderWidth, buildingRect.Height - BorderWidth);
             var borderPen
-                = this.selectedBuildings.Contains(building) ? this.borderBuildingSelectedPen
+                = this.SelectedBuildings.Contains(building) ? this.borderBuildingSelectedPen
                 : building.BuildingType.HasSoftBorder() ? this.borderSoftPen
                 : this.borderBuildingPen;
             graphics.DrawRectangle(borderPen, borderRect);
@@ -352,7 +352,7 @@ public class MapCanvasControl : Control
                 var offsetX = this.selectionDragEndCell.x - this.selectionDragStartCell.x;
                 var offsetY = this.selectionDragEndCell.y - this.selectionDragStartCell.y;
                 this.MapModel.IsChanged = true;
-                this.MapModel.MoveBuildingsByOffset(this.selectedBuildings, offsetX, offsetY);
+                this.MapModel.MoveBuildingsByOffset(this.SelectedBuildings, offsetX, offsetY);
             }
 
             this.ghostLocation = null;
@@ -516,16 +516,16 @@ public class MapCanvasControl : Control
 
             if (selectionChanged)
             {
-                if (this.selectedBuildings.Count > 0)
+                if (this.SelectedBuildings.Count > 0)
                 {
-                    this.selectedBuildings.Clear();
+                    this.SelectedBuildings.Clear();
                     invalidate = true;
                 }
 
                 var buildings = this.MapModel.GetAllBuildingsInRectangle(this.selectionDragStartCell, this.selectionDragEndCell);
                 if (buildings.Count > 0)
                 {
-                    this.selectedBuildings.UnionWith(buildings);
+                    this.SelectedBuildings.UnionWith(buildings);
                     invalidate = true;
                 }
 
@@ -536,7 +536,7 @@ public class MapCanvasControl : Control
         {
             // TODO: how do we move when it's a mutliple selection? the initial mouse-down reduces our selection to the clicked building
             // attempting to move stuff
-            if (this.selectedBuildings.Count > 0)
+            if (this.SelectedBuildings.Count > 0)
             {
                 var newEndCell = (cellX, cellY);
                 if (this.selectionDragEndCell != newEndCell)
@@ -545,7 +545,7 @@ public class MapCanvasControl : Control
                     if (this.moveValid == null)
                     {
                         var startCell = this.MapModel.Cells[this.selectionDragStartCell.x, this.selectionDragStartCell.y];
-                        if (startCell.Building == null || !this.selectedBuildings.Contains(startCell.Building))
+                        if (startCell.Building == null || !this.SelectedBuildings.Contains(startCell.Building))
                         {
                             return;
                         }
@@ -565,12 +565,12 @@ public class MapCanvasControl : Control
                     if (offsetX != 0 || offsetY != 0)
                     {
                         this.moveValid = true;
-                        foreach (var building in this.selectedBuildings)
+                        foreach (var building in this.SelectedBuildings)
                         {
                             var newCellX = building.Left + offsetX;
                             var newCellY = building.Top + offsetY;
 
-                            var isValid = this.MapModel.CanAddBuilding(newCellX, newCellY, building.BuildingType, selectedBuildings);
+                            var isValid = this.MapModel.CanAddBuilding(newCellX, newCellY, building.BuildingType, this.SelectedBuildings);
                             this.moveValid &= isValid;
 
                             if (building.BuildingType.IgnoreMainBuilding())
@@ -612,13 +612,13 @@ public class MapCanvasControl : Control
             {
                 if (buildingOnCell != null)
                 {
-                    if (this.selectedBuildings.Contains(buildingOnCell))
+                    if (this.SelectedBuildings.Contains(buildingOnCell))
                     {
-                        this.selectedBuildings.Remove(buildingOnCell);
+                        this.SelectedBuildings.Remove(buildingOnCell);
                     }
                     else
                     {
-                        this.selectedBuildings.Add(buildingOnCell);
+                        this.SelectedBuildings.Add(buildingOnCell);
                     }
 
                     this.OnSelectionChanged();
@@ -673,22 +673,22 @@ public class MapCanvasControl : Control
         var buildingOnCell = cellModel.Building;
         if (buildingOnCell == null)
         {
-            if (this.selectedBuildings.Count > 0)
+            if (this.SelectedBuildings.Count > 0)
             {
-                this.selectedBuildings.Clear();
+                this.SelectedBuildings.Clear();
                 invalidate = true;
             }
         }
-        else if (this.selectedBuildings.Count == 0)
+        else if (this.SelectedBuildings.Count == 0)
         {
-            this.selectedBuildings.Add(buildingOnCell);
+            this.SelectedBuildings.Add(buildingOnCell);
             invalidateRect = GetBuildingRectangle(buildingOnCell, includingDesire: false);
             invalidate = true;
         }
         else
         {
-            this.selectedBuildings.Clear();
-            this.selectedBuildings.Add(buildingOnCell);
+            this.SelectedBuildings.Clear();
+            this.SelectedBuildings.Add(buildingOnCell);
             invalidate = true;
         }
 
@@ -830,7 +830,7 @@ public class MapCanvasControl : Control
 
     private void BuildingsCutOrDelete(bool putOnClipboard)
     {
-        if (this.selectedBuildings.Count > 0)
+        if (this.SelectedBuildings.Count > 0)
         {
             if (putOnClipboard)
             {
@@ -838,7 +838,7 @@ public class MapCanvasControl : Control
             }
 
             this.MapModel.IsChanged = true;
-            foreach (var building in this.selectedBuildings)
+            foreach (var building in this.SelectedBuildings)
             {
                 this.MapModel.RemoveBuilding(building);
             }
@@ -849,13 +849,13 @@ public class MapCanvasControl : Control
 
     public void BuildingsCopy()
     {
-        if (this.selectedBuildings.Count > 0)
+        if (this.SelectedBuildings.Count > 0)
         {
             var clipboardBuildings = new List<MapBuilding>();
 
             int minX = int.MaxValue;
             int minY = int.MaxValue;
-            foreach (var building in this.selectedBuildings)
+            foreach (var building in this.SelectedBuildings)
             {
                 clipboardBuildings.Add(building.GetCopy());
                 minX = Math.Min(minX, building.Left);
@@ -869,13 +869,13 @@ public class MapCanvasControl : Control
                 building.Top -= minY;
             }
 
-            ExternalHelper.PutOnClipboard(clipboardBuildings, this);
+            ExternalHelper.PutJsonOnClipboard(clipboardBuildings, this);
         }
     }
 
     private void BuildingsPaste(int cellX, int cellY)
     {
-        var clipboardBuildings = ExternalHelper.GetFromClipboard<List<MapBuilding>>(this);
+        var clipboardBuildings = ExternalHelper.GetFromClipboardJson<List<MapBuilding>>(this);
         if (clipboardBuildings == null || clipboardBuildings.Count == 0)
         {
             return;
@@ -907,8 +907,8 @@ public class MapCanvasControl : Control
     {
         if (this.SelectionChanged != null)
         {
-            var roadLength = this.selectedBuildings.Count(building => building.BuildingType is MapBuildingType.Road or MapBuildingType.Plaza);
-            var house2x2Count = this.selectedBuildings.Count(building => building.BuildingType is MapBuildingType.House2);
+            var roadLength = this.SelectedBuildings.Count(building => building.BuildingType is MapBuildingType.Road or MapBuildingType.Plaza);
+            var house2x2Count = this.SelectedBuildings.Count(building => building.BuildingType is MapBuildingType.House2);
             var args = new MapSelectionChangeEventArgs
             {
                 SelectedRoadLength = roadLength,

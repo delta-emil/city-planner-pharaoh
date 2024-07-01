@@ -16,13 +16,11 @@ internal static class ExternalHelper
         return options;
     }
 
-    public static void PutOnClipboard<T>(T data, Control control)
+    public static void PutTextOnClipboard(string text, Control control)
     {
-        var clipboardString = JsonSerializer.Serialize(data, JsonSerializerOptions);
-
         try
         {
-            Clipboard.SetText(clipboardString);
+            Clipboard.SetText(text);
         }
         catch (ExternalException ex)
         {
@@ -30,7 +28,13 @@ internal static class ExternalHelper
         }
     }
 
-    public static T? GetFromClipboard<T>(Control control) where T : class
+    public static void PutJsonOnClipboard<T>(T data, Control control)
+    {
+        var clipboardString = JsonSerializer.Serialize(data, JsonSerializerOptions);
+        PutTextOnClipboard(clipboardString, control);
+    }
+
+    public static T? GetFromClipboardJson<T>(Control control) where T : class
     {
         IDataObject? clipboardData;
         try

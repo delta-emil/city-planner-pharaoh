@@ -34,10 +34,11 @@ I'll describe the less obvious parts, which is the mouse and keyboard shortcuts:
 * You can press **Del** on your keyboard to delete the selected buildings
 * You can **right-click** somewhere to paste the cut/copied building. If there is no room for all building to be placed, nothing will happen.
 * You can save using Ctrl+S
+* The Glyph button exports the selected buildings, or if none, all buildings, and attempts to compose Glyphs (for https://pharaoh.heavengames.com/strategy/pharaohglyph/) and put them on the clipboard. Some building types have no glyphs, so are replaced by something else.
 
 Notes:
 
-* The desirabilty effects on houses on each other is also taken into consideration.
+* The desirabilty effects on houses on each other are also taken into consideration.
   Sometimes though a house's displayed level might not be updated until redrawn if it's far enough away from the place where you made the change.
   If you wave a building placement over it, it shoud update. I plan to fix this.
 * House level is shown as the maximum achievable regardless of the placed house size.
@@ -45,7 +46,7 @@ Notes:
   E.g. a 2x2 house can show H20 (Palatial Estate) but will only have the desirability effect of the top 2x2 house level 14 (Fancy Residence).
 * "New from game save..." lets you select a save file and it loads the terrain from it
 * North is to the upper-left. (as seems to be customary in the forums)
-* Currently it doesn't check if the building is allowed on the terrain type (i.e. you can place a buildin on a dune, or in the water). It only checks that you're within bounds of the map and not overlapping other buildings.
+* Currently it doesn't check if the building is allowed on the terrain type (i.e. you can place a building on a dune, or in the water). It only checks that you're within bounds of the map and not overlapping other buildings.
 
 # TODO
 
@@ -62,4 +63,4 @@ Low prio:
 - hold Shift to paint Terrain in a rectangle
 - keyboard shortcuts
 - button icons
-- export to image/html/glyphs(?)
+- export to image/html(?)
