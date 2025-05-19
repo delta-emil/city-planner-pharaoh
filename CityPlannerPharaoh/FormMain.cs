@@ -208,6 +208,7 @@ public partial class FormMain : Form
             {
                 mapModel.SetDifficulty(this.mapControl.MapModel.EffectiveDifficulty);
                 this.fileName = null;
+                this.Text = "City Builder Pharaoh";
                 this.mapControl.MapModel = mapModel;
                 this.mapControl.SetSizeToFullMapSize();
                 this.mapControl.Invalidate();
@@ -233,7 +234,8 @@ public partial class FormMain : Form
         if (openDialogResult == DialogResult.OK)
         {
             this.fileName = this.openFileDialog.FileName;
-            var mapModel = LoadMapModel(fileName);
+            this.Text = "City Builder Pharaoh - " + Path.GetFileName(this.fileName);
+            var mapModel = LoadMapModel(this.fileName);
             if (mapModel != null)
             {
                 this.mapControl.MapModel = mapModel;
@@ -314,10 +316,16 @@ public partial class FormMain : Form
 
     private bool DoSaveDialog()
     {
+        if (this.fileName != null)
+        {
+            this.saveFileDialog.FileName = this.fileName;
+        }
+
         var saveDialogResult = this.saveFileDialog.ShowDialog();
         if (saveDialogResult == DialogResult.OK)
         {
             this.fileName = this.saveFileDialog.FileName;
+            this.Text = "City Builder Pharaoh - " + Path.GetFileName(this.fileName);
             return SaveMapModel(this.mapControl.MapModel, this.fileName);
         }
         else
@@ -334,6 +342,7 @@ public partial class FormMain : Form
         this.mapControl.SetSizeToFullMapSize();
         this.mapControl.Invalidate();
         this.fileName = null;
+        this.Text = "City Builder Pharaoh";
     }
 
     public static bool SaveMapModel(MapModel mapModel, string fileName)

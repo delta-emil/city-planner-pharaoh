@@ -504,7 +504,7 @@
             Controls.Add(toolStripMain);
             KeyPreview = true;
             Name = "FormMain";
-            Text = "City Planner";
+            Text = "City Planner Pharaoh";
             FormClosing += FormMain_FormClosing;
             KeyDown += FormMain_KeyDown;
             toolStripMain.ResumeLayout(false);
