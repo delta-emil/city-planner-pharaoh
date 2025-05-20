@@ -230,6 +230,18 @@ public class MapModel
         return maxDesire;
     }
 
+    public bool IsBuildingUpgraged(MapBuilding building)
+    {
+        int? requirementOnNorthTile = building.BuildingType.GetDesireOnNorthBlockNeededToUpgrade();
+        if (requirementOnNorthTile != null)
+        {
+            var desireOnNorthTile = this.Cells[building.Left, building.Top].Desirability;
+            return desireOnNorthTile >= requirementOnNorthTile.Value;
+        }
+
+        return false;
+    }
+
     public void MoveBuildingsByOffset(HashSet<MapBuilding> selectedBuildings, int offsetX, int offsetY)
     {
         foreach (var building in selectedBuildings)

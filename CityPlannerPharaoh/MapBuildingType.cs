@@ -616,4 +616,20 @@ public static partial class MapBuildingTypeExtensions
             _ => false,
         };
     }
+
+    public static int? GetDesireOnNorthBlockNeededToUpgrade(this MapBuildingType mapBuildingType)
+    {
+        if (mapBuildingType == MapBuildingType.Bazaar)
+        {
+            return 31;
+        }
+        else if (mapBuildingType == MapBuildingType.WaterSupply)
+        {
+            return 30;
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

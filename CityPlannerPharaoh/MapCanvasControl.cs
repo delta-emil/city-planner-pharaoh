@@ -247,6 +247,11 @@ public class MapCanvasControl : Control
             if (building.BuildingType.ShowName())
             {
                 string text = building.BuildingType.GetDisplayString();
+                if (this.MapModel.IsBuildingUpgraged(building))
+                {
+                    text += "\r\nLv.2";
+                }
+
                 var textSize = graphics.MeasureString(text, this.smallFont);
 
                 var textBrushToUse = this.textBrush;
@@ -289,17 +294,28 @@ public class MapCanvasControl : Control
 
             if (building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply)
             {
-                DrawDesireabilityOnBuilding(graphics, building);
+                DrawDesireabilityOnBuilding(graphics, building, northCellOnly: true);
             }
         }
     }
 
-    private void DrawDesireabilityOnBuilding(Graphics graphics, MapBuilding building, (int width, int height)? preCalculatedSize = null)
+    private void DrawDesireabilityOnBuilding(Graphics graphics, MapBuilding building, (int width, int height)? preCalculatedSize = null, bool northCellOnly = false)
     {
         if (this.ShowDesirability)
         {
-            var size = preCalculatedSize ?? building.BuildingType.GetSize();
-            int maxDesire = this.MapModel.GetBuildingMaxDesirability(building);
+            (int width, int height) size;
+            int maxDesire;
+            if (northCellOnly)
+            {
+                size = (width: 1, height: 1);
+                maxDesire = int.MaxValue;
+            }
+            else
+            {
+                size = preCalculatedSize ?? building.BuildingType.GetSize();
+                maxDesire = this.MapModel.GetBuildingMaxDesirability(building);
+            }
+
             for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
             {
                 for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
