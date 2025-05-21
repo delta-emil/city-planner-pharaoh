@@ -46,10 +46,16 @@ public class MapModel
             this.SavedDifficulty = savedDifficulty.Value;
         }
 
-        foreach (var mapBuilding in this.Buildings)
+        foreach (var mapBuilding in this.Buildings.Where(x => x.BuildingType.GetCategory() != MapBuildingCategory.House))
         {
             SetBuildingInCells(mapBuilding);
-            AddDesirabilityEffect(mapBuilding, 1);
+            AddDesirabilityEffectNormal(mapBuilding, 1);
+        }
+
+        foreach (var mapBuilding in this.Buildings.Where(x => x.BuildingType.GetCategory() == MapBuildingCategory.House))
+        {
+            SetBuildingInCells(mapBuilding);
+            AddDesirabilityEffectAddingHouse(mapBuilding);
         }
     }
 
@@ -79,6 +85,11 @@ public class MapModel
 
         var mapBuilding = new MapBuilding { Left = left, Top = top, BuildingType = mapBuildingType };
 
+        return AddBuildingInternal(mapBuilding);
+    }
+
+    private MapBuilding AddBuildingInternal(MapBuilding mapBuilding)
+    {
         this.Buildings.Add(mapBuilding);
 
         SetBuildingInCells(mapBuilding);
@@ -246,17 +257,15 @@ public class MapModel
     {
         foreach (var building in selectedBuildings)
         {
-            RemoveBuildingFromCells(building);
-            AddDesirabilityEffect(building, -1);
+            RemoveBuilding(building);
         }
 
         foreach (var building in selectedBuildings)
         {
             building.Left += offsetX;
             building.Top += offsetY;
-            SetBuildingInCells(building);
             building.HouseLevel = 0;
-            AddDesirabilityEffect(building, 1);
+            AddBuildingInternal(building);
         }
     }
 
@@ -270,37 +279,80 @@ public class MapModel
             Console.WriteLine($"-------- {(multiplier > 0 ? "adding" : "removing")} des from {mapBuilding.BuildingType} on {mapBuilding.Left}, {mapBuilding.Top}");
         }
 
-        var affectedHouses = new HashSet<MapBuilding>();
-
-        if (mapBuilding.BuildingType.GetCategory() == MapBuildingCategory.House && multiplier > 0)
+        bool areHouseAffected = AddDesirabilityEffectNormal(mapBuilding, multiplier);
+        if (!areHouseAffected)
         {
-            affectedHouses.Add(mapBuilding);
+            return;
         }
-        else
+
+        if (DoLogging)
         {
-            var desireConfig = GetBuildingDesire(mapBuilding);
-            if (desireConfig.Range > 0)
+            Console.WriteLine($"-------- Houses were affecting. Recalculating all houses");
+        }
+
+        // redo all houses, so that we recalculate them properly
+        // skip adding the house that's being removed, if that's the case
+        var houses = this.Buildings
+            .Where(x => x.BuildingType.GetCategory() == MapBuildingCategory.House)
+            .Where(x => !(multiplier < 0 && x == mapBuilding))
+            .ToList();
+
+        foreach (var building in houses)
+        {
+            RemoveBuildingFromCells(building);
+            AddDesirabilityEffectNormal(building, -1);
+        }
+
+        foreach (var building in houses)
+        {
+            SetBuildingInCells(building);
+            building.HouseLevel = 0;
+            AddDesirabilityEffectAddingHouse(building);
+        }
+    }
+
+    /// <returns>True when houses are affected and house logic is needed.</returns>
+    private bool AddDesirabilityEffectNormal(MapBuilding mapBuilding, int multiplier)
+    {
+        // adding a house means we're left with at least the new house affected
+        // removing a house, just like removing something else, can only potentially leave other houses affected
+        bool areHousesAffected = mapBuilding.BuildingType.GetCategory() == MapBuildingCategory.House && multiplier > 0;
+
+        var desireConfig = GetBuildingDesire(mapBuilding);
+        if (desireConfig.Range > 0)
+        {
+            var oldState = DoLogging ? GetDesireData() : null;
+            foreach (var (cell, _, _, distance) in EnumerateAroundBuildingToRange(mapBuilding, desireConfig.Range, includingInside: false))
             {
-                var oldState = DoLogging ? GetDesireData() : null;
+                var delta = (desireConfig.Start + (distance - 1) / desireConfig.StepRange * desireConfig.StepDiff) * multiplier;
 
-                foreach (var (cell, _, _, distance) in EnumerateAroundBuildingToRange(mapBuilding, desireConfig.Range, includingInside: false))
+                cell.Desirability += delta;
+
+                if (cell.Building?.BuildingType.GetCategory() == MapBuildingCategory.House)
                 {
-                    var delta = (desireConfig.Start + (distance - 1) / desireConfig.StepRange * desireConfig.StepDiff) * multiplier;
-
-                    cell.Desirability += delta;
-
-                    if (cell.Building?.BuildingType.GetCategory() == MapBuildingCategory.House)
-                    {
-                        affectedHouses.Add(cell.Building);
-                    }
-                }
-
-                if (DoLogging)
-                {
-                    ShowDesirabilityDiff(oldState!);
+                    areHousesAffected = true;
                 }
             }
+
+            if (DoLogging)
+            {
+                ShowDesirabilityDiff(oldState!);
+            }
         }
+
+        foreach (var subBuilding in mapBuilding.GetSubBuildings())
+        {
+            // recursion into sub-buildings
+            // good thing houses have no sub-buildings
+            areHousesAffected |= AddDesirabilityEffectNormal(subBuilding, multiplier);
+        }
+
+        return areHousesAffected;
+    }
+
+    private void AddDesirabilityEffectAddingHouse(MapBuilding mapBuilding)
+    {
+        var affectedHouses = new HashSet<MapBuilding> { mapBuilding };
 
         int loopCount = 0;
         while (affectedHouses.Count > 0)
@@ -344,11 +396,6 @@ public class MapModel
             }
 
             affectedHouses = newlyAffectedHouses;
-        }
-
-        foreach (var subBuilding in mapBuilding.GetSubBuildings())
-        {
-            AddDesirabilityEffect(subBuilding, multiplier);
         }
     }
 
@@ -473,7 +520,7 @@ public class MapModel
         foreach (var building in houses)
         {
             RemoveBuildingFromCells(building);
-            AddDesirabilityEffect(building, -1);
+            AddDesirabilityEffectNormal(building, -1);
         }
 
         this.IsChanged = true;
@@ -483,7 +530,7 @@ public class MapModel
         {
             SetBuildingInCells(building);
             building.HouseLevel = 0;
-            AddDesirabilityEffect(building, 1);
+            AddDesirabilityEffectAddingHouse(building);
         }
     }
 
