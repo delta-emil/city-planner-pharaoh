@@ -103,10 +103,25 @@ public class MapCanvasControl : Control
         this.MapModel = new MapModel(8, 8);
         this.tool = new Tool();
         this.SelectedBuildings = new();
+        this.undoStack = new UndoStack<MapModel>(1000);
     }
 
-    public MapModel MapModel { get; set; }
+    public MapModel MapModel { get; private set; }
     public HashSet<MapBuilding> SelectedBuildings { get; }
+
+    private readonly UndoStack<MapModel> undoStack;
+
+    public void SetMapModel(MapModel mapModel)
+    {
+        this.MapModel = mapModel;
+        this.SetSizeToFullMapSize();
+
+        this.undoStack.Init(mapModel);
+        this.OnUndoStackChanged();
+
+        this.SelectedBuildings.Clear();
+        this.OnSelectionChanged();
+    }
 
     private Tool tool;
     public Tool Tool
@@ -142,8 +157,9 @@ public class MapCanvasControl : Control
     }
 
     public event Action<object, MapSelectionChangeEventArgs>? SelectionChanged;
+    public event Action<object, MapUndoStackChangeEventArgs>? UndoStackChanged;
 
-    public void SetSizeToFullMapSize()
+    private void SetSizeToFullMapSize()
     {
         this.Size = new Size(this.MapModel.MapSideX * CellSideLength, this.MapModel.MapSideY * CellSideLength);
     }
@@ -367,7 +383,7 @@ public class MapCanvasControl : Control
             {
                 var offsetX = this.selectionDragEndCell.x - this.selectionDragStartCell.x;
                 var offsetY = this.selectionDragEndCell.y - this.selectionDragStartCell.y;
-                this.MapModel.IsChanged = true;
+                this.RegisterUndoPoint();
                 this.MapModel.MoveBuildingsByOffset(this.SelectedBuildings, offsetX, offsetY);
             }
 
@@ -466,7 +482,7 @@ public class MapCanvasControl : Control
                 return;
             }
 
-            this.MapModel.IsChanged = true;
+            this.RegisterUndoPoint();
             cellModel.Terrain = this.Tool.Terrain.Value;
 
             if (cellModel.Building == null)
@@ -478,10 +494,10 @@ public class MapCanvasControl : Control
         }
         else if (this.Tool.BuildingType != null)
         {
-            var building = this.MapModel.AddBuilding(cellX, cellY, this.Tool.BuildingType.Value);
-            if (building != null)
+            if (this.MapModel.CanAddBuilding(cellX, cellY, this.Tool.BuildingType.Value))
             {
-                this.MapModel.IsChanged = true;
+                this.RegisterUndoPoint();
+                this.MapModel.AddBuilding(cellX, cellY, this.Tool.BuildingType.Value);
                 this.Invalidate();
             }
         }
@@ -493,7 +509,7 @@ public class MapCanvasControl : Control
                 return;
             }
 
-            this.MapModel.IsChanged = true;
+            this.RegisterUndoPoint();
             this.MapModel.RemoveBuilding(building);
             this.Invalidate();
         }
@@ -851,7 +867,8 @@ public class MapCanvasControl : Control
                 BuildingsCopy();
             }
 
-            this.MapModel.IsChanged = true;
+            this.RegisterUndoPoint();
+
             foreach (var building in this.SelectedBuildings)
             {
                 this.MapModel.RemoveBuilding(building);
@@ -932,6 +949,20 @@ public class MapCanvasControl : Control
         }
     }
 
+    private void OnUndoStackChanged()
+    {
+        if (this.UndoStackChanged != null)
+        {
+            var args = new MapUndoStackChangeEventArgs
+            {
+                CanUndo = this.undoStack.CanUndo,
+                CanRedo = this.undoStack.CanRedo,
+                Difficulty = this.MapModel.EffectiveDifficulty,
+            };
+            this.UndoStackChanged(this, args);
+        }
+    }
+
     public void SetDifficulty(Difficulty difficulty)
     {
         if (this.MapModel.EffectiveDifficulty == difficulty)
@@ -939,7 +970,58 @@ public class MapCanvasControl : Control
             return;
         }
 
+        this.RegisterUndoPoint();
         this.MapModel.SetDifficulty(difficulty);
         this.Invalidate();
     }
+
+    public void RegisterUndoPoint()
+    {
+        var mapModelCopy = this.MapModel.GetDeepCopy();
+        this.undoStack.Do(mapModelCopy);
+        this.OnUndoStackChanged();
+    }
+
+    public void Undo()
+    {
+        if (!this.undoStack.CanUndo)
+        {
+            this.OnUndoStackChanged();
+            return;
+        }
+
+        var mapModel = this.undoStack.Undo();
+        this.MapModel = mapModel;
+        this.OnUndoStackChanged();
+
+        this.SelectedBuildings.Clear();
+        this.OnSelectionChanged();
+
+        this.Invalidate();
+    }
+
+    public void Redo()
+    {
+        if (!this.undoStack.CanRedo)
+        {
+            this.OnUndoStackChanged();
+            return;
+        }
+
+        var mapModel = this.undoStack.Redo();
+        this.MapModel = mapModel;
+        this.OnUndoStackChanged();
+
+        this.SelectedBuildings.Clear();
+        this.OnSelectionChanged();
+
+        this.Invalidate();
+    }
+
+    public void ChangesSaved()
+    {
+        this.undoStack.Save();
+    }
+
+    public bool IsChanged => this.undoStack.IsChanged;
 }

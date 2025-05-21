@@ -17,9 +17,7 @@ public partial class FormMain : Form
 
         buttonToSecondary = this.MakeSecondaryToolbars();
 
-        var mapModel = new MapModel(MapModel.DefaultMapSize, MapModel.DefaultMapSize);
-        this.mapControl.MapModel = mapModel;
-        this.mapControl.SetSizeToFullMapSize();
+        this.mapControl.SetMapModel(new MapModel(MapModel.DefaultMapSize, MapModel.DefaultMapSize));
 
         foreach (var button in this.buttonToSecondary.Keys)
         {
@@ -174,7 +172,7 @@ public partial class FormMain : Form
 
     private void btnFileNew_Click(object sender, EventArgs e)
     {
-        if (this.mapControl.MapModel.IsChanged)
+        if (this.mapControl.IsChanged)
         {
             if (!AskToSaveCurrentFile())
             {
@@ -187,7 +185,7 @@ public partial class FormMain : Form
 
     private void btnNewFromGameSave_Click(object sender, EventArgs e)
     {
-        if (this.mapControl.MapModel.IsChanged)
+        if (this.mapControl.IsChanged)
         {
             if (!AskToSaveCurrentFile())
             {
@@ -209,8 +207,7 @@ public partial class FormMain : Form
                 mapModel.SetDifficulty(this.mapControl.MapModel.EffectiveDifficulty);
                 this.fileName = null;
                 this.Text = "City Builder Pharaoh";
-                this.mapControl.MapModel = mapModel;
-                this.mapControl.SetSizeToFullMapSize();
+                this.mapControl.SetMapModel(mapModel);
                 this.mapControl.Invalidate();
             }
             else
@@ -222,7 +219,7 @@ public partial class FormMain : Form
 
     private void btnFileOpen_Click(object sender, EventArgs e)
     {
-        if (this.mapControl.MapModel.IsChanged)
+        if (this.mapControl.IsChanged)
         {
             if (!AskToSaveCurrentFile())
             {
@@ -233,24 +230,16 @@ public partial class FormMain : Form
         var openDialogResult = this.openFileDialog.ShowDialog();
         if (openDialogResult == DialogResult.OK)
         {
-            this.fileName = this.openFileDialog.FileName;
-            this.Text = "City Builder Pharaoh - " + Path.GetFileName(this.fileName);
-            var mapModel = LoadMapModel(this.fileName);
+            var fileNameToLoad = this.openFileDialog.FileName;
+            var mapModel = LoadMapModel(fileNameToLoad);
             if (mapModel != null)
             {
-                this.mapControl.MapModel = mapModel;
-                this.mapControl.SetSizeToFullMapSize();
+                this.fileName = fileNameToLoad;
+                this.Text = "City Builder Pharaoh - " + Path.GetFileName(this.fileName);
+                this.mapControl.SetMapModel(mapModel);
                 this.mapControl.Invalidate();
                 this.SetShownDifficulty(mapModel.EffectiveDifficulty);
             }
-            else
-            {
-                InitEmptyFile();
-            }
-        }
-        else
-        {
-            InitEmptyFile();
         }
     }
 
@@ -262,12 +251,12 @@ public partial class FormMain : Form
             return;
         }
 
-        if (!this.mapControl.MapModel.IsChanged)
+        if (!this.mapControl.IsChanged)
         {
             return;
         }
 
-        SaveMapModel(this.mapControl.MapModel, this.fileName);
+        SaveCurrentMapModel();
     }
 
     private void btnFileSaveAs_Click(object sender, EventArgs e)
@@ -277,7 +266,7 @@ public partial class FormMain : Form
 
     private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
     {
-        if (this.mapControl.MapModel.IsChanged)
+        if (this.mapControl.IsChanged)
         {
             if (!AskToSaveCurrentFile())
             {
@@ -297,7 +286,7 @@ public partial class FormMain : Form
         {
             if (this.fileName != null)
             {
-                return SaveMapModel(this.mapControl.MapModel, this.fileName);
+                return SaveCurrentMapModel();
             }
             else
             {
@@ -326,7 +315,7 @@ public partial class FormMain : Form
         {
             this.fileName = this.saveFileDialog.FileName;
             this.Text = "City Builder Pharaoh - " + Path.GetFileName(this.fileName);
-            return SaveMapModel(this.mapControl.MapModel, this.fileName);
+            return SaveCurrentMapModel();
         }
         else
         {
@@ -338,11 +327,21 @@ public partial class FormMain : Form
     {
         var mapModel = new MapModel(MapModel.DefaultMapSize, MapModel.DefaultMapSize);
         mapModel.SetDifficulty(this.mapControl.MapModel.EffectiveDifficulty);
-        this.mapControl.MapModel = mapModel;
-        this.mapControl.SetSizeToFullMapSize();
+        this.mapControl.SetMapModel(mapModel);
         this.mapControl.Invalidate();
         this.fileName = null;
         this.Text = "City Builder Pharaoh";
+    }
+
+    public bool SaveCurrentMapModel()
+    {
+        if (!SaveMapModel(this.mapControl.MapModel, this.fileName!))
+        {
+            return false;
+        }
+
+        this.mapControl.ChangesSaved();
+        return true;
     }
 
     public static bool SaveMapModel(MapModel mapModel, string fileName)
@@ -351,8 +350,6 @@ public partial class FormMain : Form
         {
             using FileStream outputStream = File.Create(fileName);
             JsonSerializer.Serialize(outputStream, mapModel, ExternalHelper.JsonSerializerOptions);
-
-            mapModel.IsChanged = false;
 
             return true;
         }
@@ -397,6 +394,13 @@ public partial class FormMain : Form
     {
         this.toolStripLabelRoadLength.Text = e.SelectedRoadLength.ToString();
         this.toolStrip2x2HouseCount.Text = e.Selected2x2HouseCount.ToString();
+    }
+
+    private void mapControl_UndoStackChanged(object sender, MapUndoStackChangeEventArgs e)
+    {
+        this.btnUndo.Enabled = e.CanUndo;
+        this.btnRedo.Enabled = e.CanRedo;
+        this.SetShownDifficulty(e.Difficulty);
     }
 
     #region secondary toolstrips
@@ -611,6 +615,18 @@ public partial class FormMain : Form
         {
             this.mapControl.BuildingsCut();
         }
+        else if (e.KeyCode == Keys.Z && ModifierKeys == Keys.Control)
+        {
+            this.mapControl.Undo();
+        }
+        else if (e.KeyCode == Keys.Z && ModifierKeys == (Keys.Control | Keys.Shift))
+        {
+            this.mapControl.Redo();
+        }
+        else if (e.KeyCode == Keys.Y && ModifierKeys == Keys.Control)
+        {
+            this.mapControl.Redo();
+        }
         else if (e.KeyCode == Keys.Delete)
         {
             this.mapControl.BuildingsDelete();
@@ -664,5 +680,15 @@ public partial class FormMain : Form
         }
 
         ExternalHelper.PutTextOnClipboard(glyphs, this);
+    }
+
+    private void btnUndo_Click(object sender, EventArgs e)
+    {
+        this.mapControl.Undo();
+    }
+
+    private void btnRedo_Click(object sender, EventArgs e)
+    {
+        this.mapControl.Redo();
     }
 }

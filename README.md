@@ -35,6 +35,7 @@ I'll describe the less obvious parts, which is the mouse and keyboard shortcuts:
 * You can **right-click** somewhere to paste the cut/copied building. If there is no room for all building to be placed, nothing will happen.
 * You can press **Del** on your keyboard to delete the selected buildings
 * You can save using Ctrl+S
+* You can Undo using Ctrl+Z (or the toolbar) up to 1000 actions, and Redo using Ctrl+Y or Ctrl+Shift+Z (or the toolbar)
 * The Glyph button exports the selected buildings, or if none, all buildings, and attempts to compose Glyphs
   (for https://pharaoh.heavengames.com/strategy/pharaohglyph/) and put them on the clipboard.
   Some building types have no glyphs, so are replaced by something else.
@@ -52,10 +53,8 @@ Notes:
 
 # TODO
 
-- improve double-bufferring: keep the buffer; use in building placement
 - on paste failing because of no space, show ghosts for a moment so user can know the problem (maybe show on key down, resolve on key up?)
     - alternative idea: have a paste button/Ctrl+V activate placing the buildings from clipboard like when dragging
-- undo/redo
 - nicer display names for buildings
 - fix farm irrigation - understand and fix the algorith; show on floodplains
 

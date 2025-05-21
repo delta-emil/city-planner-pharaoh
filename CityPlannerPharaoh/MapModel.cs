@@ -59,8 +59,48 @@ public class MapModel
         }
     }
 
-    [JsonIgnore]
-    public bool IsChanged { get; set; }
+    private MapModel(MapModel source)
+    {
+        this.MapSideX = source.MapSideX;
+        this.MapSideY = source.MapSideY;
+        this.HasTooCloseToVoidToBuild = source.HasTooCloseToVoidToBuild;
+        this.SavedDifficulty = source.SavedDifficulty;
+
+        var buildingMapping = new Dictionary<MapBuilding, MapBuilding>(source.Buildings.Count);
+
+        this.Buildings = new List<MapBuilding>(source.Buildings.Count);
+        foreach (var srcBuilding in source.Buildings)
+        {
+            var newBuilding = srcBuilding.GetCopy();
+            newBuilding.HouseLevel = srcBuilding.HouseLevel;
+            this.Buildings.Add(newBuilding);
+            buildingMapping[srcBuilding] = newBuilding;
+        }
+
+        this.Cells = new MapCellModel[this.MapSideX, this.MapSideY];
+        for (int cellX = 0; cellX < MapSideX; cellX++)
+        {
+            for (int cellY = 0; cellY < MapSideY; cellY++)
+            {
+                var srcCell = source.Cells[cellX, cellY];
+                
+                var newCell = new MapCellModel
+                {
+                    Terrain = srcCell.Terrain,
+                    Desirability = srcCell.Desirability,
+                    TooCloseToVoidToBuild = srcCell.TooCloseToVoidToBuild,
+                    Building = srcCell.Building != null ? buildingMapping[srcCell.Building] : null,
+                };
+
+                this.Cells[cellX, cellY] = newCell;
+            }
+        }
+    }
+
+    public MapModel GetDeepCopy()
+    {
+        return new MapModel(this);
+    }
 
     public int MapSideX { get; }
     public int MapSideY { get; }
@@ -523,7 +563,6 @@ public class MapModel
             AddDesirabilityEffectNormal(building, -1);
         }
 
-        this.IsChanged = true;
         this.SavedDifficulty = newDifficulty;
 
         foreach (var building in houses)
