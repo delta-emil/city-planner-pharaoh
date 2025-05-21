@@ -482,8 +482,7 @@ public class MapCanvasControl : Control
             if (building != null)
             {
                 this.MapModel.IsChanged = true;
-                var buildingRect = GetBuildingRectangle(building, includingDesire: this.ShowDesirability);
-                Invalidate(buildingRect);
+                this.Invalidate();
             }
         }
         else if (this.Tool.IsClearBuilding)
@@ -496,8 +495,7 @@ public class MapCanvasControl : Control
 
             this.MapModel.IsChanged = true;
             this.MapModel.RemoveBuilding(building);
-            var buildingRect = GetBuildingRectangle(building, includingDesire: this.ShowDesirability);
-            Invalidate(buildingRect);
+            this.Invalidate();
         }
         else
         {

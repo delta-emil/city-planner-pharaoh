@@ -42,8 +42,6 @@ I'll describe the less obvious parts, which is the mouse and keyboard shortcuts:
 Notes:
 
 * The desirabilty effects on houses on each other are also taken into consideration.
-  Sometimes though a house's displayed level might not be updated until redrawn if it's far enough away from the place where you made the change.
-  If you wave a building placement over it, it shoud update. I plan to fix this.
 * House level is shown as the maximum achievable regardless of the placed house size.
   However the desirability effect of the house is capped at the max level of it size.
   E.g. a 2x2 house can show H20 (Palatial Estate) but will only have the desirability effect of the top 2x2 house level 14 (Fancy Residence).
@@ -55,7 +53,6 @@ Notes:
 # TODO
 
 - improve double-bufferring: keep the buffer; use in building placement
-- redraw entire view when add/move/delete building, because disireability effects can cascade further through houses
 - on paste failing because of no space, show ghosts for a moment so user can know the problem (maybe show on key down, resolve on key up?)
     - alternative idea: have a paste button/Ctrl+V activate placing the buildings from clipboard like when dragging
 - undo/redo
