@@ -22,6 +22,7 @@ public class MapCanvasControl : Control
     private readonly Brush[] buildingBrushes;
     private readonly Brush farmMeadowBrush;
     private readonly Brush farmIrrigatedTextBrush;
+    private readonly Brush noWaterTextBrush;
     private readonly Brush tooCloseToVoidToBuildBrush;
     private readonly Brush[] desirablityBrushes;
 
@@ -95,7 +96,8 @@ public class MapCanvasControl : Control
 
         this.farmMeadowBrush = new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(157, 198, 121), Color.FromArgb(255, 222, 89));
         this.farmIrrigatedTextBrush = new SolidBrush(Color.Teal);
-        this.tooCloseToVoidToBuildBrush = new HatchBrush(HatchStyle.Percent70, Color.FromArgb(160, 0, 0, 0), Color.FromArgb(0, 0, 0, 0));
+        this.noWaterTextBrush = new SolidBrush(Color.Red);
+        this.tooCloseToVoidToBuildBrush = new HatchBrush(HatchStyle.Percent50, Color.FromArgb(128, 0, 0, 0), Color.FromArgb(0, 0, 0, 0));
         this.desirablityBrushes = new Brush[110];
 
         // mostly for the designer preview
@@ -237,25 +239,28 @@ public class MapCanvasControl : Control
         if (!ignoreMainBuilding)
         {
             bool isMeadowFarm = false;
-            if (building.BuildingType == MapBuildingType.Farm)
+
+            foreach (var (cellModel, cellX, cellY) in this.MapModel.EnumerateInsideBuildingWithCoords(building))
             {
-                var size = building.BuildingType.GetSize();
-
-                for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+                Brush? brushToApply = null;
+                if (cellModel.TooCloseToVoidToBuild)
                 {
-                    for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
-                    {
-                        var cellModel = this.MapModel.Cells[cellX, cellY];
-                        if (cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland or MapTerrain.Floodpain)
-                        {
-                            var innerRect = new Rectangle(
-                                cellX * CellSideLength + BorderWidth, cellY * CellSideLength + BorderWidth,
-                                CellSideLength - BorderWidthDouble, CellSideLength - BorderWidthDouble);
-                            graphics.FillRectangle(this.farmMeadowBrush, innerRect);
+                    brushToApply = this.tooCloseToVoidToBuildBrush;
+                }
+                else if (building.BuildingType == MapBuildingType.Farm
+                    && cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland or MapTerrain.Floodpain)
+                {
+                    brushToApply = this.farmMeadowBrush;
 
-                            isMeadowFarm |= cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland;
-                        }
-                    }
+                    isMeadowFarm |= cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland;
+                }
+                
+                if (brushToApply != null)
+                {
+                    var innerRect = new Rectangle(
+                        cellX * CellSideLength + BorderWidth, cellY * CellSideLength + BorderWidth,
+                        CellSideLength - BorderWidthDouble, CellSideLength - BorderWidthDouble);
+                    graphics.FillRectangle(brushToApply, innerRect);
                 }
             }
 
@@ -274,6 +279,10 @@ public class MapCanvasControl : Control
                 if (isMeadowFarm && this.MapModel.IsFarmIrrigated(building))
                 {
                     textBrushToUse = this.farmIrrigatedTextBrush;
+                }
+                else if (this.MapModel.IsMissingRequiredWater(building))
+                {
+                    textBrushToUse = this.noWaterTextBrush;
                 }
 
                 graphics.DrawString(
@@ -808,7 +817,8 @@ public class MapCanvasControl : Control
             {
                 graphics.FillRectangle(this.tooCloseToVoidToBuildBrush, innerRect);
             }
-            else if (this.ShowDesirability && cellModel.Desirability != 0)
+            
+            if (this.ShowDesirability && cellModel.Desirability != 0)
             {
                 var brush = this.GetDesirabilityBrush(cellModel.Desirability);
                 graphics.DrawString(cellModel.Desirability.ToString(), this.smallFont, brush, cellRect.Left + 2, cellRect.Top + 2);

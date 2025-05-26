@@ -617,6 +617,22 @@ public static partial class MapBuildingTypeExtensions
         };
     }
 
+    public static bool NeedsWater(this MapBuildingType mapBuildingType)
+    {
+        return mapBuildingType switch
+        {
+            MapBuildingType.Well => true,
+            MapBuildingType.WaterSupply => true,
+            MapBuildingType.PalaceVillage => true,
+            MapBuildingType.PalaceTown => true,
+            MapBuildingType.PalaceCity => true,
+            MapBuildingType.MansionPersonal => true,
+            MapBuildingType.MansionFamily => true,
+            MapBuildingType.MansionDynasty => true,
+            _ => false,
+        };
+    }
+
     public static int? GetDesireOnNorthBlockNeededToUpgrade(this MapBuildingType mapBuildingType)
     {
         if (mapBuildingType == MapBuildingType.Bazaar)

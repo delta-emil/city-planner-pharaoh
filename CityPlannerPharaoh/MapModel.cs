@@ -161,8 +161,7 @@ public class MapModel
                 }
 
                 MapCellModel mapCellModel = this.Cells[cellX, cellY];
-                if (mapCellModel.Terrain == MapTerrain.Void
-                    || mapCellModel.TooCloseToVoidToBuild)
+                if (mapCellModel.Terrain == MapTerrain.Void)
                 {
                     return false;
                 }
@@ -268,17 +267,7 @@ public class MapModel
 
     public int GetBuildingMaxDesirability(MapBuilding building)
     {
-        var size = building.BuildingType.GetSize();
-
-        int maxDesire = int.MinValue;
-        for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
-        {
-            for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
-            {
-                maxDesire = Math.Max(maxDesire, this.Cells[cellX, cellY].Desirability);
-            }
-        }
-        return maxDesire;
+        return EnumerateInsideBuilding(building).Max(x => x.Desirability);
     }
 
     public bool IsBuildingUpgraged(MapBuilding building)
@@ -520,6 +509,32 @@ public class MapModel
         }
     }
 
+    public IEnumerable<MapCellModel> EnumerateInsideBuilding(MapBuilding building)
+    {
+        var size = building.BuildingType.GetSize();
+
+        for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+        {
+            for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+            {
+                yield return this.Cells[cellX, cellY];
+            }
+        }
+    }
+
+    public IEnumerable<(MapCellModel cell, int cellX, int cellY)> EnumerateInsideBuildingWithCoords(MapBuilding building)
+    {
+        var size = building.BuildingType.GetSize();
+
+        for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
+        {
+            for (int cellY = building.Top; cellY < building.Top + size.height; cellY++)
+            {
+                yield return (this.Cells[cellX, cellY], cellX, cellY);
+            }
+        }
+    }
+
     public void SetTooCloseToVoidToBuildAfterInit()
     {
         for (int cellX = 0; cellX < this.MapSideX; cellX++)
@@ -617,4 +632,15 @@ public class MapModel
             Console.WriteLine("},");
         }
     }
+
+    public bool IsMissingRequiredWater(MapBuilding building)
+    {
+        if (!building.BuildingType.NeedsWater())
+        {
+            return false;
+        }
+
+        return !EnumerateInsideBuilding(building).Any(x => x.Terrain is MapTerrain.Grass or MapTerrain.GrassFarmland);
+    }
+
 }
