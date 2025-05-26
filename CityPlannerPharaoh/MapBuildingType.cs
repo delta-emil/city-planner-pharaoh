@@ -576,7 +576,7 @@ public static partial class MapBuildingTypeExtensions
             MapBuildingType.House4 => false,
             MapBuildingType.Ditch => false,
             MapBuildingType.StorageYardTower => false,
-            MapBuildingType.JuggleStage => false,
+            MapBuildingType.JuggleStage => true, //false,
             MapBuildingType.MusicStage => false,
             MapBuildingType.DanceStage => false,
             MapBuildingType.TempleComplexBuilding => false,
@@ -601,6 +601,7 @@ public static partial class MapBuildingTypeExtensions
             MapBuildingType.Well => "W",
             MapBuildingType.StatueSmall => "St",
             MapBuildingType.Weaponsmith => "Weapon\r\nsmith",
+            MapBuildingType.JuggleStage => "J",
             _ => RegexWordBumpBorder().Replace(mapBuildingType.ToString(), "$1\r\n$2"),
         };
     }
