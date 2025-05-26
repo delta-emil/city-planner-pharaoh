@@ -1,7 +1,6 @@
 using CityPlannerPharaoh.FileDataExtraction;
+using CityPlannerPharaoh.FileFormat;
 using CityPlannerPharaoh.Properties;
-using System.Text.Json;
-using System.Windows.Forms;
 
 namespace CityPlannerPharaoh;
 
@@ -349,7 +348,7 @@ public partial class FormMain : Form
         try
         {
             using FileStream outputStream = File.Create(fileName);
-            JsonSerializer.Serialize(outputStream, mapModel, ExternalHelper.JsonSerializerOptions);
+            Writer.Write(outputStream, mapModel);
 
             return true;
         }
@@ -365,7 +364,7 @@ public partial class FormMain : Form
         try
         {
             using FileStream inputStream = File.Open(fileName, FileMode.Open);
-            return JsonSerializer.Deserialize<MapModel>(inputStream, ExternalHelper.JsonSerializerOptions);
+            return Reader.Read(inputStream);
         }
         catch (Exception ex)
         {

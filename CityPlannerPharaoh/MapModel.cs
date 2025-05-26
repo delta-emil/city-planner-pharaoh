@@ -7,6 +7,7 @@ namespace CityPlannerPharaoh;
 public class MapModel
 {
     public const int DefaultMapSize = 200;
+    public const Difficulty DefaultDifficulty = Difficulty.VeryHard;
 
     public MapModel(int mapSideX, int mapSideY, MapTerrain initTerrainType = MapTerrain.Grass, bool hasTooCloseToVoidToBuild = false)
     {
@@ -25,10 +26,9 @@ public class MapModel
         }
 
         this.Buildings = new();
-        this.SavedDifficulty = Difficulty.Hard;
+        this.EffectiveDifficulty = DefaultDifficulty;
     }
 
-    [JsonConstructor]
     public MapModel(int mapSideX, int mapSideY, bool hasTooCloseToVoidToBuild, MapCellModel[,] cells, List<MapBuilding> buildings, Difficulty? savedDifficulty)
         : this(mapSideX, mapSideY)
     {
@@ -41,10 +41,7 @@ public class MapModel
             this.SetTooCloseToVoidToBuildAfterInit();
         }
 
-        if (savedDifficulty != null)
-        {
-            this.SavedDifficulty = savedDifficulty.Value;
-        }
+        this.EffectiveDifficulty = savedDifficulty ?? DefaultDifficulty;
 
         foreach (var mapBuilding in this.Buildings.Where(x => x.BuildingType.GetCategory() != MapBuildingCategory.House))
         {
@@ -64,7 +61,7 @@ public class MapModel
         this.MapSideX = source.MapSideX;
         this.MapSideY = source.MapSideY;
         this.HasTooCloseToVoidToBuild = source.HasTooCloseToVoidToBuild;
-        this.SavedDifficulty = source.SavedDifficulty;
+        this.EffectiveDifficulty = source.EffectiveDifficulty;
 
         var buildingMapping = new Dictionary<MapBuilding, MapBuilding>(source.Buildings.Count);
 
@@ -97,24 +94,21 @@ public class MapModel
         }
     }
 
-    public MapModel GetDeepCopy()
-    {
-        return new MapModel(this);
-    }
+    #region data
 
     public int MapSideX { get; }
     public int MapSideY { get; }
     public bool HasTooCloseToVoidToBuild { get; }
+    public Difficulty EffectiveDifficulty { get; private set; }
 
     public MapCellModel[,] Cells { get; }
 
     public List<MapBuilding> Buildings { get; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public Difficulty? SavedDifficulty { get; private set; }
-
     [JsonIgnore]
-    public Difficulty EffectiveDifficulty => SavedDifficulty!.Value;
+    public bool DoLogging { get; set; }
+
+    #endregion
 
     public MapBuilding? AddBuilding(int left, int top, MapBuildingType mapBuildingType)
     {
@@ -578,7 +572,7 @@ public class MapModel
             AddDesirabilityEffectNormal(building, -1);
         }
 
-        this.SavedDifficulty = newDifficulty;
+        this.EffectiveDifficulty = newDifficulty;
 
         foreach (var building in houses)
         {
@@ -587,8 +581,6 @@ public class MapModel
             AddDesirabilityEffectAddingHouse(building);
         }
     }
-
-    public bool DoLogging { get; set; }
 
     // for debug
     public int[,] GetDesireData()
@@ -643,4 +635,8 @@ public class MapModel
         return !EnumerateInsideBuilding(building).Any(x => x.Terrain is MapTerrain.Grass or MapTerrain.GrassFarmland);
     }
 
+    public MapModel GetDeepCopy()
+    {
+        return new MapModel(this);
+    }
 }

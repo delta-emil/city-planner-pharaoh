@@ -11,7 +11,6 @@ internal static class ExternalHelper
     private static JsonSerializerOptions CreateJsonOptions()
     {
         var options = new JsonSerializerOptions { WriteIndented = true };
-        options.Converters.Add(new MapCellsJsonConverter());
         options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         return options;
     }
