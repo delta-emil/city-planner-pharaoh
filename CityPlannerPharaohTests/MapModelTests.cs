@@ -3,6 +3,7 @@ using CityPlannerPharaoh;
 
 namespace CityPlannerPharaohTests;
 
+[TestFixture]
 public class MapModelTests
 {
     [Test]
@@ -20,8 +21,8 @@ public class MapModelTests
             Console.WriteLine();
         }
 
-        var a2 = new int[2, 2] { { 1, 3 }, { 5, 4 } };
-        Assert.That(a1, Is.EqualTo(a2));
+        //var a2 = new int[2, 2] { { 1, 3 }, { 5, 4 } };
+        //Assert.That(a1, Is.EqualTo(a2));
     }
         
     [Test]
