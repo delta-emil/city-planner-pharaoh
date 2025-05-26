@@ -1,5 +1,7 @@
 ﻿
 
+
+
 namespace CityPlannerPharaohTests.Pavilion;
 
 internal static class PavilionAlgo
@@ -10,6 +12,11 @@ internal static class PavilionAlgo
         for (int row = 0; row < 4; row++)
         {
             arr[row] = input[row].ToCharArray();
+        }
+
+        if (!ValidateCrossroad(arr))
+        {
+            return null;
         }
 
         if (!AddPavilion(arr))
@@ -23,6 +30,53 @@ internal static class PavilionAlgo
             result[row] = new string(arr[row]);
         }
         return result;
+    }
+
+    private static readonly (int row, int col)[] ValidCrossroadPositions = [
+        (0, 1),
+        (0, 2),
+        (1, 0),
+        (1, 1),
+        (1, 2),
+        // (1, 3), // the impossible crossroad
+        (2, 0),
+        (2, 1),
+        (2, 2),
+        (2, 3),
+        (3, 1),
+        (3, 2),
+    ];
+
+    private static bool ValidateCrossroad(char[][] arr)
+    {
+        foreach (var (row, col) in ValidCrossroadPositions)
+        {
+            if (IsValidCrossroad(arr, row, col))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsValidCrossroad(char[][] arr, int crossRow, int crossCol)
+    {
+        for (int row = 0; row < 4; row++)
+        {
+            for (int col = 0; col < 4; col++)
+            {
+                if (row == crossRow || col == crossCol)
+                {
+                    if (arr[row][col] != '.')
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     private static bool AddPavilion(char[][] arr)

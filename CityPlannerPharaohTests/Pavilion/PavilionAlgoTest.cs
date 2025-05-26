@@ -19,7 +19,7 @@ public class PavilionAlgoTest
     }
 
     [Test]
-    public void CheckTheImpossiblePavilionCase()
+    public void CheckTheImpossibleCrossroadCase()
     {
         string[] input =
         [
@@ -27,6 +27,42 @@ public class PavilionAlgoTest
             "....",
             "   .",
             "   .",
+        ];
+
+        string[]? output = PavilionAlgo.AddPavilion(input);
+        if (output != null)
+        {
+            Assert.Fail(string.Join(Environment.NewLine, output));
+        }
+    }
+
+    [Test]
+    public void CheckNotProperCrossroadCase()
+    {
+        string[] input =
+        [
+            "    ",
+            "  ..",
+            "  . ",
+            "....",
+        ];
+
+        string[]? output = PavilionAlgo.AddPavilion(input);
+        if (output != null)
+        {
+            Assert.Fail(string.Join(Environment.NewLine, output));
+        }
+    }
+
+    [Test]
+    public void CheckOtherBuildingInTheWayCase()
+    {
+        string[] input =
+        [
+            "  . ",
+            "X . ",
+            "  . ",
+            "....",
         ];
 
         string[]? output = PavilionAlgo.AddPavilion(input);
