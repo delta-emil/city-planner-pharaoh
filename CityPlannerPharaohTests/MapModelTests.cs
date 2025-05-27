@@ -40,12 +40,12 @@ public class MapModelTests
 
         // ------- add statues ------
         var statues = new List<MapBuilding>();
-        statues.Add(mapModel.AddBuilding(5, 7, MapBuildingType.StatueLarge) ?? throw new Exception("Statue could not be added"));
-        statues.Add(mapModel.AddBuilding(5, 10, MapBuildingType.StatueLarge) ?? throw new Exception("Statue could not be added"));
-        statues.Add(mapModel.AddBuilding(8, 5, MapBuildingType.StatueLarge) ?? throw new Exception("Statue could not be added"));
-        statues.Add(mapModel.AddBuilding(8, 12, MapBuildingType.StatueLarge) ?? throw new Exception("Statue could not be added"));
-        statues.Add(mapModel.AddBuilding(11, 7, MapBuildingType.StatueLarge) ?? throw new Exception("Statue could not be added"));
-        statues.Add(mapModel.AddBuilding(11, 10, MapBuildingType.StatueLarge) ?? throw new Exception("Statue could not be added"));
+        statues.Add(AddBuilding(mapModel, 5, 7, MapBuildingType.StatueLarge));
+        statues.Add(AddBuilding(mapModel, 5, 10, MapBuildingType.StatueLarge));
+        statues.Add(AddBuilding(mapModel, 8, 5, MapBuildingType.StatueLarge));
+        statues.Add(AddBuilding(mapModel, 8, 12, MapBuildingType.StatueLarge));
+        statues.Add(AddBuilding(mapModel, 11, 7, MapBuildingType.StatueLarge));
+        statues.Add(AddBuilding(mapModel, 11, 10, MapBuildingType.StatueLarge));
 
         //ShowState(mapModel);
 
@@ -96,7 +96,7 @@ public class MapModelTests
 
         // ------- add house ------
 
-        var house = mapModel.AddBuilding(8, 9, MapBuildingType.House2) ?? throw new Exception("House could not be added");
+        var house = AddBuilding(mapModel, 8, 9, MapBuildingType.House2);
 
         Assert.That(house.HouseLevel, Is.EqualTo(19));
 
@@ -157,6 +157,36 @@ public class MapModelTests
         Console.WriteLine(new string('*', 40));
         mapModel.ShowDesirabilityState();
         Console.WriteLine(new string('*', 40));
+    }
+
+    [Test]
+    public void Test2()
+    {
+        var mapModel = new MapModel(6, 6);
+        AddBuilding(mapModel, 1, 4, MapBuildingType.Road);
+        AddBuilding(mapModel, 2, 1, MapBuildingType.Road);
+        AddBuilding(mapModel, 2, 2, MapBuildingType.Road);
+        AddBuilding(mapModel, 2, 3, MapBuildingType.Road);
+        AddBuilding(mapModel, 2, 4, MapBuildingType.Road);
+        AddBuilding(mapModel, 3, 4, MapBuildingType.Road);
+        AddBuilding(mapModel, 4, 4, MapBuildingType.Road);
+
+        mapModel.ShowBuildings();
+
+        Assert.That(mapModel.CanAddBuilding(1, 1, MapBuildingType.Pavilion, null), Is.True);
+    }
+
+    [Test]
+    public void Test3()
+    {
+        var mapModel = new MapModel(6, 6);
+
+        Assert.That(mapModel.CanAddBuilding(1, 1, MapBuildingType.Pavilion, null), Is.False);
+    }
+
+    private static MapBuilding AddBuilding(MapModel mapModel, int left, int top, MapBuildingType mapBuildingType)
+    {
+        return mapModel.AddBuilding(left, top, mapBuildingType, null) ?? throw new Exception("Building could not be added");
     }
 
     private static int[,] GetDesireData(MapModel mapModel)

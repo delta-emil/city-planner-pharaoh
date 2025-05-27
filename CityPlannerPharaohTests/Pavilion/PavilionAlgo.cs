@@ -1,8 +1,4 @@
-﻿
-
-
-
-namespace CityPlannerPharaohTests.Pavilion;
+﻿namespace CityPlannerPharaohTests.Pavilion;
 
 internal static class PavilionAlgo
 {

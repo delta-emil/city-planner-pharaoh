@@ -110,19 +110,62 @@ public class MapModel
 
     #endregion
 
-    public MapBuilding? AddBuilding(int left, int top, MapBuildingType mapBuildingType)
+    public MapBuilding? AddBuilding(int left, int top, MapBuildingType mapBuildingType, List<MapBuilding>? subBuildings)
     {
-        if (!CanAddBuilding(left, top, mapBuildingType))
+        if (!CanAddBuilding(left, top, mapBuildingType, subBuildings))
         {
             return null;
         }
 
-        var mapBuilding = new MapBuilding { Left = left, Top = top, BuildingType = mapBuildingType };
+        var mapBuilding = ConstructMapBuilding(left, top, mapBuildingType, subBuildings);
+        if (mapBuilding == null)
+        {
+            return null;
+        }
 
-        return AddBuildingInternal(mapBuilding);
+        return AddBuildingAfterCheck(mapBuilding);
     }
 
-    private MapBuilding AddBuildingInternal(MapBuilding mapBuilding)
+    public MapBuilding? ConstructMapBuilding(int left, int top, MapBuildingType mapBuildingType, List<MapBuilding>? subBuildings)
+    {
+        List<MapBuilding>? effectiveSubBuildings;
+        if (subBuildings != null)
+        {
+            effectiveSubBuildings = subBuildings.Select(x => x.GetCopy()).ToList();
+        }
+        else if (mapBuildingType == MapBuildingType.Pavilion)
+        {
+            effectiveSubBuildings = StageLayout.GetPavilionSubBuildings(this.Cells, startRow: top, startCol: left);
+            if (effectiveSubBuildings == null)
+            {
+                return null;
+            }
+        }
+        else if (mapBuildingType == MapBuildingType.Bandstand)
+        {
+            effectiveSubBuildings = StageLayout.GetBandstandSubBuildings(this.Cells, startRow: top, startCol: left);
+            if (effectiveSubBuildings == null)
+            {
+                return null;
+            }
+        }
+        else if (mapBuildingType == MapBuildingType.Booth)
+        {
+            effectiveSubBuildings = StageLayout.GetBoothSubBuildings(this.Cells, startRow: top, startCol: left);
+            if (effectiveSubBuildings == null)
+            {
+                return null;
+            }
+        }
+        else
+        {
+            effectiveSubBuildings = null;
+        }
+
+        return new MapBuilding { Left = left, Top = top, BuildingType = mapBuildingType, SubBuildings = effectiveSubBuildings };
+    }
+
+    public MapBuilding AddBuildingAfterCheck(MapBuilding mapBuilding)
     {
         this.Buildings.Add(mapBuilding);
 
@@ -132,7 +175,7 @@ public class MapModel
         return mapBuilding;
     }
 
-    public bool CanAddBuilding(int left, int top, MapBuildingType mapBuildingType, HashSet<MapBuilding>? ignoredBuildings = null)
+    public bool CanAddBuilding(int left, int top, MapBuildingType mapBuildingType, List<MapBuilding>? subBuildings, HashSet<MapBuilding>? ignoredBuildings = null)
     {
         var size = mapBuildingType.GetSize();
         var right = left + size.width - 1;
@@ -143,8 +186,13 @@ public class MapModel
             return false;
         }
 
-        // check for existing building
-        var tempMapBuilding = new MapBuilding { Left = left, Top = top, BuildingType = mapBuildingType };
+        // check for existing buildings
+        var tempMapBuilding = ConstructMapBuilding(left, top, mapBuildingType, subBuildings);
+        if (tempMapBuilding == null)
+        {
+            return false;
+        }
+
         for (int cellX = left; cellX <= right; cellX++)
         {
             for (int cellY = top; cellY <= bottom; cellY++)
@@ -163,9 +211,9 @@ public class MapModel
                 var existingBuilding = mapCellModel.Building;
                 if (existingBuilding != null && (ignoredBuildings == null || !ignoredBuildings.Contains(existingBuilding)))
                 {
-                    // plaza can overwrite Road
-                    if (mapBuildingType == MapBuildingType.Plaza
-                        && existingBuilding.BuildingType == MapBuildingType.Road)
+                    // Plaza can overwrite Road
+                    // TODO: support vice-versa
+                    if (mapBuildingType == MapBuildingType.Plaza && existingBuilding.BuildingType == MapBuildingType.Road)
                     {
                         continue;
                     }
@@ -285,10 +333,9 @@ public class MapModel
 
         foreach (var building in selectedBuildings)
         {
-            building.Left += offsetX;
-            building.Top += offsetY;
+            building.MoveLocation(deltaX: offsetX, deltaY: offsetY);
             building.HouseLevel = 0;
-            AddBuildingInternal(building);
+            AddBuildingAfterCheck(building);
         }
     }
 
@@ -582,6 +629,40 @@ public class MapModel
         }
     }
 
+    public bool IsMissingRequiredWater(MapBuilding building)
+    {
+        if (!building.BuildingType.NeedsWater())
+        {
+            return false;
+        }
+
+        return !EnumerateInsideBuilding(building).Any(x => x.Terrain is MapTerrain.Grass or MapTerrain.GrassFarmland);
+    }
+
+    public bool IsMissingRequiredCrossroad(MapBuilding building)
+    {
+        if (building.BuildingType.GetCategory() != MapBuildingCategory.Venue)
+        {
+            return false;
+        }
+
+        foreach (var (mapCellModel, cellX, cellY) in EnumerateInsideBuildingWithCoords(building))
+        {
+            if (building.IsEmptyCell(cellX, cellY)
+                && mapCellModel.Building?.BuildingType != MapBuildingType.Road)
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public MapModel GetDeepCopy()
+    {
+        return new MapModel(this);
+    }
+
     // for debug
     public int[,] GetDesireData()
     {
@@ -625,18 +706,29 @@ public class MapModel
         }
     }
 
-    public bool IsMissingRequiredWater(MapBuilding building)
+    // for debug
+    public void ShowBuildings()
     {
-        if (!building.BuildingType.NeedsWater())
+        for (int row = 0; row < this.MapSideY; row++)
         {
-            return false;
+            Console.Write("        { ");
+            for (int col = 0; col < this.MapSideX; col++)
+            {
+                string buildingShort;
+                var building = this.Cells[col, row].Building;
+                if (building != null)
+                {
+                    string buildingDisplay = building.BuildingType.GetDisplayString();
+                    buildingShort = buildingDisplay.Length > 2 ? buildingDisplay[..2] : buildingDisplay;
+                }
+                else
+                {
+                    buildingShort = string.Empty;
+                }
+
+                Console.Write($"{buildingShort,2}, ");
+            }
+            Console.WriteLine("},");
         }
-
-        return !EnumerateInsideBuilding(building).Any(x => x.Terrain is MapTerrain.Grass or MapTerrain.GrassFarmland);
-    }
-
-    public MapModel GetDeepCopy()
-    {
-        return new MapModel(this);
     }
 }

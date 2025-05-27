@@ -36,6 +36,7 @@ I'll describe the less obvious parts, which is the mouse and keyboard shortcuts:
 * You can press **Del** on your keyboard to delete the selected buildings
 * You can save using Ctrl+S
 * You can Undo using Ctrl+Z (or the toolbar) up to 1000 actions, and Redo using Ctrl+Y or Ctrl+Shift+Z (or the toolbar)
+* You can scroll horizontally using the mouse wheel while holding Shift
 * The Glyph button exports the selected buildings, or if none, all buildings, and attempts to compose Glyphs
   (for https://pharaoh.heavengames.com/strategy/pharaohglyph/) and put them on the clipboard.
   Some building types have no glyphs, so are replaced by something else.
@@ -53,15 +54,21 @@ Notes:
 
 # TODO
 
+- only N 2x2 of gatehouse should have the des effect!
+- fix farm irrigation
+    - fix the algorith - it's 4 tiles to the Farm's N tile; single ditch tile doesn't count
+    - show on floodplains
 - on paste failing because of no space, show ghosts for a moment so user can know the problem (maybe show on key down, resolve on key up?)
     - alternative idea: have a paste button/Ctrl+V activate placing the buildings from clipboard like when dragging
+        - this could also free up the right-click for scrolling like in Julius
 - nicer display names for buildings
-- fix farm irrigation - understand and fix the algorith; show on floodplains
 
 Low prio:
 
+- option to show walker start/finish tiles for a building
 - Copy-Paste Terrain
 - hold Shift to paint Terrain in a rectangle
 - keyboard shortcuts
 - button icons
 - export to image/html(?)
+- auto-downgrade plazas with a venue over them

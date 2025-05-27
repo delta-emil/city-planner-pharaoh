@@ -8,7 +8,7 @@ internal static class Writer
     {
         using Utf8JsonWriter writer = new(outputStream, new JsonWriterOptions { Indented = true });
         writer.WriteStartObject();
-        ////writer.WriteNumber("Version", 2);
+        writer.WriteNumber("Version", 2);
         writer.WriteNumber(nameof(MapModel.MapSideX), mapModel.MapSideX);
         writer.WriteNumber(nameof(MapModel.MapSideY), mapModel.MapSideY);
         writer.WriteBoolean(nameof(MapModel.HasTooCloseToVoidToBuild), mapModel.HasTooCloseToVoidToBuild);
@@ -29,14 +29,28 @@ internal static class Writer
         writer.WriteStartArray(nameof(MapModel.Buildings));
         foreach (var building in mapModel.Buildings)
         {
-            writer.WriteStartObject();
-            writer.WriteNumber(nameof(MapBuilding.Left), building.Left);
-            writer.WriteNumber(nameof(MapBuilding.Top), building.Top);
-            writer.WriteString(nameof(MapBuilding.BuildingType), EnumToString(building.BuildingType));
-            writer.WriteEndObject();
+            WriteBuilding(writer, building);
         }
         writer.WriteEndArray();
 
+        writer.WriteEndObject();
+    }
+
+    private static void WriteBuilding(Utf8JsonWriter writer, MapBuilding building)
+    {
+        writer.WriteStartObject();
+        writer.WriteNumber(nameof(MapBuilding.Left), building.Left);
+        writer.WriteNumber(nameof(MapBuilding.Top), building.Top);
+        writer.WriteString(nameof(MapBuilding.BuildingType), EnumToString(building.BuildingType));
+        if (building.SubBuildings != null)
+        {
+            writer.WriteStartArray(nameof(MapBuilding.SubBuildings));
+            foreach (var subBuilding in building.SubBuildings)
+            {
+                WriteBuilding(writer, subBuilding);
+            }
+            writer.WriteEndArray();
+        }
         writer.WriteEndObject();
     }
 

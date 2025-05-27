@@ -7,6 +7,7 @@ public class MapBuilding
     public int Left { get; set; }
     public int Top { get; set; }
     public MapBuildingType BuildingType { get; set; }
+    public List<MapBuilding>? SubBuildings { get; set; }
 
     [JsonIgnore]
     public int HouseLevel { get; set; }
@@ -18,178 +19,76 @@ public class MapBuilding
 
     public MapBuilding GetCopy()
     {
-        return new MapBuilding { Left = Left, Top = Top, BuildingType = BuildingType };
+        var copy = new MapBuilding { Left = Left, Top = Top, BuildingType = BuildingType };
+
+        if (this.SubBuildings != null)
+        {
+            copy.SubBuildings = new List<MapBuilding>(this.SubBuildings.Count);
+            for (int i = 0; i < this.SubBuildings.Count; i++)
+            {
+                copy.SubBuildings.Add(this.SubBuildings[i].GetCopy());
+            }
+        }
+
+        return copy;
     }
 
-    public MapBuilding[] GetSubBuildings()
+    public void MoveLocation(int deltaX, int deltaY)
     {
+        this.Left += deltaX;
+        this.Top += deltaY;
+
+        if (this.SubBuildings != null)
+        {
+            foreach (var subBuilding in this.SubBuildings)
+            {
+                subBuilding.Left += deltaX;
+                subBuilding.Top += deltaY;
+            }
+        }
+    }
+
+    public List<MapBuilding> GetSubBuildings()
+    {
+        if (this.SubBuildings != null)
+        {
+            return this.SubBuildings;
+        }
+
         return this.BuildingType switch
         {
-            MapBuildingType.StorageYard => new MapBuilding[] { new() { Left = this.Left, Top = this.Top, BuildingType = MapBuildingType.StorageYardTower } },
+            MapBuildingType.StorageYard => [new() { Left = this.Left, Top = this.Top, BuildingType = MapBuildingType.StorageYardTower }],
 
-            MapBuildingType.TempleComplex1 => new MapBuilding[]
-            {
+            MapBuildingType.TempleComplex1 =>
+            [
                 new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.TempleComplexBuilding },
                 new() { Left = this.Left + 3, Top = this.Top + 2, BuildingType = MapBuildingType.TempleComplexBuilding },
                 new() { Left = this.Left + 6, Top = this.Top + 2, BuildingType = MapBuildingType.TempleComplexBuilding },
-            },
-            MapBuildingType.TempleComplex2 => new MapBuilding[]
-            {
+            ],
+            MapBuildingType.TempleComplex2 =>
+            [
                 new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.TempleComplexBuilding },
                 new() { Left = this.Left + 2, Top = this.Top + 3, BuildingType = MapBuildingType.TempleComplexBuilding },
                 new() { Left = this.Left + 2, Top = this.Top + 6, BuildingType = MapBuildingType.TempleComplexBuilding },
-            },
+            ],
 
-            MapBuildingType.Gate1 => new MapBuilding[]
-            {
+            MapBuildingType.Gate1 =>
+            [
                 new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.GatePath },
                 new() { Left = this.Left + 2, Top = this.Top + 1, BuildingType = MapBuildingType.GatePath },
-            },
-            MapBuildingType.Gate2 => new MapBuilding[]
-            {
+            ],
+            MapBuildingType.Gate2 =>
+            [
                 new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.GatePath },
                 new() { Left = this.Left + 1, Top = this.Top + 2, BuildingType = MapBuildingType.GatePath },
-            },
-            MapBuildingType.Fort => new MapBuilding[]
-            {
+            ],
+            MapBuildingType.Fort =>
+            [
                 new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.FortBuilding },
                 new() { Left = this.Left + 3, Top = this.Top,     BuildingType = MapBuildingType.FortYard },
-            },
+            ],
 
-            MapBuildingType.Booth1 => new MapBuilding[] { new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.JuggleStage } },
-            MapBuildingType.Booth2 => new MapBuilding[] { new() { Left = this.Left + 1, Top = this.Top,     BuildingType = MapBuildingType.JuggleStage } },
-            MapBuildingType.Booth3 => new MapBuilding[] { new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.JuggleStage } },
-            MapBuildingType.Booth4 => new MapBuilding[] { new() { Left = this.Left + 1, Top = this.Top + 1, BuildingType = MapBuildingType.JuggleStage } },
-
-            MapBuildingType.Bandstand1 => new MapBuilding[]
-            {
-                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 1, Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 1, Top = this.Top + 2, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Bandstand2 => new MapBuilding[]
-            {
-                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 2, Top = this.Top + 1, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Bandstand3 => new MapBuilding[]
-            {
-                new() { Left = this.Left + 1, Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 2, Top = this.Top + 2, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 1, Top = this.Top + 2, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Bandstand4 => new MapBuilding[]
-            {
-                new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 2, Top = this.Top + 2, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 2, Top = this.Top + 1, BuildingType = MapBuildingType.Garden },
-            },
-
-            MapBuildingType.Pavilion1 => new MapBuilding[]
-            {
-                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left + 3, Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 3, Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 3, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 1, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 3, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion2 => new MapBuilding[]
-            {
-                new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 3, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 2, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 3, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion3 => new MapBuilding[]
-            {
-                new() { Left = this.Left + 2, Top = this.Top + 2, BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 3, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 3, Top = this.Top,     BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion4 => new MapBuilding[]
-            {
-                new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left + 3, Top = this.Top + 2, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 3, Top = this.Top + 3, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 1, Top = this.Top,     BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 3, Top = this.Top,     BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion5 => new MapBuilding[]
-            {
-                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left + 3, Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 3, Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 1, Top = this.Top + 2, BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 3, Top = this.Top + 2, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion6 => new MapBuilding[]
-            {
-                new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 2, Top = this.Top + 2, BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 3, Top = this.Top + 2, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion7 => new MapBuilding[]
-            {
-                new() { Left = this.Left + 1, Top = this.Top,     BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left + 3, Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 3, Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 3, Top = this.Top + 3, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 1, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 2, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion8 => new MapBuilding[]
-            {
-                new() { Left = this.Left + 1, Top = this.Top + 2, BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left + 3, Top = this.Top + 2, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 3, Top = this.Top + 3, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 3, Top = this.Top,     BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 1, Top = this.Top,     BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion9 => new MapBuilding[]
-            {
-                new() { Left = this.Left + 2, Top = this.Top + 1, BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 3, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 2, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 3, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion10 => new MapBuilding[]
-            {
-                new() { Left = this.Left,     Top = this.Top + 1, BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left + 3, Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 3, Top = this.Top + 2, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 3, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 1, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 3, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-            },
-            MapBuildingType.Pavilion11 => new MapBuilding[]
-            {
-                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.DanceStage },
-                new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left + 2, Top = this.Top + 1, BuildingType = MapBuildingType.MusicStage },
-                new() { Left = this.Left,     Top = this.Top + 3, BuildingType = MapBuildingType.JuggleStage },
-                new() { Left = this.Left + 1, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-                new() { Left = this.Left + 2, Top = this.Top + 3, BuildingType = MapBuildingType.Garden },
-            },
-            _ => Array.Empty<MapBuilding>(),
+            _ => [],
         };
     }
 
@@ -199,6 +98,21 @@ public class MapBuilding
         {
             return cellY == this.Top
                 && this.Left <= cellX && cellX  < this.Left + 3;
+        }
+
+        if (this.BuildingType.GetCategory() == MapBuildingCategory.Venue && this.SubBuildings != null)
+        {
+            foreach (var subBuilding in this.SubBuildings)
+            {
+                var size = subBuilding.BuildingType.GetSize();
+                if (subBuilding.Left <= cellX && cellX < subBuilding.Left + size.width
+                    && subBuilding.Top <= cellY && cellY < subBuilding.Top + size.height)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         return false;

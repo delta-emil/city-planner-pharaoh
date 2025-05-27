@@ -1,4 +1,5 @@
-﻿using System.Drawing.Drawing2D;
+﻿using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace CityPlannerPharaoh;
 
@@ -79,7 +80,7 @@ public class MapCanvasControl : Control
             new SolidBrush(Color.FromArgb(181, 162, 143)), // Guild,
             new SolidBrush(Color.FromArgb(255, 219, 182)), // Distribution,
             new SolidBrush(Color.FromArgb(114, 159, 207)), // VenueStage,
-            new SolidBrush(Color.FromArgb(172, 189, 208)), // Venue,
+            new SolidBrush(Color.FromArgb(128, 172, 189, 208)), // Venue,
             new SolidBrush(Color.FromArgb(50, 115, 181)), // EntSchool,
             new SolidBrush(Color.FromArgb(191, 129, 158)), // Religious,
             new SolidBrush(Color.FromArgb(212, 234, 107)), // Education,
@@ -170,14 +171,16 @@ public class MapCanvasControl : Control
     {
         var graphics = pe.Graphics;
 
-        var buildingToPaint = new List<MapBuilding>();
+        var buildingsToPaint = new List<MapBuilding>();
+        var buildingsToPaintLater = new HashSet<MapBuilding>();
 
         for (int cellX = 0; cellX < this.MapModel.MapSideX; cellX++)
         {
             for (int cellY = 0; cellY < this.MapModel.MapSideY; cellY++)
             {
-                var cellRect = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, CellSideLength, CellSideLength);
-                if (!cellRect.IntersectsWith(pe.ClipRectangle))
+                // check for overload a bit wider, so that we catch venues that overlap roads on the edge of the ClipRectangle
+                var cellRectExt = new Rectangle((cellX - 4) * CellSideLength, (cellY - 4) * CellSideLength, CellSideLength * 9, CellSideLength * 9);
+                if (!cellRectExt.IntersectsWith(pe.ClipRectangle))
                 {
                     continue;
                 }
@@ -186,16 +189,29 @@ public class MapCanvasControl : Control
 
                 if (cellModel.Building != null && this.ShowBuildings)
                 {
-                    buildingToPaint.Add(cellModel.Building);
+                    var buildingType = cellModel.Building.BuildingType;
+                    if (buildingType.IgnoreMainBuilding() && buildingType.DrawMainBuildingBackground())
+                    {
+                        buildingsToPaintLater.Add(cellModel.Building);
+                    }
+                    else
+                    {
+                        buildingsToPaint.Add(cellModel.Building);
+                    }
                 }
                 else
                 {
+                    var cellRect = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, CellSideLength, CellSideLength);
                     PaintTerrainCell(graphics, cellX, cellY, cellRect, cellModel);
                 }
             }
         }
 
-        foreach (MapBuilding building in buildingToPaint)
+        foreach (MapBuilding building in buildingsToPaint)
+        {
+            PaintBuilding(graphics, building);
+        }
+        foreach (MapBuilding building in buildingsToPaintLater)
         {
             PaintBuilding(graphics, building);
         }
@@ -206,8 +222,7 @@ public class MapCanvasControl : Control
         var buildingRect = GetBuildingRectangle(building, includingDesire: false);
 
         var buildingCategory = building.BuildingType.GetCategory();
-        var ignoreMainBuilding = building.BuildingType.IgnoreMainBuilding();
-        if (!ignoreMainBuilding)
+        if (building.BuildingType.DrawMainBuildingBackground())
         {
             var brush = this.buildingBrushes[(int)buildingCategory];
 
@@ -224,6 +239,7 @@ public class MapCanvasControl : Control
         }
 
         // draw border
+        var ignoreMainBuilding = building.BuildingType.IgnoreMainBuilding();
         if (!ignoreMainBuilding || this.SelectedBuildings.Contains(building))
         {
             var borderRect = new Rectangle(
@@ -236,92 +252,97 @@ public class MapCanvasControl : Control
             graphics.DrawRectangle(borderPen, borderRect);
         }
 
-        if (!ignoreMainBuilding)
+        bool isMeadowFarm = false;
+
+        foreach (var (cellModel, cellX, cellY) in this.MapModel.EnumerateInsideBuildingWithCoords(building))
         {
-            bool isMeadowFarm = false;
-
-            foreach (var (cellModel, cellX, cellY) in this.MapModel.EnumerateInsideBuildingWithCoords(building))
+            Brush? brushToApply = null;
+            if (cellModel.TooCloseToVoidToBuild)
             {
-                Brush? brushToApply = null;
-                if (cellModel.TooCloseToVoidToBuild)
-                {
-                    brushToApply = this.tooCloseToVoidToBuildBrush;
-                }
-                else if (building.BuildingType == MapBuildingType.Farm
-                    && cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland or MapTerrain.Floodpain)
-                {
-                    brushToApply = this.farmMeadowBrush;
+                brushToApply = this.tooCloseToVoidToBuildBrush;
+            }
+            else if (building.BuildingType == MapBuildingType.Farm
+                && cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland or MapTerrain.Floodpain)
+            {
+                brushToApply = this.farmMeadowBrush;
 
-                    isMeadowFarm |= cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland;
-                }
+                isMeadowFarm |= cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland;
+            }
                 
-                if (brushToApply != null)
-                {
-                    var innerRect = new Rectangle(
-                        cellX * CellSideLength + BorderWidth, cellY * CellSideLength + BorderWidth,
-                        CellSideLength - BorderWidthDouble, CellSideLength - BorderWidthDouble);
-                    graphics.FillRectangle(brushToApply, innerRect);
-                }
-            }
-
-            // draw building name
-            if (building.BuildingType.ShowName())
+            if (brushToApply != null)
             {
-                string text = building.BuildingType.GetDisplayString();
-                if (this.MapModel.IsBuildingUpgraged(building))
-                {
-                    text += "\r\nLv.2";
-                }
-
-                var textSize = graphics.MeasureString(text, this.smallFont);
-
-                var textBrushToUse = this.textBrush;
-                if (isMeadowFarm && this.MapModel.IsFarmIrrigated(building))
-                {
-                    textBrushToUse = this.farmIrrigatedTextBrush;
-                }
-                else if (this.MapModel.IsMissingRequiredWater(building))
-                {
-                    textBrushToUse = this.noWaterTextBrush;
-                }
-
-                graphics.DrawString(
-                    text, this.smallFont, textBrushToUse,
-                    buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2,
-                    buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2);
+                var innerRect = new Rectangle(
+                    cellX * CellSideLength + BorderWidth, cellY * CellSideLength + BorderWidth,
+                    CellSideLength - BorderWidthDouble, CellSideLength - BorderWidthDouble);
+                graphics.FillRectangle(brushToApply, innerRect);
             }
+        }
 
-            if (buildingCategory == MapBuildingCategory.House)
+        // draw building name
+        if (building.BuildingType.ShowName())
+        {
+            string text = building.BuildingType.GetDisplayString();
+            if (this.MapModel.IsBuildingUpgraged(building))
             {
-                var size = building.BuildingType.GetSize();
-
-                // draw desire
-                DrawDesireabilityOnBuilding(graphics, building, size);
-
-                // draw max house level
-                string text = "H" + building.HouseLevel;
-                var houseLabelFont = size.width > 1 ? this.bigHouseFont : this.smallFont;
-                var textSize = graphics.MeasureString(text, houseLabelFont);
-
-                int positionShift
-                    = size.width switch
-                    {
-                        1 => 3,
-                        3 => 9,
-                        _ => -3
-                    };
-
-                graphics.DrawString(
-                    text, houseLabelFont, this.textBrush,
-                    buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2 + positionShift,
-                    buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2 + positionShift);
+                text += "\r\nLv.2";
             }
 
-            if (building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply)
+            var textSize = graphics.MeasureString(text, this.smallFont);
+
+            var textBrushToUse = this.textBrush;
+            if (isMeadowFarm && this.MapModel.IsFarmIrrigated(building))
+            {
+                textBrushToUse = this.farmIrrigatedTextBrush;
+            }
+            else if (this.MapModel.IsMissingRequiredWater(building)
+                || this.MapModel.IsMissingRequiredCrossroad(building))
+            {
+                textBrushToUse = this.noWaterTextBrush;
+            }
+
+            int shiftY
+                = building.BuildingType switch
+                {
+                    MapBuildingType.Pavilion => -7,
+                    _ => 0,
+                };
+
+            graphics.DrawString(
+                text, this.smallFont, textBrushToUse,
+                buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2,
+                buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2 + shiftY);
+        }
+
+        if (buildingCategory == MapBuildingCategory.House)
+        {
+            var size = building.BuildingType.GetSize();
+
+            // draw desire
+            DrawDesireabilityOnBuilding(graphics, building, size);
+
+            // draw max house level
+            string text = "H" + building.HouseLevel;
+            var houseLabelFont = size.width > 1 ? this.bigHouseFont : this.smallFont;
+            var textSize = graphics.MeasureString(text, houseLabelFont);
+
+            int positionShift
+                = size.width switch
+                {
+                    1 => 3,
+                    3 => 9,
+                    _ => -3
+                };
+
+            graphics.DrawString(
+                text, houseLabelFont, this.textBrush,
+                buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2 + positionShift,
+                buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2 + positionShift);
+        }
+
+        if (building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply)
             {
                 DrawDesireabilityOnBuilding(graphics, building, northCellOnly: true);
             }
-        }
     }
 
     private void DrawDesireabilityOnBuilding(Graphics graphics, MapBuilding building, (int width, int height)? preCalculatedSize = null, bool northCellOnly = false)
@@ -457,9 +478,10 @@ public class MapCanvasControl : Control
             var newGhostRect = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, width * CellSideLength, height * CellSideLength);
             if (this.ghostLocation == null || !this.ghostLocation.Equals(newGhostRect))
             {
+                var isValid = this.MapModel.CanAddBuilding(cellX, cellY, buildingType, subBuildings: null);
+
                 using var graphics = this.CreateGraphics();
                 ClearGhost(graphics);
-                var isValid = this.MapModel.CanAddBuilding(cellX, cellY, buildingType);
                 ShowGhostOnCells(newGhostRect, isValid, graphics);
             }
         }
@@ -503,10 +525,10 @@ public class MapCanvasControl : Control
         }
         else if (this.Tool.BuildingType != null)
         {
-            if (this.MapModel.CanAddBuilding(cellX, cellY, this.Tool.BuildingType.Value))
+            if (this.MapModel.CanAddBuilding(cellX, cellY, this.Tool.BuildingType.Value, subBuildings: null))
             {
                 this.RegisterUndoPoint();
-                this.MapModel.AddBuilding(cellX, cellY, this.Tool.BuildingType.Value);
+                this.MapModel.AddBuilding(cellX, cellY, this.Tool.BuildingType.Value, subBuildings: null);
                 this.Invalidate();
             }
         }
@@ -606,20 +628,20 @@ public class MapCanvasControl : Control
                         this.moveValid = true;
                         foreach (var building in this.SelectedBuildings)
                         {
-                            var newCellX = building.Left + offsetX;
-                            var newCellY = building.Top + offsetY;
+                            var buildingCopy = building.GetCopy();
+                            buildingCopy.MoveLocation(deltaX: offsetX, deltaY: offsetY);
 
-                            var isValid = this.MapModel.CanAddBuilding(newCellX, newCellY, building.BuildingType, this.SelectedBuildings);
+                            var isValid = this.MapModel.CanAddBuilding(buildingCopy.Left, buildingCopy.Top, buildingCopy.BuildingType, buildingCopy.SubBuildings, this.SelectedBuildings);
                             this.moveValid &= isValid;
 
-                            if (building.BuildingType.IgnoreMainBuilding())
+                            if (buildingCopy.BuildingType.IgnoreMainBuilding())
                             {
-                                foreach (var subBuilding in building.GetSubBuildings())
+                                foreach (var subBuilding in buildingCopy.GetSubBuildings())
                                 {
                                     var (width, height) = subBuilding.BuildingType.GetSize();
                                     var newGhostRect = new Rectangle(
-                                        (subBuilding.Left + offsetX) * CellSideLength,
-                                        (subBuilding.Top + offsetY) * CellSideLength,
+                                        subBuilding.Left * CellSideLength,
+                                        subBuilding.Top * CellSideLength,
                                         width * CellSideLength,
                                         height * CellSideLength);
                                     ShowGhostOnCells(newGhostRect, isValid, bufferedGraphics.Graphics, append: true);
@@ -627,8 +649,12 @@ public class MapCanvasControl : Control
                             }
                             else
                             {
-                                var (width, height) = building.BuildingType.GetSize();
-                                var newGhostRect = new Rectangle(newCellX * CellSideLength, newCellY * CellSideLength, width * CellSideLength, height * CellSideLength);
+                                var (width, height) = buildingCopy.BuildingType.GetSize();
+                                var newGhostRect = new Rectangle(
+                                    buildingCopy.Left * CellSideLength,
+                                    buildingCopy.Top * CellSideLength,
+                                    width * CellSideLength,
+                                    height * CellSideLength);
                                 ShowGhostOnCells(newGhostRect, isValid, bufferedGraphics.Graphics, append: true);
                             }
                         }
@@ -906,8 +932,7 @@ public class MapCanvasControl : Control
             // make their Left & Top relative to the top-left of their bounding rect
             foreach (var building in clipboardBuildings)
             {
-                building.Left -= minX;
-                building.Top -= minY;
+                building.MoveLocation(deltaX: -minX, deltaY: -minY);
             }
 
             ExternalHelper.PutJsonOnClipboard(clipboardBuildings, this);
@@ -922,21 +947,21 @@ public class MapCanvasControl : Control
             return;
         }
 
+        var newBuildings = new List<MapBuilding>(clipboardBuildings.Count);
         foreach (var building in clipboardBuildings)
         {
-            var left = building.Left + cellX;
-            var top = building.Top + cellY;
-            if (!this.MapModel.CanAddBuilding(left, top, building.BuildingType))
+            var newBuilding = building.GetCopy();
+            newBuilding.MoveLocation(deltaX: cellX, deltaY: cellY);
+            newBuildings.Add(newBuilding);
+            if (!this.MapModel.CanAddBuilding(newBuilding.Left, newBuilding.Top, newBuilding.BuildingType, newBuilding.SubBuildings))
             {
                 return;
             }
         }
 
-        foreach (var building in clipboardBuildings)
+        foreach (var newBuilding in newBuildings)
         {
-            var left = building.Left + cellX;
-            var top = building.Top + cellY;
-            this.MapModel.AddBuilding(left, top, building.BuildingType);
+            this.MapModel.AddBuildingAfterCheck(newBuilding);
         }
 
         this.Invalidate();
