@@ -28,7 +28,8 @@ public class MapCanvasControl : Control
     private readonly Brush[] desirablityBrushes;
 
     private int cellSideLength = 24;
-    private Rectangle? ghostLocation;
+    private Rectangle? ghostsBoundingRect;
+    private List<(Rectangle Location, bool IsValid)> ghosts = new();
     private (int x, int y) selectionDragStartCell;
     private (int x, int y) selectionDragEndCell;
     private bool? moveValid;
@@ -36,6 +37,12 @@ public class MapCanvasControl : Control
     public MapCanvasControl()
     {
         this.DoubleBuffered = true;
+        this.SetStyle(
+            ControlStyles.AllPaintingInWmPaint
+            | ControlStyles.UserPaint
+            | ControlStyles.OptimizedDoubleBuffer,
+            true);
+        this.UpdateStyles();
 
         this.borderSoftPen = new Pen(Color.Gray, BorderWidth);
         this.borderBuildingPen = new Pen(Color.Black, BorderWidth);
@@ -133,7 +140,12 @@ public class MapCanvasControl : Control
         set
         {
             tool = value;
-            ClearGhost();
+            if (this.ghostsBoundingRect != null)
+            {
+                var repaintRect = this.ghostsBoundingRect.Value;
+                ClearGhost();
+                this.Invalidate(repaintRect);
+            }
         }
     }
 
@@ -214,6 +226,15 @@ public class MapCanvasControl : Control
         foreach (MapBuilding building in buildingsToPaintLater)
         {
             PaintBuilding(graphics, building);
+        }
+
+        foreach (var (ghostLocation, isValid) in this.ghosts)
+        {
+            if (ghostLocation.IntersectsWith(pe.ClipRectangle))
+            {
+                var fillBrush = isValid ? this.ghostValidBrush : this.ghostInvalidBrush;
+                graphics.FillRectangle(fillBrush, ghostLocation);
+            }
         }
     }
 
@@ -417,7 +438,7 @@ public class MapCanvasControl : Control
                 this.MapModel.MoveBuildingsByOffset(this.SelectedBuildings, offsetX, offsetY);
             }
 
-            this.ghostLocation = null;
+            this.ClearGhost();
             this.moveValid = null;
             this.Invalidate();
         }
@@ -428,42 +449,30 @@ public class MapCanvasControl : Control
         }
     }
 
-    private void ClearGhost(Graphics? existingGraphics = null)
+    private void ClearGhost()
     {
-        if (this.ghostLocation == null)
-        {
-            return;
-        }
-
-        bool disposeGraphics = existingGraphics == null;
-        var graphics = existingGraphics ?? this.CreateGraphics();
-        try
-        {
-            this.InvokePaint(this, new PaintEventArgs(graphics, this.ghostLocation.Value));
-        }
-        finally
-        {
-            this.ghostLocation = null;
-            if (disposeGraphics)
-            {
-                graphics.Dispose();
-            }
-        }
+        this.ghostsBoundingRect = null;
+        this.ghosts.Clear();
     }
 
-    private void ShowGhostOnCells(Rectangle newGhostRect, bool isValid, Graphics graphics, bool append = false)
+    private void UpdateGhostLocation(Rectangle newGhostRect, bool isValid, bool append = false)
     {
-        var fillBrush = isValid ? this.ghostValidBrush : this.ghostInvalidBrush;
-        graphics.FillRectangle(fillBrush, newGhostRect);
-
-        if (append && this.ghostLocation != null)
+        if (append && this.ghostsBoundingRect != null)
         {
-            this.ghostLocation = Rectangle.Union(this.ghostLocation.Value, newGhostRect);
+            this.ghostsBoundingRect = Rectangle.Union(this.ghostsBoundingRect.Value, newGhostRect);
         }
         else
         {
-            this.ghostLocation = newGhostRect;
+            this.ghostsBoundingRect = newGhostRect;
+            this.ghosts.Clear();
         }
+
+        this.ghosts.Add((newGhostRect, isValid));
+    }
+
+    private static Rectangle RectUnion(Rectangle? optionalRect1, Rectangle rect2)
+    {
+        return optionalRect1 != null ? Rectangle.Union(optionalRect1.Value, rect2) : rect2;
     }
 
     protected override void OnMouseMove(MouseEventArgs e)
@@ -476,13 +485,14 @@ public class MapCanvasControl : Control
             var (width, height) = buildingType.GetSize();
 
             var newGhostRect = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, width * CellSideLength, height * CellSideLength);
-            if (this.ghostLocation == null || !this.ghostLocation.Equals(newGhostRect))
+            if (this.ghostsBoundingRect == null || !this.ghostsBoundingRect.Equals(newGhostRect))
             {
-                var isValid = this.MapModel.CanAddBuilding(cellX, cellY, buildingType, subBuildings: null);
+                var repaintRect = RectUnion(this.ghostsBoundingRect, newGhostRect);
 
-                using var graphics = this.CreateGraphics();
-                ClearGhost(graphics);
-                ShowGhostOnCells(newGhostRect, isValid, graphics);
+                var isValid = this.MapModel.CanAddBuilding(cellX, cellY, buildingType, subBuildings: null);
+                this.UpdateGhostLocation(newGhostRect, isValid);
+                
+                Invalidate(repaintRect);
             }
         }
 
@@ -518,9 +528,8 @@ public class MapCanvasControl : Control
 
             if (cellModel.Building == null)
             {
-                using var graphics = this.CreateGraphics();
                 var cellRect = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, CellSideLength, CellSideLength);
-                PaintTerrainCell(graphics, cellX, cellY, cellRect, cellModel);
+                this.Invalidate(cellRect);
             }
         }
         else if (this.Tool.BuildingType != null)
@@ -616,12 +625,8 @@ public class MapCanvasControl : Control
                     var offsetX = this.selectionDragEndCell.x - this.selectionDragStartCell.x;
                     var offsetY = this.selectionDragEndCell.y - this.selectionDragStartCell.y;
                     
-                    using var graphics = this.CreateGraphics();
-                    // TODO: keep the same buffer until a map with a different size is loaded
-                    using BufferedGraphics bufferedGraphics = BufferedGraphicsManager.Current.Allocate(graphics, Rectangle.Round(this.ClientRectangle));
-                    var screenRect = this.RectangleToScreen(this.ClientRectangle);
-                    bufferedGraphics.Graphics.CopyFromScreen(screenRect.Left, screenRect.Top, 0, 0, screenRect.Size);
-                    ClearGhost(bufferedGraphics.Graphics);
+                    var repaintRect = this.ghostsBoundingRect;
+                    this.ClearGhost();
 
                     if (offsetX != 0 || offsetY != 0)
                     {
@@ -644,7 +649,8 @@ public class MapCanvasControl : Control
                                         subBuilding.Top * CellSideLength,
                                         width * CellSideLength,
                                         height * CellSideLength);
-                                    ShowGhostOnCells(newGhostRect, isValid, bufferedGraphics.Graphics, append: true);
+                                    UpdateGhostLocation(newGhostRect, isValid, append: true);
+                                    repaintRect = RectUnion(repaintRect, newGhostRect);
                                 }
                             }
                             else
@@ -655,7 +661,8 @@ public class MapCanvasControl : Control
                                     buildingCopy.Top * CellSideLength,
                                     width * CellSideLength,
                                     height * CellSideLength);
-                                ShowGhostOnCells(newGhostRect, isValid, bufferedGraphics.Graphics, append: true);
+                                UpdateGhostLocation(newGhostRect, isValid, append: true);
+                                repaintRect = RectUnion(repaintRect, newGhostRect);
                             }
                         }
                     }
@@ -664,7 +671,10 @@ public class MapCanvasControl : Control
                         this.moveValid = false;
                     }
 
-                    bufferedGraphics.Render(graphics);
+                    if (repaintRect != null)
+                    {
+                        this.Invalidate(repaintRect.Value);
+                    }
                 }
             }
         }
