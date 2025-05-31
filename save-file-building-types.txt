@@ -1,0 +1,134 @@
+Road       > terrain?
+Plaza      > terrain?
+Garden     > terrain? 39/size:0???
+
+House      > 10-29
+
+Farm       > 100(bar)101(flax)102(grain)103(lett)104(pom)105(chi)196(fig)
+Cattle     > 194
+WaterLift  > 90
+Ditch      > terrain?
+Hunter     > 115
+Fisher     > 76
+WorkCamp   > 199
+
+QuarryPlainStone  > 106
+QuarryLimestone   > 107
+QuarrySandstone   > 221
+QuarryGranite     > 216
+MineGems          > 162
+MineCopper        > 217
+MineGold          > 161
+
+Clay  > 109
+Reed  > 195
+Wood  > 108
+
+Potter     > 114
+Brewer     > 110
+Papyrus    > 203
+Weaver     > 111
+Jeweler    > 113
+Bricks     > 204
+Lamps      > 232
+Paint      > 233
+Shipwright > 74
+
+GuildBricklayer  > 178
+GuildCarpenter   > 177
+GuildStonemason  > 179
+GuildArtisan     > 231
+
+Bazaar             > 70
+Granary            > 71
+StorageYardTower   > 72 (1x1)
+StorageYardStorage > 73 (8 tiles of 1x1)
+Dock               > 75
+
+(ent: 30-37?)
+JuggleStage   > 31
+MusicStage    > 30
+DanceStage    > 33
+Booth         > terrain?
+Bandstand     > terrain?
+Pavilion      > terrain?
+Senet         > 32
+Zoo           > 226
+JuggleSchool  > 36
+MusicSchool   > 34
+DanceSchool   > 35
+
+Shrine                 > 140-144
+Temple                 > 60-64
+TempleComplex1         > 65-69 for each 3x3 TempleComplexBuilding
+TempleComplex2         > (same, but rot:6)
+TC upgrages            > 211,212, size:0
+FestivalSquare         > 209
+
+ScribeSchool   > 51
+Library        > 53
+
+Well          > 92
+WaterSupply   > 180
+Physician     > 206
+Apothecary    > 46
+Dentist       > 49
+Mortuary      > 47
+
+Firehouse   > 167
+Architect   > 81
+Police      > 55
+Tax         > 86
+Courthouse  > 185
+
+Roadblock     > 138
+Bridge        > terrain?
+FerryLanding  > 136
+
+StatueSmall   > 41, rot:varies
+StatueMedium  > 42
+StatueLarge   > 43
+
+PalaceVillage    > 187
+PalaceTown       > 188
+PalaceCity       > 189
+MansionPersonal  > 77
+MansionFamily    > 78
+MansionDynasty   > 79
+
+Wall           > terrain?
+Tower          > 173
+GatePath       > -
+Gate1          > 202, rot:1 (the N 2x2 only)
+Gate2          > 202, rot:0 (the N 2x2 only)
+Recruiter      > 95
+Academy        > 94
+Weaponsmith    > 112
+Chariot        > 205
+Fort           > -
+FortBuilding   > 57
+FortYard       > 54
+Warship        > 182
+TransportShip  > 181
+
+wat?
+
+| type / hex  | size | rotation |   x   |   y   |
+|-------------|------|----------|-------|-------|
+|   39 /   27 |    0 |        0 |     0 |     0 |
+|-------------|------|----------|-------|-------|
+| type / hex  | size | rotation |   x   |   y   |
+|-------------|------|----------|-------|-------|
+|  183 /   B7 |    2 |        0 |    47 |   112 | - pyramid 2x2 piece
+
+
+building grid values (hex):
+
+3B9B road
+3B6A paved road
+3739, 373A, 0x373B plaza
+
+        89         90         91
+65  M/88/3204  M/88/3205  r/C8/3709
+66  r/C8/370A  r/C8/370B  r/C8/370C
+67  J/88/3201  g/A8/31FB  r/C8/370F
