@@ -74,7 +74,10 @@ internal static class Glyphs
                 RenderBuilding(minX, minY, lines, building);
                 foreach (var subBuilding in building.GetSubBuildings())
                 {
-                    RenderBuilding(minX, minY, lines, subBuilding);
+                    if (subBuilding.BuildingType != MapBuildingType.GateNorth)
+                    {
+                        RenderBuilding(minX, minY, lines, subBuilding);
+                    }
                 }
             }
             else

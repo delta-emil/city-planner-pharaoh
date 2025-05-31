@@ -117,6 +117,7 @@ public enum MapBuildingType
     FortYard,
     Warship,
     TransportShip,
+    GateNorth,
 }
 
 public static partial class MapBuildingTypeExtensions
@@ -237,6 +238,7 @@ public static partial class MapBuildingTypeExtensions
         (4, 4), // FortYard,
         (3, 3), // Warship,
         (2, 2), // TransportShip,
+        (2, 2), // GateNorth,
     };
 
     public static DesireConfig GetDesire(this MapBuildingType mapBuildingType)
@@ -348,8 +350,8 @@ public static partial class MapBuildingTypeExtensions
         new(0, 0, 0, 0), // Wall,
         new(6, -6, 1, 1), // Tower,
         new(0, 0, 0, 0), // GatePath,
-        new(4, -4, 1, 1), // Gate1,
-        new(4, -4, 1, 1), // Gate2,
+        new(0, 0, 0, 0), // Gate1,
+        new(0, 0, 0, 0), // Gate2,
         new(3, -6, 1, 1), // Recruiter,
         new(3, -3, 1, 1), // Academy,
         new(3, -3, 1, 1), // Weaponsmith,
@@ -359,6 +361,7 @@ public static partial class MapBuildingTypeExtensions
         new(6, -20, 2, 2), // FortYard,
         new(4, -4, 1, 1), // Warship,
         new(2, -2, 1, 1), // TransportShip,
+        new(4, -4, 1, 1), // GateNorth,
     };
 
     public static MapBuildingCategory GetCategory(this MapBuildingType mapBuildingType)
@@ -478,6 +481,7 @@ public static partial class MapBuildingTypeExtensions
             MapBuildingType.FortYard => MapBuildingCategory.Military,
             MapBuildingType.Warship => MapBuildingCategory.Military,
             MapBuildingType.TransportShip => MapBuildingCategory.Military,
+            MapBuildingType.GateNorth => MapBuildingCategory.Military,
 
             _ => throw new NotImplementedException(),
         };
@@ -521,6 +525,7 @@ public static partial class MapBuildingTypeExtensions
             MapBuildingType.Bridge => false,
             MapBuildingType.Wall => false,
             MapBuildingType.GatePath => false,
+            MapBuildingType.GateNorth => false,
             MapBuildingType.FortBuilding => false,
             MapBuildingType.FortYard => false,
             _ => true,
@@ -557,6 +562,7 @@ public static partial class MapBuildingTypeExtensions
             MapBuildingType.Pavilion => true,
             MapBuildingType.Bandstand => true,
             MapBuildingType.Booth => true,
+            MapBuildingType.GateNorth => true,
             _ => false,
         };
     }
@@ -569,6 +575,7 @@ public static partial class MapBuildingTypeExtensions
             MapBuildingType.Pavilion => true,
             MapBuildingType.Bandstand => true,
             MapBuildingType.Booth => true,
+            MapBuildingType.GateNorth => false,
             _ => true,
         };
     }

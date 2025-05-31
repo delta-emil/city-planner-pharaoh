@@ -47,14 +47,13 @@ Notes:
 * House level is shown as the maximum achievable regardless of the placed house size.
   However the desirability effect of the house is capped at the max level of it size.
   E.g. a 2x2 house can show H20 (Palatial Estate) but will only have the desirability effect of the top 2x2 house level 14 (Fancy Residence).
-* "New from game save..." lets you select a save file and it loads the terrain from it
+* "New from game save..." lets you select a save file and it loads the terrain and buildings from it
 * North is to the upper-left. (as seems to be customary in the forums)
 * Currently it doesn't check if the building is allowed on the terrain type (i.e. you can place a building on a dune, or in the water).
   It only checks that you're within bounds of the map and not overlapping other buildings.
 
 # TODO
 
-- only N 2x2 of gatehouse should have the des effect!
 - fix farm irrigation
     - fix the algorith - it's 4 tiles to the Farm's N tile; single ditch tile doesn't count
     - show on floodplains

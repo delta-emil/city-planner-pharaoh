@@ -74,11 +74,13 @@ public class MapBuilding
 
             MapBuildingType.Gate1 =>
             [
+                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.GateNorth },
                 new() { Left = this.Left + 2, Top = this.Top,     BuildingType = MapBuildingType.GatePath },
                 new() { Left = this.Left + 2, Top = this.Top + 1, BuildingType = MapBuildingType.GatePath },
             ],
             MapBuildingType.Gate2 =>
             [
+                new() { Left = this.Left,     Top = this.Top,     BuildingType = MapBuildingType.GateNorth },
                 new() { Left = this.Left,     Top = this.Top + 2, BuildingType = MapBuildingType.GatePath },
                 new() { Left = this.Left + 1, Top = this.Top + 2, BuildingType = MapBuildingType.GatePath },
             ],
