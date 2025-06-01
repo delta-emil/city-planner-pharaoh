@@ -6,7 +6,7 @@ namespace CityPlannerPharaoh;
 public class MapCanvasControl : Control
 {
     public const int MinCellSideLength = 8;
-    public const int MaxCellSideLength = 32;
+    public const int MaxCellSideLength = 64;
     public const int BorderWidth = 1;
     public const int BorderWidthDouble = 2 * BorderWidth;
 
@@ -360,16 +360,44 @@ public class MapCanvasControl : Control
                 buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2 + positionShift);
         }
 
-        if (building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply)
-            {
-                DrawDesireabilityOnBuilding(graphics, building, northCellOnly: true);
-            }
+        //if (building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply)
+        //{
+        //    DrawDesireabilityOnBuilding(graphics, building, northCellOnly: true);
+        //}
+
+        DrawDesireabilityOnBuilding(graphics, building);
     }
 
-    private void DrawDesireabilityOnBuilding(Graphics graphics, MapBuilding building, (int width, int height)? preCalculatedSize = null, bool northCellOnly = false)
+    private void DrawDesireabilityOnBuilding(Graphics graphics, MapBuilding building, (int width, int height)? preCalculatedSize = null)
     {
         if (this.ShowDesirability)
         {
+            //// bool colorText = building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply;
+            bool northCellOnly;
+            bool fullColor = building.BuildingType.GetCategory() == MapBuildingCategory.House;
+            bool northCellColor = building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply;
+
+            bool fullMode = false;
+            if (fullMode)
+            {
+                northCellOnly = false;
+            }
+            else
+            {
+                if (fullColor)
+                {
+                    northCellOnly = false;
+                }
+                else if(northCellColor)
+                {
+                    northCellOnly = true;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
             (int width, int height) size;
             int maxDesire;
             if (northCellOnly)
@@ -389,7 +417,11 @@ public class MapCanvasControl : Control
                 {
                     var desire = this.MapModel.Cells[cellX, cellY].Desirability;
                     var font = desire == maxDesire ? this.smallFontBold : this.smallFont;
-                    var brush = this.GetDesirabilityBrush(desire);
+
+                    var brush
+                        = fullColor || (northCellColor && cellX == building.Left && cellY == building.Top)
+                        ? this.GetDesirabilityBrush(desire)
+                        : this.textBrush;
                     graphics.DrawString(desire.ToString(), font, brush, cellX * CellSideLength + 2, cellY * CellSideLength + 2);
                 }
             }

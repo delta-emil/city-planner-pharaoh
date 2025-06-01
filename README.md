@@ -64,6 +64,8 @@ Notes:
 
 Low prio:
 
+- ability to add text comments to spots on the map
+- monuments
 - option to show walker start/finish tiles for a building
 - Copy-Paste Terrain
 - hold Shift to paint Terrain in a rectangle

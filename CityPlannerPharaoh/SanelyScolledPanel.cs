@@ -26,6 +26,8 @@ public class SanelyScolledPanel : Panel
             {
                 var args = new ZoomEventArgs { Delta = Math.Sign(e.Delta) };
                 this.Zoom(this, args);
+                ((HandledMouseEventArgs)e).Handled = true;
+                return;
             }
         }
         // Favor the vertical scroll bar, since it's the most common use. However, if
