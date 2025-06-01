@@ -21,6 +21,8 @@ internal static class ReaderV3
             savedDifficulty = null;
         }
 
+        bool simpleHouseDesire = rootElement.GetProperty(nameof(MapModel.SimpleHouseDesire)).GetBoolean();
+
         // --- cells ---
 
         JsonElement cellsElement = rootElement.GetProperty(nameof(MapModel.Cells));
@@ -60,6 +62,7 @@ internal static class ReaderV3
             mapSideX,
             mapSideY,
             hasTooCloseToVoidToBuild,
+            simpleHouseDesire,
             cells,
             buildings,
             savedDifficulty);

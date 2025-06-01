@@ -176,10 +176,9 @@ public partial class FormMain : Form
         this.mapControl.Invalidate();
     }
 
-    private void btnFilterCoords_Click(object sender, EventArgs e)
+    private void btnFilterSimpleHouseDesire_Click(object sender, EventArgs e)
     {
-        this.mapControl.ShowCellCoords = btnFilterCoords.Checked;
-        this.mapControl.Invalidate();
+        this.mapControl.SetSimpleHouseDesire(btnFilterSimpleHouseDesire.Checked);
     }
 
     #region file operations
@@ -218,6 +217,7 @@ public partial class FormMain : Form
 
             if (mapModel != null)
             {
+                mapModel.SetSimpleHouseDesire(this.mapControl.MapModel.SimpleHouseDesire);
                 mapModel.SetDifficulty(this.mapControl.MapModel.EffectiveDifficulty);
                 this.fileName = null;
                 this.Text = "City Builder Pharaoh";
@@ -253,6 +253,7 @@ public partial class FormMain : Form
                 this.mapControl.SetMapModel(mapModel);
                 this.mapControl.Invalidate();
                 this.SetShownDifficulty(mapModel.EffectiveDifficulty);
+                this.SetShownSimpleHouseDesire(mapModel.SimpleHouseDesire);
             }
         }
     }
@@ -340,6 +341,7 @@ public partial class FormMain : Form
     private void InitEmptyFile()
     {
         var mapModel = new MapModel(MapModel.DefaultMapSize, MapModel.DefaultMapSize);
+        mapModel.SetSimpleHouseDesire(this.mapControl.MapModel.SimpleHouseDesire);
         mapModel.SetDifficulty(this.mapControl.MapModel.EffectiveDifficulty);
         this.mapControl.SetMapModel(mapModel);
         this.mapControl.Invalidate();
@@ -414,7 +416,11 @@ public partial class FormMain : Form
     {
         this.btnUndo.Enabled = e.CanUndo;
         this.btnRedo.Enabled = e.CanRedo;
-        this.SetShownDifficulty(e.Difficulty);
+        if (e.UpdateContentControls)
+        {
+            this.SetShownDifficulty(e.Difficulty);
+            this.SetShownSimpleHouseDesire(e.SimpleHouseDesire);
+        }
     }
 
     #region secondary toolstrips
@@ -676,6 +682,11 @@ public partial class FormMain : Form
             Difficulty.VeryHard => "Very Hard",
             _                   => MapModel.DefaultDifficulty.ToString(),
         };
+    }
+
+    private void SetShownSimpleHouseDesire(bool simpleHouseDesire)
+    {
+        btnFilterSimpleHouseDesire.Checked = simpleHouseDesire;
     }
 
     private void btnGlyph_Click(object sender, EventArgs e)

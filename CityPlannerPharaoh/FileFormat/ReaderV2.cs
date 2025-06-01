@@ -60,6 +60,7 @@ internal static class ReaderV2
             mapSideX,
             mapSideY,
             hasTooCloseToVoidToBuild,
+            simpleHouseDesire: false,
             cells,
             buildings,
             savedDifficulty);

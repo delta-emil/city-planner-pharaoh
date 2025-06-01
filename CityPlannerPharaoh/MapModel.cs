@@ -29,12 +29,13 @@ public class MapModel
         this.EffectiveDifficulty = DefaultDifficulty;
     }
 
-    public MapModel(int mapSideX, int mapSideY, bool hasTooCloseToVoidToBuild, MapCellModel[,] cells, List<MapBuilding> buildings, Difficulty? savedDifficulty)
+    public MapModel(int mapSideX, int mapSideY, bool hasTooCloseToVoidToBuild, bool simpleHouseDesire, MapCellModel[,] cells, List<MapBuilding> buildings, Difficulty? savedDifficulty)
         : this(mapSideX, mapSideY)
     {
         this.Cells = cells;
         this.Buildings = buildings;
         this.HasTooCloseToVoidToBuild = hasTooCloseToVoidToBuild;
+        this.SimpleHouseDesire = simpleHouseDesire;
 
         if (this.HasTooCloseToVoidToBuild)
         {
@@ -68,9 +69,7 @@ public class MapModel
         this.Buildings = new List<MapBuilding>(source.Buildings.Count);
         foreach (var srcBuilding in source.Buildings)
         {
-            var newBuilding = srcBuilding.GetCopy();
-            newBuilding.HouseLevel = srcBuilding.HouseLevel;
-            newBuilding.MaxHouseLevelExceedable = srcBuilding.MaxHouseLevelExceedable;
+            var newBuilding = srcBuilding.GetCopy(includeTransientData: true);
             this.Buildings.Add(newBuilding);
             buildingMapping[srcBuilding] = newBuilding;
         }
@@ -101,6 +100,7 @@ public class MapModel
     public int MapSideY { get; }
     public bool HasTooCloseToVoidToBuild { get; }
     public Difficulty EffectiveDifficulty { get; private set; }
+    public bool SimpleHouseDesire { get; set; }
 
     public MapCellModel[,] Cells { get; }
 
@@ -342,8 +342,7 @@ public class MapModel
         foreach (var building in selectedBuildings)
         {
             building.MoveLocation(deltaX: offsetX, deltaY: offsetY);
-            building.HouseLevel = 0;
-            building.MaxHouseLevelExceedable = false;
+            building.ClearTransientData();
             AddBuildingAfterCheck(building);
         }
     }
@@ -384,9 +383,8 @@ public class MapModel
 
         foreach (var building in houses)
         {
+            building.ClearTransientData();
             SetBuildingInCells(building);
-            building.HouseLevel = 0;
-            building.MaxHouseLevelExceedable = false;
             AddDesirabilityEffectAddingHouse(building);
         }
     }
@@ -458,16 +456,20 @@ public class MapModel
                 var (newHouseLevel, newExceedable) = HouseLevelData.GetHouseLevel(maxDesire, this.EffectiveDifficulty, affectedHouse.MaxHouseLevel);
                 affectedHouse.HouseLevel = newHouseLevel;
                 affectedHouse.MaxHouseLevelExceedable = newExceedable;
+                affectedHouse.HouseWouldNotDowngrade
+                    = affectedHouse.HouseLevel == affectedHouse.MaxHouseLevel - 1
+                    ? HouseLevelData.GetHouseWouldMaintainLevel(maxDesire, this.EffectiveDifficulty, affectedHouse.MaxHouseLevel)
+                    : false;
 
-                if (oldHouseLevel != newHouseLevel)
+                if (oldHouseLevel != newHouseLevel && (oldHouseLevel == 0 || !this.SimpleHouseDesire))
                 {
                     if (DoLogging)
                     {
                         Console.WriteLine($"@@@@@@@@ house on looping on {affectedHouse.Left}, {affectedHouse.Top} chaning level {oldHouseLevel} -> {newHouseLevel}");
                     }
 
-                    var oldDesireConfig = HouseLevelData.GetDesire(oldHouseLevel);
-                    var newDesireConfig = HouseLevelData.GetDesire(newHouseLevel);
+                    var oldDesireConfig = HouseLevelData.GetDesire(oldHouseLevel); // for this.SimpleHouseDesire this will be 0 if we got here, so it works
+                    var newDesireConfig = HouseLevelData.GetDesire(this.SimpleHouseDesire ? affectedHouse.MaxHouseLevel : newHouseLevel);
                     if (!oldDesireConfig.Equals(newDesireConfig))
                     {
                         AdjustHouseDesirabilityEffect(affectedHouse, oldDesireConfig, newDesireConfig, newlyAffectedHouses);
@@ -611,7 +613,7 @@ public class MapModel
     {
         if (mapBuilding.BuildingType.GetCategory() == MapBuildingCategory.House)
         {
-            return HouseLevelData.GetDesire(mapBuilding.HouseLevel);
+            return HouseLevelData.GetDesire(this.SimpleHouseDesire ? mapBuilding.MaxHouseLevel : mapBuilding.HouseLevel);
         }
         else
         {
@@ -621,6 +623,16 @@ public class MapModel
 
     public void SetDifficulty(Difficulty newDifficulty)
     {
+        RedoHouses(() => this.EffectiveDifficulty = newDifficulty);
+    }
+
+    public void SetSimpleHouseDesire(bool simpleHouseDesire)
+    {
+        RedoHouses(() => this.SimpleHouseDesire = simpleHouseDesire);
+    }
+
+    private void RedoHouses(Action applyChange)
+    {
         var houses = this.Buildings.Where(x => x.BuildingType.GetCategory() == MapBuildingCategory.House).ToList();
 
         foreach (var building in houses)
@@ -629,13 +641,12 @@ public class MapModel
             AddDesirabilityEffectNormal(building, -1);
         }
 
-        this.EffectiveDifficulty = newDifficulty;
+        applyChange();
 
         foreach (var building in houses)
         {
+            building.ClearTransientData();
             SetBuildingInCells(building);
-            building.HouseLevel = 0;
-            building.MaxHouseLevelExceedable = false;
             AddDesirabilityEffectAddingHouse(building);
         }
     }

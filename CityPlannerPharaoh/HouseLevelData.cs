@@ -23,6 +23,15 @@ public static class HouseLevelData
             [-98, -10, -5,  0, 4, 9, 13, 17, 21, 26, 33, 41, 50, 55, 60, 65, 70, 76, 82, 92], // VeryHard
         ];
 
+    private static readonly int[][] HouseDevolveBounds =
+        [
+            [-99, -12, -9, -4, 0, 4,  8, 12, 16, 19, 26, 33, 40, 45, 47, 50, 55, 64, 65, 80], // VeryEasy
+            [-99, -12, -8, -3, 1, 6,  9, 13, 17, 20, 27, 34, 41, 46, 48, 51, 57, 66, 67, 82], // Easy
+            [-99, -12, -7, -2, 2, 6, 10, 14, 18, 22, 29, 36, 43, 48, 50, 53, 60, 68, 70, 85], // Normal
+            [-99, -12, -7, -2, 2, 6, 10, 14, 18, 22, 29, 36, 43, 48, 50, 53, 60, 68, 70, 85], // Hard
+            [-99, -12, -7, -2, 2, 7, 11, 15, 19, 23, 30, 37, 45, 50, 52, 55, 62, 70, 72, 87], // VeryHard
+        ];
+
     public static (int Level, bool Exceedable) GetHouseLevel(int maxDesire, Difficulty difficulty, int maxHouseLevel)
     {
         var boundsForDifficulty = HouseEvolveBounds[(int)difficulty];
@@ -48,6 +57,11 @@ public static class HouseLevelData
         }
 
         return (Level: level, Exceedable: false);
+    }
+
+    public static bool GetHouseWouldMaintainLevel(int maxDesire, Difficulty difficulty, int targetHouseLevel)
+    {
+        return maxDesire > HouseDevolveBounds[(int)difficulty][targetHouseLevel - 1];
     }
 
     public static int GetNeededDesire(Difficulty difficulty, int maxHouseLevel)

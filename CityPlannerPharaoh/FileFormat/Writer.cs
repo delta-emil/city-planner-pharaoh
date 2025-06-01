@@ -13,6 +13,7 @@ internal static class Writer
         writer.WriteNumber(nameof(MapModel.MapSideY), mapModel.MapSideY);
         writer.WriteBoolean(nameof(MapModel.HasTooCloseToVoidToBuild), mapModel.HasTooCloseToVoidToBuild);
         writer.WriteString("SavedDifficulty", EnumToString(mapModel.EffectiveDifficulty));
+        writer.WriteBoolean(nameof(MapModel.SimpleHouseDesire), mapModel.SimpleHouseDesire);
 
         writer.WriteStartArray(nameof(MapModel.Cells));
         for (int x = 0; x < mapModel.MapSideX; x++)

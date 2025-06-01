@@ -14,6 +14,8 @@ public class MapBuilding
     public int HouseLevel { get; set; }
     [JsonIgnore]
     public bool MaxHouseLevelExceedable { get; set; }
+    [JsonIgnore]
+    public bool HouseWouldNotDowngrade { get; set; }
 
     public override string ToString()
     {
@@ -27,7 +29,7 @@ public class MapBuilding
         }
     }
 
-    public MapBuilding GetCopy()
+    public MapBuilding GetCopy(bool includeTransientData = false)
     {
         var copy = new MapBuilding
         {
@@ -46,6 +48,13 @@ public class MapBuilding
             }
         }
 
+        if (includeTransientData)
+        {
+            copy.HouseLevel = this.HouseLevel;
+            copy.MaxHouseLevelExceedable = this.MaxHouseLevelExceedable;
+            copy.HouseWouldNotDowngrade = this.HouseWouldNotDowngrade;
+        }
+
         return copy;
     }
 
@@ -62,6 +71,13 @@ public class MapBuilding
                 subBuilding.Top += deltaY;
             }
         }
+    }
+
+    public void ClearTransientData()
+    {
+        this.HouseLevel = 0;
+        this.MaxHouseLevelExceedable = false;
+        this.HouseWouldNotDowngrade = false;
     }
 
     public List<MapBuilding> GetSubBuildings()

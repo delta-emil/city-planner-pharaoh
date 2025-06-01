@@ -23,6 +23,7 @@ public class MapCanvasControl : Control
     private readonly Brush farmMeadowBrush;
     private readonly Brush farmIrrigatedTextBrush;
     private readonly Brush incorrectTextBrush;
+    private readonly Brush warningTextBrush;
     private readonly Brush tooCloseToVoidToBuildBrush;
     private readonly Brush[] desirablityBrushes;
 
@@ -104,6 +105,7 @@ public class MapCanvasControl : Control
         this.farmMeadowBrush = new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(157, 198, 121), Color.FromArgb(255, 222, 89));
         this.farmIrrigatedTextBrush = new SolidBrush(Color.Teal);
         this.incorrectTextBrush = new SolidBrush(Color.Red);
+        this.warningTextBrush = new SolidBrush(Color.FromArgb(0xBB, 0, 0));
         this.tooCloseToVoidToBuildBrush = new HatchBrush(HatchStyle.Percent50, Color.FromArgb(128, 0, 0, 0), Color.FromArgb(0, 0, 0, 0));
         this.desirablityBrushes = new Brush[110];
 
@@ -371,9 +373,16 @@ public class MapCanvasControl : Control
                     ? $"{longLabelOfMax}(+)"
                 : building.HouseLevel == building.MaxHouseLevel
                     ? $"{longLabelOfMax}"
-                :     $"{longLabelOfMax}({HouseLevelData.GetNeededDesire(this.MapModel.EffectiveDifficulty, building.MaxHouseLevel)}){Environment.NewLine}({HouseLevelData.LabelsShort[building.HouseLevel]})";
+                :
+                      $"{longLabelOfMax}({HouseLevelData.GetNeededDesire(this.MapModel.EffectiveDifficulty, building.MaxHouseLevel)}){Environment.NewLine}({HouseLevelData.LabelsShort[building.HouseLevel]})";
 
-            Brush brushToUse = building.HouseLevel == building.MaxHouseLevel ? this.textBrush : this.incorrectTextBrush;
+            Brush brushToUse
+                = building.HouseLevel == building.MaxHouseLevel
+                    ? this.textBrush
+                : building.HouseWouldNotDowngrade
+                    ? this.warningTextBrush
+                :
+                      this.incorrectTextBrush;
 
             var houseLabelFont = size.width > 1 ? this.bigHouseFont : this.smallFont;
             
@@ -1049,7 +1058,7 @@ public class MapCanvasControl : Control
         }
     }
 
-    private void OnUndoStackChanged()
+    private void OnUndoStackChanged(bool updateContentControls = true)
     {
         if (this.UndoStackChanged != null)
         {
@@ -1057,7 +1066,9 @@ public class MapCanvasControl : Control
             {
                 CanUndo = this.undoStack.CanUndo,
                 CanRedo = this.undoStack.CanRedo,
+                UpdateContentControls = updateContentControls,
                 Difficulty = this.MapModel.EffectiveDifficulty,
+                SimpleHouseDesire = this.MapModel.SimpleHouseDesire,
             };
             this.UndoStackChanged(this, args);
         }
@@ -1075,11 +1086,26 @@ public class MapCanvasControl : Control
         this.Invalidate();
     }
 
+    public void SetSimpleHouseDesire(bool simpleHouseDesire)
+    {
+        if (this.MapModel.SimpleHouseDesire == simpleHouseDesire)
+        {
+            return;
+        }
+
+        this.RegisterUndoPoint();
+        this.MapModel.SetSimpleHouseDesire(simpleHouseDesire);
+        this.Invalidate();
+    }
+
     public void RegisterUndoPoint()
     {
         var mapModelCopy = this.MapModel.GetDeepCopy();
         this.undoStack.Do(mapModelCopy);
-        this.OnUndoStackChanged();
+
+        // do not update controls like difficulty shown because we're registering the undo point before the change
+        // and if the change is in them, we would be undoing them
+        this.OnUndoStackChanged(updateContentControls: false);
     }
 
     public void Undo()
