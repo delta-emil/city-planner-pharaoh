@@ -22,7 +22,7 @@ public class MapCanvasControl : Control
     private readonly Brush[] buildingBrushes;
     private readonly Brush farmMeadowBrush;
     private readonly Brush farmIrrigatedTextBrush;
-    private readonly Brush noWaterTextBrush;
+    private readonly Brush incorrectTextBrush;
     private readonly Brush tooCloseToVoidToBuildBrush;
     private readonly Brush[] desirablityBrushes;
 
@@ -103,7 +103,7 @@ public class MapCanvasControl : Control
 
         this.farmMeadowBrush = new HatchBrush(HatchStyle.DashedVertical, Color.FromArgb(157, 198, 121), Color.FromArgb(255, 222, 89));
         this.farmIrrigatedTextBrush = new SolidBrush(Color.Teal);
-        this.noWaterTextBrush = new SolidBrush(Color.Red);
+        this.incorrectTextBrush = new SolidBrush(Color.Red);
         this.tooCloseToVoidToBuildBrush = new HatchBrush(HatchStyle.Percent50, Color.FromArgb(128, 0, 0, 0), Color.FromArgb(0, 0, 0, 0));
         this.desirablityBrushes = new Brush[110];
 
@@ -341,7 +341,7 @@ public class MapCanvasControl : Control
             else if (this.MapModel.IsMissingRequiredWater(building)
                 || this.MapModel.IsMissingRequiredCrossroad(building))
             {
-                textBrushToUse = this.noWaterTextBrush;
+                textBrushToUse = this.incorrectTextBrush;
             }
 
             int shiftY
@@ -365,8 +365,18 @@ public class MapCanvasControl : Control
             DrawDesireabilityOnBuilding(graphics, building, size);
 
             // draw max house level
-            string text = "H" + building.HouseLevel;
+            var longLabelOfMax = HouseLevelData.LabelsShort[building.MaxHouseLevel];
+            string text
+                = building.MaxHouseLevelExceedable
+                    ? $"{longLabelOfMax}(+)"
+                : building.HouseLevel == building.MaxHouseLevel
+                    ? $"{longLabelOfMax}"
+                :     $"{longLabelOfMax}({HouseLevelData.GetNeededDesire(this.MapModel.EffectiveDifficulty, building.MaxHouseLevel)}){Environment.NewLine}({HouseLevelData.LabelsShort[building.HouseLevel]})";
+
+            Brush brushToUse = building.HouseLevel == building.MaxHouseLevel ? this.textBrush : this.incorrectTextBrush;
+
             var houseLabelFont = size.width > 1 ? this.bigHouseFont : this.smallFont;
+            
             var textSize = graphics.MeasureString(text, houseLabelFont);
 
             int positionShift
@@ -378,7 +388,7 @@ public class MapCanvasControl : Control
                 };
 
             graphics.DrawString(
-                text, houseLabelFont, this.textBrush,
+                text, houseLabelFont, brushToUse,
                 buildingRect.Left + buildingRect.Width / 2 - textSize.Width / 2 + positionShift,
                 buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2 + positionShift);
         }
@@ -580,10 +590,15 @@ public class MapCanvasControl : Control
         }
         else if (this.Tool.BuildingType != null)
         {
-            if (this.MapModel.CanAddBuilding(cellX, cellY, this.Tool.BuildingType.Value, subBuildings: null))
+            var buildingType = this.Tool.BuildingType.Value;
+            if (this.MapModel.CanAddBuilding(cellX, cellY, buildingType, subBuildings: null))
             {
                 this.RegisterUndoPoint();
-                this.MapModel.AddBuilding(cellX, cellY, this.Tool.BuildingType.Value, subBuildings: null);
+                this.MapModel.AddBuilding(cellX, cellY, buildingType, subBuildings: null, houseLevel: this.Tool.HouseLevel);
+
+                // clear the ghost
+                this.ClearGhost();
+
                 this.Invalidate();
             }
         }

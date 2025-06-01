@@ -23,16 +23,23 @@ public static class HouseLevelData
             [-98, -10, -5,  0, 4, 9, 13, 17, 21, 26, 33, 41, 50, 55, 60, 65, 70, 76, 82, 92], // VeryHard
         ];
 
-    public static int GetHouseLevel(int maxDesire, Difficulty difficulty)
+    public static (int Level, bool Exceedable) GetHouseLevel(int maxDesire, Difficulty difficulty, int maxHouseLevel)
     {
         var boundsForDifficulty = HouseEvolveBounds[(int)difficulty];
-        // TODO: this is for Hard, make an option for what difficulty to show
+
         int level = 0;
         for (int bound = 0; bound < boundsForDifficulty.Length; bound++)
         {
             if (maxDesire >= boundsForDifficulty[bound])
             {
-                level++;
+                if (level == maxHouseLevel)
+                {
+                    return (Level: level, Exceedable: true);
+                }
+                else
+                {
+                    level++;
+                }
             }
             else
             {
@@ -40,30 +47,17 @@ public static class HouseLevelData
             }
         }
 
-        return level;
+        return (Level: level, Exceedable: false);
     }
 
-    public static DesireConfig GetDesire(int houseLevel, int houseSize)
+    public static int GetNeededDesire(Difficulty difficulty, int maxHouseLevel)
     {
-        int levelForDesire;
-        if (houseSize == 1)
-        {
-            levelForDesire = Math.Min(houseLevel, 10);
-        }
-        else if (houseSize == 2)
-        {
-            levelForDesire = Math.Min(houseLevel, 14);
-        }
-        else if (houseSize == 3)
-        {
-            levelForDesire = Math.Min(houseLevel, 18);
-        }
-        else
-        {
-            levelForDesire = houseLevel;
-        }
+        return HouseEvolveBounds[(int)difficulty][maxHouseLevel - 1];
+    }
 
-        return desires[levelForDesire];
+    public static DesireConfig GetDesire(int houseLevel)
+    {
+        return desires[houseLevel];
     }
 
     private static readonly DesireConfig[] desires =
@@ -96,5 +90,80 @@ public static class HouseLevelData
 
         new(6, 5, 2, -1),
         new(6, 5, 2, -1),
+    ];
+
+    public static readonly string[] LabelsShort =
+    [
+        string.Empty,
+        "CHu",
+        "SHu",
+        "MSh",
+        "CSh",
+        "RCo",
+        "OCo",
+        "MHo",
+        "SHo",
+        "MAp",
+        "SAp",
+        "CRe",
+        "SRe",
+        "ERe",
+        "FRe",
+        "CMa",
+        "SMa",
+        "EMa",
+        "SMa",
+        "MEs",
+        "PEs",
+    ];
+
+    public static readonly string[] LabelsMid =
+    [
+        string.Empty,
+        "Cr.Hut",
+        "St.Hut",
+        "Me.Sha",
+        "Co.Sha",
+        "Ro.Cot",
+        "Or.Cot",
+        "Mo.Hom",
+        "Sp.Hom",
+        "Mo.Apa",
+        "Sp.Apa",
+        "Co.Res",
+        "Sp.Res",
+        "El.Res",
+        "Fa.Res",
+        "Co.Man",
+        "Sp.Man",
+        "El.Man",
+        "St.Man",
+        "Mo.Est",
+        "Pa.Est",
+    ];
+
+    public static readonly string[] LabelsFull =
+    [
+        string.Empty,
+        "Crude Hut",
+        "Sturdy Hut",
+        "Meagre Shanty",
+        "Common Shanty",
+        "Rough Cottage",
+        "Ordinary Cottage",
+        "Modest Homestead",
+        "Spacious Homestead",
+        "Modest Apartment",
+        "Spacious Apartment",
+        "Common Residence",
+        "Spacious Residence",
+        "Elegant Residence",
+        "Fancy Residence",
+        "Common Manor",
+        "Spacious Manor",
+        "Elegant Manor",
+        "Stately Manor",
+        "Modest Estate",
+        "Palatial Estate",
     ];
 }

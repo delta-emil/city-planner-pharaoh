@@ -8,7 +8,7 @@ internal static class Writer
     {
         using Utf8JsonWriter writer = new(outputStream, new JsonWriterOptions { Indented = true });
         writer.WriteStartObject();
-        writer.WriteNumber("Version", 2);
+        writer.WriteNumber("Version", 3);
         writer.WriteNumber(nameof(MapModel.MapSideX), mapModel.MapSideX);
         writer.WriteNumber(nameof(MapModel.MapSideY), mapModel.MapSideY);
         writer.WriteBoolean(nameof(MapModel.HasTooCloseToVoidToBuild), mapModel.HasTooCloseToVoidToBuild);
@@ -42,6 +42,10 @@ internal static class Writer
         writer.WriteNumber(nameof(MapBuilding.Left), building.Left);
         writer.WriteNumber(nameof(MapBuilding.Top), building.Top);
         writer.WriteString(nameof(MapBuilding.BuildingType), EnumToString(building.BuildingType));
+        if (building.BuildingType.GetCategory() == MapBuildingCategory.House)
+        {
+            writer.WriteNumber(nameof(MapBuilding.MaxHouseLevel), building.MaxHouseLevel);
+        }
         if (building.SubBuildings != null)
         {
             writer.WriteStartArray(nameof(MapBuilding.SubBuildings));

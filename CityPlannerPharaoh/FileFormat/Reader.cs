@@ -24,6 +24,7 @@ internal static class Reader
         {
             case 1: return ReaderV1.Read(rootElement);
             case 2: return ReaderV2.Read(rootElement);
+            case 3: return ReaderV3.Read(rootElement);
 
             default: throw new Exception($"Unsupported file version: {version}. The file may have been created by a newer version of this program.");
          }

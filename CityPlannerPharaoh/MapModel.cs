@@ -70,6 +70,7 @@ public class MapModel
         {
             var newBuilding = srcBuilding.GetCopy();
             newBuilding.HouseLevel = srcBuilding.HouseLevel;
+            newBuilding.MaxHouseLevelExceedable = srcBuilding.MaxHouseLevelExceedable;
             this.Buildings.Add(newBuilding);
             buildingMapping[srcBuilding] = newBuilding;
         }
@@ -110,14 +111,14 @@ public class MapModel
 
     #endregion
 
-    public MapBuilding? AddBuilding(int left, int top, MapBuildingType mapBuildingType, List<MapBuilding>? subBuildings)
+    public MapBuilding? AddBuilding(int left, int top, MapBuildingType mapBuildingType, List<MapBuilding>? subBuildings, int houseLevel = 0)
     {
         if (!CanAddBuilding(left, top, mapBuildingType, subBuildings))
         {
             return null;
         }
 
-        var mapBuilding = ConstructMapBuilding(left, top, mapBuildingType, subBuildings);
+        var mapBuilding = ConstructMapBuilding(left, top, mapBuildingType, subBuildings, houseLevel);
         if (mapBuilding == null)
         {
             return null;
@@ -126,7 +127,7 @@ public class MapModel
         return AddBuildingAfterCheck(mapBuilding);
     }
 
-    public MapBuilding? ConstructMapBuilding(int left, int top, MapBuildingType mapBuildingType, List<MapBuilding>? subBuildings)
+    private MapBuilding? ConstructMapBuilding(int left, int top, MapBuildingType mapBuildingType, List<MapBuilding>? subBuildings, int houseLevel = 0)
     {
         List<MapBuilding>? effectiveSubBuildings;
         if (subBuildings != null)
@@ -162,7 +163,14 @@ public class MapModel
             effectiveSubBuildings = null;
         }
 
-        return new MapBuilding { Left = left, Top = top, BuildingType = mapBuildingType, SubBuildings = effectiveSubBuildings };
+        return new MapBuilding
+        {
+            Left = left,
+            Top = top,
+            BuildingType = mapBuildingType,
+            MaxHouseLevel = houseLevel,
+            SubBuildings = effectiveSubBuildings,
+        };
     }
 
     public MapBuilding AddBuildingAfterCheck(MapBuilding mapBuilding)
@@ -212,7 +220,7 @@ public class MapModel
                 if (existingBuilding != null && (ignoredBuildings == null || !ignoredBuildings.Contains(existingBuilding)))
                 {
                     // Plaza can overwrite Road
-                    // TODO: support vice-versa
+                    // TODO: support vice-versa?
                     if (mapBuildingType == MapBuildingType.Plaza && existingBuilding.BuildingType == MapBuildingType.Road)
                     {
                         continue;
@@ -335,6 +343,7 @@ public class MapModel
         {
             building.MoveLocation(deltaX: offsetX, deltaY: offsetY);
             building.HouseLevel = 0;
+            building.MaxHouseLevelExceedable = false;
             AddBuildingAfterCheck(building);
         }
     }
@@ -377,6 +386,7 @@ public class MapModel
         {
             SetBuildingInCells(building);
             building.HouseLevel = 0;
+            building.MaxHouseLevelExceedable = false;
             AddDesirabilityEffectAddingHouse(building);
         }
     }
@@ -442,10 +452,12 @@ public class MapModel
             foreach (var affectedHouse in affectedHouses)
             {
                 var oldHouseLevel = affectedHouse.HouseLevel;
+                var oldExceedable = affectedHouse.MaxHouseLevelExceedable;
 
                 var maxDesire = this.GetBuildingMaxDesirability(affectedHouse);
-                var newHouseLevel = HouseLevelData.GetHouseLevel(maxDesire, this.EffectiveDifficulty);
+                var (newHouseLevel, newExceedable) = HouseLevelData.GetHouseLevel(maxDesire, this.EffectiveDifficulty, affectedHouse.MaxHouseLevel);
                 affectedHouse.HouseLevel = newHouseLevel;
+                affectedHouse.MaxHouseLevelExceedable = newExceedable;
 
                 if (oldHouseLevel != newHouseLevel)
                 {
@@ -454,10 +466,8 @@ public class MapModel
                         Console.WriteLine($"@@@@@@@@ house on looping on {affectedHouse.Left}, {affectedHouse.Top} chaning level {oldHouseLevel} -> {newHouseLevel}");
                     }
 
-                    var houseSize = affectedHouse.BuildingType.GetSize().width;
-
-                    var oldDesireConfig = HouseLevelData.GetDesire(oldHouseLevel, houseSize);
-                    var newDesireConfig = HouseLevelData.GetDesire(newHouseLevel, houseSize);
+                    var oldDesireConfig = HouseLevelData.GetDesire(oldHouseLevel);
+                    var newDesireConfig = HouseLevelData.GetDesire(newHouseLevel);
                     if (!oldDesireConfig.Equals(newDesireConfig))
                     {
                         AdjustHouseDesirabilityEffect(affectedHouse, oldDesireConfig, newDesireConfig, newlyAffectedHouses);
@@ -601,7 +611,7 @@ public class MapModel
     {
         if (mapBuilding.BuildingType.GetCategory() == MapBuildingCategory.House)
         {
-            return HouseLevelData.GetDesire(mapBuilding.HouseLevel, mapBuilding.BuildingType.GetSize().width);
+            return HouseLevelData.GetDesire(mapBuilding.HouseLevel);
         }
         else
         {
@@ -625,6 +635,7 @@ public class MapModel
         {
             SetBuildingInCells(building);
             building.HouseLevel = 0;
+            building.MaxHouseLevelExceedable = false;
             AddDesirabilityEffectAddingHouse(building);
         }
     }

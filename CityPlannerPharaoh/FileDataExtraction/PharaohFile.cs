@@ -269,7 +269,14 @@ public class PharaohFile : GameFile
                     4 => MapBuildingType.House4,
                     _ => throw new Exception("Should have already been checked"),
                 };
-                houses.Add(new MapBuilding { BuildingType = mapBuildingType, Left = building.x, Top = building.y });
+                houses.Add(
+                    new MapBuilding
+                    {
+                        BuildingType = mapBuildingType,
+                        Left = building.x,
+                        Top = building.y,
+                        MaxHouseLevel = building.type - BuildingTypeHouseLevel1 + 1,
+                    });
             }
             else
             {
@@ -323,6 +330,9 @@ public class PharaohFile : GameFile
             mapModel.AddBuildingAfterCheck(new MapBuilding { BuildingType = mapBuildingType, Left = building.x, Top = building.y });
         }
     }
+
+
+    private const int BuildingTypeHouseLevel1 = 10;
 
     private static readonly MapBuildingType[] BuildingTypeMap =
         [

@@ -60,6 +60,7 @@
             btnFilterBuildings = new ToolStripButton();
             btnFilterDesire = new ToolStripButton();
             btnFilterDesireFull = new ToolStripButton();
+            btnFilterCoords = new ToolStripButton();
             toolStripLabelRoadLengthLabel = new ToolStripLabel();
             toolStripLabelRoadLength = new ToolStripLabel();
             toolStripSeparator20 = new ToolStripSeparator();
@@ -85,7 +86,6 @@
             saveFileDialog = new SaveFileDialog();
             toolStripSecondary = new ToolStrip();
             openFileDialogImport = new OpenFileDialog();
-            btnFilterCoords = new ToolStripButton();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
             toolStripTop.SuspendLayout();
@@ -253,7 +253,7 @@
             canvas.Controls.Add(mapControl);
             canvas.Location = new Point(0, 28);
             canvas.Name = "canvas";
-            canvas.Size = new Size(1243, 804);
+            canvas.Size = new Size(1229, 804);
             canvas.TabIndex = 1;
             canvas.Zoom += canvas_Zoom;
             // 
@@ -265,10 +265,12 @@
             mapControl.ShowBuildings = false;
             mapControl.ShowCellCoords = false;
             mapControl.ShowDesirability = false;
+            mapControl.ShowDesirabilityFull = false;
             mapControl.Size = new Size(200, 200);
             mapControl.TabIndex = 0;
             mapControl.Text = "mapCanvasControl1";
             tool1.BuildingType = null;
+            tool1.HouseLevel = 0;
             tool1.IsClearBuilding = false;
             tool1.Terrain = null;
             mapControl.Tool = tool1;
@@ -281,7 +283,7 @@
             toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, btnFilterDesireFull, btnFilterCoords, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3, btnUndo, btnRedo, toolStripSeparator4, ddDifficulty, toolStripSeparator5, btnGlyph });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
-            toolStripTop.Size = new Size(1246, 25);
+            toolStripTop.Size = new Size(1232, 25);
             toolStripTop.TabIndex = 4;
             toolStripTop.Text = "toolStrip1";
             // 
@@ -360,6 +362,15 @@
             btnFilterDesireFull.Size = new Size(23, 22);
             btnFilterDesireFull.Text = "F";
             btnFilterDesireFull.Click += btnFilterDesireFull_Click;
+            // 
+            // btnFilterCoords
+            // 
+            btnFilterCoords.CheckOnClick = true;
+            btnFilterCoords.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnFilterCoords.Name = "btnFilterCoords";
+            btnFilterCoords.Size = new Size(23, 22);
+            btnFilterCoords.Text = "C";
+            btnFilterCoords.Click += btnFilterCoords_Click;
             // 
             // toolStripLabelRoadLengthLabel
             // 
@@ -521,24 +532,15 @@
             // 
             toolStripSecondary.AutoSize = false;
             toolStripSecondary.Dock = DockStyle.Right;
-            toolStripSecondary.Location = new Point(1246, 0);
+            toolStripSecondary.Location = new Point(1232, 0);
             toolStripSecondary.Name = "toolStripSecondary";
-            toolStripSecondary.Size = new Size(39, 837);
+            toolStripSecondary.Size = new Size(53, 837);
             toolStripSecondary.TabIndex = 14;
             toolStripSecondary.Text = "toolStrip5";
             // 
             // openFileDialogImport
             // 
             openFileDialogImport.Filter = "Pharaoh save files|*.sav|All files|*.*";
-            // 
-            // btnFilterCoords
-            // 
-            btnFilterCoords.CheckOnClick = true;
-            btnFilterCoords.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            btnFilterCoords.Name = "btnFilterCoords";
-            btnFilterCoords.Size = new Size(23, 22);
-            btnFilterCoords.Text = "C";
-            btnFilterCoords.Click += btnFilterCoords_Click;
             // 
             // FormMain
             // 

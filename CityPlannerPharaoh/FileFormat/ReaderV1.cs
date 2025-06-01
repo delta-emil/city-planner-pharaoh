@@ -71,6 +71,19 @@ internal static class ReaderV1
                 BuildingType = buildingType,
                 SubBuildings = subBuildings,
             };
+
+            if (buildingType.GetCategory() == MapBuildingCategory.House)
+            {
+                mapBuilding.MaxHouseLevel = buildingType.GetSize().width switch
+                {
+                    1 => 10,
+                    2 => 14,
+                    3 => 18,
+                    4 => 20,
+                    _ => throw new Exception($"Unexpected house size {buildingType.GetSize().width}"),
+                };
+            }
+
             buildings.Add(mapBuilding);
         }
 

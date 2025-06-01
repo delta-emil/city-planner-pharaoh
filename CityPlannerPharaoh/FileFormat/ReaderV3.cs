@@ -2,7 +2,7 @@
 
 namespace CityPlannerPharaoh.FileFormat;
 
-internal static class ReaderV2
+internal static class ReaderV3
 {
     public static MapModel Read(JsonElement rootElement)
     {
@@ -70,7 +70,6 @@ internal static class ReaderV2
         int left = buildingElement.GetProperty(nameof(MapBuilding.Left)).GetInt32();
         int top = buildingElement.GetProperty(nameof(MapBuilding.Top)).GetInt32();
         var buildingType = Reader.ParseEnum<MapBuildingType>(buildingElement.GetProperty(nameof(MapBuilding.BuildingType)));
-        
         var mapBuilding = new MapBuilding
         {
             Left = left,
@@ -80,14 +79,7 @@ internal static class ReaderV2
 
         if (buildingType.GetCategory() == MapBuildingCategory.House)
         {
-            mapBuilding.MaxHouseLevel = buildingType.GetSize().width switch
-            {
-                1 => 10,
-                2 => 14,
-                3 => 18,
-                4 => 20,
-                _ => throw new Exception($"Unexpected house size {buildingType.GetSize().width}"),
-            };
+            mapBuilding.MaxHouseLevel = buildingElement.GetProperty(nameof(MapBuilding.MaxHouseLevel)).GetInt32();
         }
 
         if (buildingElement.TryGetProperty(nameof(MapBuilding.SubBuildings), out var subBuildingsElement))

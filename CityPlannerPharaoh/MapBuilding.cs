@@ -7,19 +7,35 @@ public class MapBuilding
     public int Left { get; set; }
     public int Top { get; set; }
     public MapBuildingType BuildingType { get; set; }
+    public int MaxHouseLevel { get; set; }
     public List<MapBuilding>? SubBuildings { get; set; }
 
     [JsonIgnore]
     public int HouseLevel { get; set; }
+    [JsonIgnore]
+    public bool MaxHouseLevelExceedable { get; set; }
 
     public override string ToString()
     {
-        return $"MapBuilding({Left},{Top},{BuildingType})";
+        if (BuildingType.GetCategory() == MapBuildingCategory.House)
+        {
+            return $"MapBuilding({Left},{Top},{BuildingType},{MaxHouseLevel})";
+        }
+        else
+        {
+            return $"MapBuilding({Left},{Top},{BuildingType})";
+        }
     }
 
     public MapBuilding GetCopy()
     {
-        var copy = new MapBuilding { Left = Left, Top = Top, BuildingType = BuildingType };
+        var copy = new MapBuilding
+        {
+            Left = this.Left,
+            Top = this.Top,
+            BuildingType = this.BuildingType,
+            MaxHouseLevel = this.MaxHouseLevel,
+        };
 
         if (this.SubBuildings != null)
         {

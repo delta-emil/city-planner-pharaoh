@@ -5,6 +5,7 @@ public class Tool
     public MapTerrain? Terrain { get; set; }
     public bool IsClearBuilding { get; set; }
     public MapBuildingType? BuildingType { get; set; }
+    public int HouseLevel { get; set; }
 
     public bool IsEmpty =>
         Terrain == null
