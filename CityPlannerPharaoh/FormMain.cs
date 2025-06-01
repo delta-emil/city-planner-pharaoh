@@ -423,6 +423,12 @@ public partial class FormMain : Form
         }
     }
 
+    private void mapControl_MouseCoordsChanged(object sender, MouseCoordsChangeEventArgs e)
+    {
+        string text = $"{e.CellX:D3}, {e.CellY:D3}";
+        this.toolStripLabelCoords.Text = text;
+    }
+
     #region secondary toolstrips
 
     private const string TagPrefixTerrain = "+";

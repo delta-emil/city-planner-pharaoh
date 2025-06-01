@@ -176,6 +176,7 @@ public class MapCanvasControl : Control
 
     public event Action<object, MapSelectionChangeEventArgs>? SelectionChanged;
     public event Action<object, MapUndoStackChangeEventArgs>? UndoStackChanged;
+    public event Action<object, MouseCoordsChangeEventArgs>? MouseCoordsChanged;
 
     private void SetSizeToFullMapSize()
     {
@@ -471,7 +472,8 @@ public class MapCanvasControl : Control
                 this.Capture = true;
             }
 
-            this.ApplyTool(e, isMove: false);
+            var (cellX, cellY) = GetCellCoordidates(e);
+            this.ApplyTool(e, cellX, cellY, isMove: false);
         }
         else if (e.Button == MouseButtons.Right)
         {
@@ -542,11 +544,12 @@ public class MapCanvasControl : Control
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
+        var (cellX, cellY) = GetCellCoordidates(e);
+
         if (this.Tool.BuildingType != null)
         {
             var buildingType = this.Tool.BuildingType.Value;
 
-            var (cellX, cellY) = GetCellCoordidates(e);
             var (width, height) = buildingType.GetSize();
 
             var newGhostRect = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, width * CellSideLength, height * CellSideLength);
@@ -563,13 +566,22 @@ public class MapCanvasControl : Control
 
         if (this.Capture)
         {
-            this.ApplyTool(e, isMove: true);
+            this.ApplyTool(e, cellX, cellY, isMove: true);
+        }
+
+        if (this.MouseCoordsChanged != null)
+        {
+            var args = new MouseCoordsChangeEventArgs
+            {
+                CellX = cellX,
+                CellY = cellY,
+            };
+            this.MouseCoordsChanged(this, args);
         }
     }
 
-    private void ApplyTool(MouseEventArgs e, bool isMove)
+    private void ApplyTool(MouseEventArgs e, int cellX, int cellY, bool isMove)
     {
-        var (cellX, cellY) = GetCellCoordidates(e);
         if (!AreCellCoordidatesValid(cellX, cellY))
         {
             return;
