@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 
 namespace CityPlannerPharaoh;
 
@@ -153,6 +152,8 @@ public class MapCanvasControl : Control
 
     public bool ShowDesirability { get; set; }
 
+    public bool ShowDesirabilityFull { get; set; }
+
     public bool ShowCellCoords { get; set; }
 
     public int CellSideLength
@@ -234,6 +235,28 @@ public class MapCanvasControl : Control
             {
                 var fillBrush = isValid ? this.ghostValidBrush : this.ghostInvalidBrush;
                 graphics.FillRectangle(fillBrush, ghostLocation);
+            }
+        }
+
+        // draw cell number (mostly for debugging)
+        if (this.ShowCellCoords)
+        {
+            for (int cellX = 0; cellX < this.MapModel.MapSideX; cellX++)
+            {
+                for (int cellY = 0; cellY < this.MapModel.MapSideY; cellY++)
+                {
+                    var cellRectExt = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, CellSideLength, CellSideLength);
+                    if (!cellRectExt.IntersectsWith(pe.ClipRectangle))
+                    {
+                        continue;
+                    }
+
+                    var cellRect = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, CellSideLength, CellSideLength);
+                    var coordsText = $"{cellX},{cellY}";
+                    var coordsFont = this.smallFont;
+                    var textSize = graphics.MeasureString(coordsText, coordsFont);
+                    graphics.DrawString(coordsText, coordsFont, this.textBrush, cellRect.Right - textSize.Width - 2, cellRect.Bottom - textSize.Height - 2);
+                }
             }
         }
     }
@@ -360,11 +383,6 @@ public class MapCanvasControl : Control
                 buildingRect.Top + buildingRect.Height / 2 - textSize.Height / 2 + positionShift);
         }
 
-        //if (building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply)
-        //{
-        //    DrawDesireabilityOnBuilding(graphics, building, northCellOnly: true);
-        //}
-
         DrawDesireabilityOnBuilding(graphics, building);
     }
 
@@ -372,13 +390,13 @@ public class MapCanvasControl : Control
     {
         if (this.ShowDesirability)
         {
-            //// bool colorText = building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply;
-            bool northCellOnly;
-            bool fullColor = building.BuildingType.GetCategory() == MapBuildingCategory.House;
+            bool fullColor, boldMaxValue;
+            fullColor = boldMaxValue = building.BuildingType.GetCategory() == MapBuildingCategory.House;
+
             bool northCellColor = building.BuildingType is MapBuildingType.Bazaar or MapBuildingType.WaterSupply;
 
-            bool fullMode = false;
-            if (fullMode)
+            bool northCellOnly;
+            if (this.ShowDesirabilityFull)
             {
                 northCellOnly = false;
             }
@@ -398,18 +416,14 @@ public class MapCanvasControl : Control
                 }
             }
 
-            (int width, int height) size;
-            int maxDesire;
-            if (northCellOnly)
-            {
-                size = (width: 1, height: 1);
-                maxDesire = int.MaxValue;
-            }
-            else
-            {
-                size = preCalculatedSize ?? building.BuildingType.GetSize();
-                maxDesire = this.MapModel.GetBuildingMaxDesirability(building);
-            }
+            (int width, int height) size
+                = northCellOnly
+                ? (width: 1, height: 1)
+                : preCalculatedSize ?? building.BuildingType.GetSize();
+
+            int maxDesire = boldMaxValue
+                ? this.MapModel.GetBuildingMaxDesirability(building)
+                : int.MaxValue;
 
             for (int cellX = building.Left; cellX < building.Left + size.width; cellX++)
             {
@@ -872,12 +886,6 @@ public class MapCanvasControl : Control
             cellRect.Width - BorderWidthDouble, cellRect.Height - BorderWidthDouble);
         var fillBrush = this.terrainBrushes[(int)cellModel.Terrain];
         graphics.FillRectangle(fillBrush, innerRect);
-
-        // draw cell number (mostly for debugging)
-        if (this.ShowCellCoords)
-        {
-            graphics.DrawString($"{cellX},{cellY}", this.smallFont, this.textBrush, cellRect.Left + 2, cellRect.Top + 2);
-        }
 
         if (cellModel.Terrain != MapTerrain.Void)
         {

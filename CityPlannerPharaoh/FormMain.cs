@@ -167,6 +167,18 @@ public partial class FormMain : Form
         this.mapControl.Invalidate();
     }
 
+    private void btnFilterDesireFull_Click(object sender, EventArgs e)
+    {
+        this.mapControl.ShowDesirabilityFull = btnFilterDesireFull.Checked;
+        this.mapControl.Invalidate();
+    }
+
+    private void btnFilterCoords_Click(object sender, EventArgs e)
+    {
+        this.mapControl.ShowCellCoords = btnFilterCoords.Checked;
+        this.mapControl.Invalidate();
+    }
+
     #region file operations
 
     private void btnFileNew_Click(object sender, EventArgs e)
@@ -642,7 +654,7 @@ public partial class FormMain : Form
             Difficulty.Normal   => "Normal",
             Difficulty.Hard     => "Hard",
             Difficulty.VeryHard => "Very Hard",
-            _                   => "Hard",
+            _                   => MapModel.DefaultDifficulty.ToString(),
         };
     }
 
