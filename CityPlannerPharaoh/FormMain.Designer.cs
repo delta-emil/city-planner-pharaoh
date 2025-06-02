@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Tool tool2 = new Tool();
+            Tool tool1 = new Tool();
             toolStripMain = new ToolStrip();
             btnSelect = new ToolStripButton();
             btnTerrain = new ToolStripButton();
@@ -255,7 +255,7 @@
             canvas.Controls.Add(mapControl);
             canvas.Location = new Point(0, 28);
             canvas.Name = "canvas";
-            canvas.Size = new Size(1229, 804);
+            canvas.Size = new Size(1229, 782);
             canvas.TabIndex = 1;
             canvas.Zoom += canvas_Zoom;
             // 
@@ -271,11 +271,11 @@
             mapControl.Size = new Size(200, 200);
             mapControl.TabIndex = 0;
             mapControl.Text = "mapCanvasControl1";
-            tool2.BuildingType = null;
-            tool2.HouseLevel = 0;
-            tool2.IsClearBuilding = false;
-            tool2.Terrain = null;
-            mapControl.Tool = tool2;
+            tool1.BuildingType = null;
+            tool1.HouseLevel = 0;
+            tool1.IsClearBuilding = false;
+            tool1.Terrain = null;
+            mapControl.Tool = tool1;
             mapControl.SelectionChanged += mapControl_SelectionChanged;
             mapControl.UndoStackChanged += mapControl_UndoStackChanged;
             mapControl.MouseCoordsChanged += mapControl_MouseCoordsChanged;
