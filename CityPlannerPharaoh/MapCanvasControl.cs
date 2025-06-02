@@ -367,15 +367,17 @@ public class MapCanvasControl : Control
             // draw desire
             DrawDesireabilityOnBuilding(graphics, building, size);
 
+            string[] levelLabels = size.width == 4 ? HouseLevelData.LabelsMid : HouseLevelData.LabelsShort;
+
             // draw max house level
-            var longLabelOfMax = HouseLevelData.LabelsShort[building.MaxHouseLevel];
+            var longLabelOfMax = levelLabels[building.MaxHouseLevel];
             string text
                 = building.MaxHouseLevelExceedable
                     ? $"{longLabelOfMax}(+)"
                 : building.HouseLevel == building.MaxHouseLevel
                     ? $"{longLabelOfMax}"
                 :
-                      $"{longLabelOfMax}({HouseLevelData.GetNeededDesire(this.MapModel.EffectiveDifficulty, building.MaxHouseLevel)}){Environment.NewLine}({HouseLevelData.LabelsShort[building.HouseLevel]})";
+                      $"{longLabelOfMax}({HouseLevelData.GetNeededDesire(this.MapModel.EffectiveDifficulty, building.MaxHouseLevel)}){Environment.NewLine}({levelLabels[building.HouseLevel]})";
 
             Brush brushToUse
                 = building.HouseLevel == building.MaxHouseLevel
