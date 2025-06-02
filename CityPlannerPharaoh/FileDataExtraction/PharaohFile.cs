@@ -205,7 +205,7 @@ public class PharaohFile : GameFile
         var sortedBuildings = templeComplexBuildings.OrderBy(b => b.x).ThenBy(b => b.y).ToList();
         if (sortedBuildings[0].y == sortedBuildings[1].y)
         {
-            mapModel.AddBuildingAfterCheck(new MapBuilding { BuildingType = MapBuildingType.TempleComplex1, Left = sortedBuildings[0].x, Top = sortedBuildings[0].y + 2 });
+            mapModel.AddBuildingAfterCheck(new MapBuilding { BuildingType = MapBuildingType.TempleComplex1, Left = sortedBuildings[0].x, Top = sortedBuildings[0].y - 2 });
         }
         else
         {
