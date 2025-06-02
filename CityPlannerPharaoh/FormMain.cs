@@ -425,7 +425,7 @@ public partial class FormMain : Form
 
     private void mapControl_MouseCoordsChanged(object sender, MouseCoordsChangeEventArgs e)
     {
-        string text = $"{e.CellX:D3}, {e.CellY:D3}";
+        string text = $"x:{e.CellX:D3},y:{e.CellY:D3}";
         this.toolStripLabelCoords.Text = text;
     }
 

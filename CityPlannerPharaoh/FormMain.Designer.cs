@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Tool tool3 = new Tool();
+            Tool tool1 = new Tool();
             toolStripMain = new ToolStrip();
             btnSelect = new ToolStripButton();
             btnTerrain = new ToolStripButton();
@@ -61,6 +61,8 @@
             btnFilterDesire = new ToolStripButton();
             btnFilterDesireFull = new ToolStripButton();
             btnFilterSimpleHouseDesire = new ToolStripButton();
+            toolStripLabelCoords = new ToolStripLabel();
+            toolStripSeparator6 = new ToolStripSeparator();
             toolStripLabelRoadLengthLabel = new ToolStripLabel();
             toolStripLabelRoadLength = new ToolStripLabel();
             toolStripSeparator20 = new ToolStripSeparator();
@@ -86,9 +88,6 @@
             saveFileDialog = new SaveFileDialog();
             toolStripSecondary = new ToolStrip();
             openFileDialogImport = new OpenFileDialog();
-            toolStripLabelCoordsLabel = new ToolStripLabel();
-            toolStripLabelCoords = new ToolStripLabel();
-            toolStripSeparator6 = new ToolStripSeparator();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
             toolStripTop.SuspendLayout();
@@ -272,11 +271,11 @@
             mapControl.Size = new Size(200, 200);
             mapControl.TabIndex = 0;
             mapControl.Text = "mapCanvasControl1";
-            tool3.BuildingType = null;
-            tool3.HouseLevel = 0;
-            tool3.IsClearBuilding = false;
-            tool3.Terrain = null;
-            mapControl.Tool = tool3;
+            tool1.BuildingType = null;
+            tool1.HouseLevel = 0;
+            tool1.IsClearBuilding = false;
+            tool1.Terrain = null;
+            mapControl.Tool = tool1;
             mapControl.SelectionChanged += mapControl_SelectionChanged;
             mapControl.UndoStackChanged += mapControl_UndoStackChanged;
             mapControl.MouseCoordsChanged += mapControl_MouseCoordsChanged;
@@ -284,7 +283,7 @@
             // toolStripTop
             // 
             toolStripTop.AutoSize = false;
-            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, btnFilterDesireFull, btnFilterSimpleHouseDesire, toolStripLabelCoordsLabel, toolStripLabelCoords, toolStripSeparator6, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3, btnUndo, btnRedo, toolStripSeparator4, ddDifficulty, toolStripSeparator5, btnGlyph });
+            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, btnFilterDesireFull, btnFilterSimpleHouseDesire, toolStripLabelCoords, toolStripSeparator6, toolStripLabelRoadLengthLabel, toolStripLabelRoadLength, toolStripSeparator20, toolStripLabel1, toolStrip2x2HouseCount, toolStripSeparator2, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3, btnUndo, btnRedo, toolStripSeparator4, ddDifficulty, toolStripSeparator5, btnGlyph });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
             toolStripTop.Size = new Size(1232, 25);
@@ -303,16 +302,17 @@
             // 
             btnNewFromGameSave.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnNewFromGameSave.Name = "btnNewFromGameSave";
-            btnNewFromGameSave.Size = new Size(132, 22);
-            btnNewFromGameSave.Text = "New from game save...";
+            btnNewFromGameSave.Size = new Size(98, 22);
+            btnNewFromGameSave.Text = "From game save";
+            btnNewFromGameSave.ToolTipText = "New from game save...1";
             btnNewFromGameSave.Click += btnNewFromGameSave_Click;
             // 
             // btnFileOpen
             // 
             btnFileOpen.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnFileOpen.Name = "btnFileOpen";
-            btnFileOpen.Size = new Size(49, 22);
-            btnFileOpen.Text = "Open...";
+            btnFileOpen.Size = new Size(40, 22);
+            btnFileOpen.Text = "Open";
             btnFileOpen.Click += btnFileOpen_Click;
             // 
             // btnFileSave
@@ -327,8 +327,8 @@
             // 
             btnFileSaveAs.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnFileSaveAs.Name = "btnFileSaveAs";
-            btnFileSaveAs.Size = new Size(60, 22);
-            btnFileSaveAs.Text = "Save As...";
+            btnFileSaveAs.Size = new Size(49, 22);
+            btnFileSaveAs.Text = "Save as";
             btnFileSaveAs.Click += btnFileSaveAs_Click;
             // 
             // toolStripSeparator1
@@ -343,8 +343,9 @@
             btnFilterBuildings.CheckState = CheckState.Checked;
             btnFilterBuildings.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnFilterBuildings.Name = "btnFilterBuildings";
-            btnFilterBuildings.Size = new Size(92, 22);
-            btnFilterBuildings.Text = "Show Buildings";
+            btnFilterBuildings.Size = new Size(33, 22);
+            btnFilterBuildings.Text = "Blds";
+            btnFilterBuildings.ToolTipText = "Show Buildings";
             btnFilterBuildings.Click += btnFilterBuildings_Click;
             // 
             // btnFilterDesire
@@ -354,8 +355,9 @@
             btnFilterDesire.CheckState = CheckState.Checked;
             btnFilterDesire.DisplayStyle = ToolStripItemDisplayStyle.Text;
             btnFilterDesire.Name = "btnFilterDesire";
-            btnFilterDesire.Size = new Size(104, 22);
-            btnFilterDesire.Text = "Show Desirablility";
+            btnFilterDesire.Size = new Size(30, 22);
+            btnFilterDesire.Text = "Des";
+            btnFilterDesire.ToolTipText = "Show Desirablility1";
             btnFilterDesire.Click += btnFilterDesire_Click;
             // 
             // btnFilterDesireFull
@@ -377,6 +379,18 @@
             btnFilterSimpleHouseDesire.Text = "S";
             btnFilterSimpleHouseDesire.ToolTipText = "Simple house desirability effect.";
             btnFilterSimpleHouseDesire.Click += btnFilterSimpleHouseDesire_Click;
+            // 
+            // toolStripLabelCoords
+            // 
+            toolStripLabelCoords.Name = "toolStripLabelCoords";
+            toolStripLabelCoords.Size = new Size(63, 22);
+            toolStripLabelCoords.Text = "x:999,y:999";
+            toolStripLabelCoords.TextAlign = ContentAlignment.MiddleRight;
+            // 
+            // toolStripSeparator6
+            // 
+            toolStripSeparator6.Name = "toolStripSeparator6";
+            toolStripSeparator6.Size = new Size(6, 25);
             // 
             // toolStripLabelRoadLengthLabel
             // 
@@ -548,25 +562,6 @@
             // 
             openFileDialogImport.Filter = "Pharaoh save files|*.sav|All files|*.*";
             // 
-            // toolStripLabelCoordsLabel
-            // 
-            toolStripLabelCoordsLabel.Name = "toolStripLabelCoordsLabel";
-            toolStripLabelCoordsLabel.Size = new Size(48, 22);
-            toolStripLabelCoordsLabel.Text = "Coords:";
-            // 
-            // toolStripLabelCoords
-            // 
-            toolStripLabelCoords.AutoSize = false;
-            toolStripLabelCoords.Name = "toolStripLabelCoords";
-            toolStripLabelCoords.Size = new Size(50, 22);
-            toolStripLabelCoords.Text = "999, 999";
-            toolStripLabelCoords.TextAlign = ContentAlignment.MiddleRight;
-            // 
-            // toolStripSeparator6
-            // 
-            toolStripSeparator6.Name = "toolStripSeparator6";
-            toolStripSeparator6.Size = new Size(6, 25);
-            // 
             // FormMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -648,7 +643,6 @@
         private ToolStripSeparator toolStripSeparator5;
         private ToolStripButton btnFilterDesireFull;
         private ToolStripButton btnFilterSimpleHouseDesire;
-        private ToolStripLabel toolStripLabelCoordsLabel;
         private ToolStripLabel toolStripLabelCoords;
         private ToolStripSeparator toolStripSeparator6;
     }
