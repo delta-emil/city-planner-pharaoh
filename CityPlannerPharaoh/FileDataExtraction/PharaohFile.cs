@@ -766,7 +766,7 @@ public class PharaohFile : GameFile
                     return MapBuildingType.Bridge;
                 }
             }
-            else if (building is 0x3739 or 0x373A or 0x373B)
+            else if (building is 0x3739 or 0x373A or 0x373B or 0x3740 or 0x373F)
             {
                 return MapBuildingType.Plaza;
             }

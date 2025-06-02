@@ -87,9 +87,9 @@ internal class Program
 
         Console.WriteLine("BUILDINGS GRID DATA:");
         Console.WriteLine("----------------------------------");
-        for (int y = 63; y <= 78; y++)
+        for (int y = 90; y <= 95; y++)
         {
-            for (int x = 44; x <= 56; x++)
+            for (int x = 24; x <= 47; x++)
             {
                 Console.Write(building_grid_data[x, y].ToString("X4"));
                 Console.Write(' ');
