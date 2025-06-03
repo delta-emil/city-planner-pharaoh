@@ -302,7 +302,7 @@ public class MapCanvasControl : Control
             graphics.DrawRectangle(borderPen, borderRect);
         }
 
-        bool isMeadowFarm = false;
+        bool isFarm = false;
 
         foreach (var (cellModel, cellX, cellY) in this.MapModel.EnumerateInsideBuildingWithCoords(building))
         {
@@ -316,7 +316,7 @@ public class MapCanvasControl : Control
             {
                 brushToApply = this.farmMeadowBrush;
 
-                isMeadowFarm |= cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland;
+                isFarm = true;
             }
                 
             if (brushToApply != null)
@@ -340,7 +340,7 @@ public class MapCanvasControl : Control
             var textSize = graphics.MeasureString(text, this.smallFont);
 
             var textBrushToUse = this.textBrush;
-            if (isMeadowFarm && this.MapModel.IsFarmIrrigated(building))
+            if (isFarm && this.MapModel.IsFarmIrrigated(building))
             {
                 textBrushToUse = this.farmIrrigatedTextBrush;
             }

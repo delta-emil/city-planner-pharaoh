@@ -54,9 +54,6 @@ Notes:
 
 # TODO
 
-- fix farm irrigation
-    - fix the algorith - it's 4 tiles to the Farm's N tile; single ditch tile doesn't count
-    - show on floodplains
 - right-click dragging to scroll like in Julius
 - nicer display names for buildings
 

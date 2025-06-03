@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Text.Json.Serialization;
 
 namespace CityPlannerPharaoh;
@@ -525,12 +526,20 @@ public class MapModel
 
     public bool IsFarmIrrigated(MapBuilding farm)
     {
-        const int IrrigationRange = 2;
-        foreach (var (cell, _, _, _) in EnumerateAroundBuildingToRange(farm, IrrigationRange, includingInside: false))
+        // 4 tiles to the N tile of the farm
+        const int IrrigationRange = 4;
+        foreach (var (cell, cellX, cellY, _) in EnumerateAroundBuildingToRange(farm.Left, farm.Top, width: 1, height: 1, IrrigationRange, includingInside: false))
         {
             if (cell.Building?.BuildingType == MapBuildingType.Ditch)
             {
-                return true;
+                // single tile ditches don't count, so check around it
+                if ((cellX > 0 && this.Cells[cellX - 1, cellY].Building?.BuildingType == MapBuildingType.Ditch)
+                 || (cellY > 0 && this.Cells[cellX, cellY - 1].Building?.BuildingType == MapBuildingType.Ditch)
+                 || (cellX < this.MapSideX - 1 && this.Cells[cellX + 1, cellY].Building?.BuildingType == MapBuildingType.Ditch)
+                 || (cellY < this.MapSideY - 1 && this.Cells[cellX, cellY + 1].Building?.BuildingType == MapBuildingType.Ditch))
+                {
+                    return true;
+                }
             }
         }
 
