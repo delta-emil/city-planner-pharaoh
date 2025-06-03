@@ -406,8 +406,16 @@ public partial class FormMain : Form
 
     #endregion
 
+    private void mapControl_GlobalStatsChanged(object sender, MapGlobalStatsChangeEventArgs e)
+    {
+        this.toolStripTotalPop.Text = e.Pop.ToString();
+        this.toolStripTotalWork23.Text = ((int)(e.Pop * 0.23)).ToString();
+        this.toolStripTotalEmpl.Text = e.Empl.ToString();
+    }
+
     private void mapControl_SelectionChanged(object sender, MapSelectionChangeEventArgs e)
     {
+        this.toolStripSelectedEmpl.Text = e.SelectedEmpl.ToString();
         this.toolStripLabelRoadLength.Text = e.SelectedRoadLength.ToString();
         this.toolStrip2x2HouseCount.Text = e.Selected2x2HouseCount.ToString();
     }

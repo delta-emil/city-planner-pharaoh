@@ -151,4 +151,20 @@ public class MapBuilding
 
         return false;
     }
+
+    public int GetMaxPopulation()
+    {
+        if (BuildingType == MapBuildingType.House)
+        {
+            return HouseLevelData.MaxPopulation1x1[this.MaxHouseLevel];
+        }
+        else if (BuildingType is MapBuildingType.House2 or MapBuildingType.House3 or MapBuildingType.House4)
+        {
+            return HouseLevelData.MaxPopulation[this.MaxHouseLevel];
+        }
+        else
+        {
+            return 0;
+        }
+    }
 }

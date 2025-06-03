@@ -93,6 +93,10 @@ public class MapModel
             }
         }
     }
+    public MapModel GetDeepCopy()
+    {
+        return new MapModel(this);
+    }
 
     #region data
 
@@ -679,13 +683,22 @@ public class MapModel
         
         return false;
     }
-    
-    public MapModel GetDeepCopy()
+
+    public int GetEmployees(MapBuilding building)
     {
-        return new MapModel(this);
+        if (building.BuildingType == MapBuildingType.Farm)
+        {
+            bool isMeadowsFarm = this.EnumerateInsideBuilding(building).Any(cell => cell.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland);
+            return isMeadowsFarm ? building.BuildingType.GetEmployees() : 0;
+        }
+        else
+        {
+            return building.BuildingType.GetEmployees();
+        }
     }
 
-    // for debug
+    #region for debug
+
     public int[,] GetDesireData()
     {
         var result = new int[this.MapSideX, this.MapSideY];
@@ -699,7 +712,6 @@ public class MapModel
         return result;
     }
 
-    // for debug
     public void ShowDesirabilityState()
     {
         for (int row = 0; row < this.MapSideX; row++)
@@ -713,7 +725,6 @@ public class MapModel
         }
     }
 
-    // for debug
     public void ShowDesirabilityDiff(int[,] oldState)
     {
         for (int row = 0; row < this.MapSideX; row++)
@@ -728,7 +739,6 @@ public class MapModel
         }
     }
 
-    // for debug
     public void ShowBuildings()
     {
         for (int row = 0; row < this.MapSideY; row++)
@@ -753,4 +763,6 @@ public class MapModel
             Console.WriteLine("},");
         }
     }
+
+    #endregion
 }

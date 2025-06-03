@@ -364,6 +364,126 @@ public static partial class MapBuildingTypeExtensions
         new(4, -4, 1, 1), // GateNorth,
     };
 
+    public static int GetEmployees(this MapBuildingType mapBuildingType) => employees[(int)mapBuildingType];
+    
+    private static readonly int[] employees = new[]
+    {
+        0, // Road
+        0, // Plaza,
+        0, // Garden,
+        0, // House,
+        0, // House2,
+        0, // House3,
+        0, // House4,
+
+        10, // Farm, // 0 if on floodplains
+        12, // Cattle,
+        5, // WaterLift,
+        0, // Ditch,
+        6, // Hunter,
+        6, // Fisher,
+        20, // WorkCamp,
+
+        12, // QuarryPlainStone,
+        12, // QuarryLimestone,
+        12, // QuarrySandstone,
+        12, // QuarryGranite,
+        8, // MineGems,
+        10, // MineCopper,
+        10, // MineGold,
+
+        8, // Clay,
+        8, // Reed,
+        8, // Wood,
+
+        12, // Potter,
+        12, // Brewer,
+        12, // Papyrus,
+        12, // Weaver,
+        12, // Jeweler,
+        12, // Bricks,
+        12, // Lamps,
+        12, // Paint,
+        20, // Shipwright,
+
+        10, // GuildBricklayer,
+        8, // GuildCarpenter,
+        12, // GuildStonemason,
+        20, // GuildArtisan,
+
+        5, // Bazaar,
+        12, // Granary,
+        0, // StorageYardTower,
+        6, // StorageYard,
+        12, // Dock,
+
+        0, // JuggleStage,
+        0, // MusicStage,
+        0, // DanceStage,
+        8, // Booth,
+        12, // Bandstand,
+        20, // Pavilion,
+        25, // Senet,
+        30, // Zoo,
+        5, // JuggleSchool,
+        8, // MusicSchool,
+        10, // DanceSchool,
+
+        0, // Shrine,
+        8, // Temple,
+        50, // TempleComplex1,
+        50, // TempleComplex2,
+        0, // TempleComplexBuilding,
+        0, // FestivalSquare,
+
+        10, // ScribeSchool,
+        30, // Library,
+
+        0, // Well,
+        5, // WaterSupply,
+        8, // Physician,
+        5, // Apothecary,
+        2, // Dentist,
+        8, // Mortuary,
+
+        6, // Firehouse,
+        5, // Architect,
+        6, // Police,
+        6, // Tax,
+        10, // Courthouse,
+
+        0, // Roadblock,
+        0, // Bridge,
+        5, // FerryLanding,
+
+        0, // StatueSmall,
+        0, // StatueMedium,
+        0, // StatueLarge,
+
+        20, // PalaceVillage,
+        25, // PalaceTown,
+        30, // PalaceCity,
+        0, // MansionPersonal,
+        0, // MansionFamily,
+        0, // MansionDynasty,
+
+        0, // Wall,
+        6, // Tower,
+        0, // GatePath,
+        0, // Gate1,
+        0, // Gate2,
+        10, // Recruiter,
+        20, // Academy,
+        12, // Weaponsmith,
+        30, // Chariot,
+        0, // Fort,
+        0, // FortBuilding,
+        0, // FortYard,
+        15, // Warship,
+        5, // TransportShip,
+        0, // GateNorth,
+    };
+
     public static MapBuildingCategory GetCategory(this MapBuildingType mapBuildingType)
     {
         return mapBuildingType switch

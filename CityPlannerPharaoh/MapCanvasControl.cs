@@ -126,6 +126,7 @@ public class MapCanvasControl : Control
     {
         this.MapModel = mapModel;
         this.SetSizeToFullMapSize();
+        this.OnBuildingsChanged();
 
         this.undoStack.Init(mapModel);
         this.OnUndoStackChanged();
@@ -174,6 +175,7 @@ public class MapCanvasControl : Control
         }
     }
 
+    public event Action<object, MapGlobalStatsChangeEventArgs>? GlobalStatsChanged;
     public event Action<object, MapSelectionChangeEventArgs>? SelectionChanged;
     public event Action<object, MapUndoStackChangeEventArgs>? UndoStackChanged;
     public event Action<object, MouseCoordsChangeEventArgs>? MouseCoordsChanged;
@@ -622,6 +624,7 @@ public class MapCanvasControl : Control
                 // clear the ghost
                 this.ClearGhost();
 
+                this.OnBuildingsChanged();
                 this.Invalidate();
             }
         }
@@ -635,6 +638,7 @@ public class MapCanvasControl : Control
 
             this.RegisterUndoPoint();
             this.MapModel.RemoveBuilding(building);
+            this.OnBuildingsChanged();
             this.Invalidate();
         }
         else
@@ -998,6 +1002,7 @@ public class MapCanvasControl : Control
                 this.MapModel.RemoveBuilding(building);
             }
 
+            this.OnBuildingsChanged();
             this.Invalidate();
         }
     }
@@ -1052,19 +1057,37 @@ public class MapCanvasControl : Control
             this.MapModel.AddBuildingAfterCheck(newBuilding);
         }
 
+        this.OnBuildingsChanged();
         this.Invalidate();
     }
 
     #endregion
 
+    private void OnBuildingsChanged()
+    {
+        if (this.GlobalStatsChanged != null)
+        {
+            var pop = this.MapModel.Buildings.Sum(building => building.GetMaxPopulation());
+            var empl = this.MapModel.Buildings.Sum(this.MapModel.GetEmployees);
+            var args = new MapGlobalStatsChangeEventArgs
+            {
+                Pop = pop,
+                Empl = empl,
+            };
+            this.GlobalStatsChanged(this, args);
+        }
+    }
+
     private void OnSelectionChanged()
     {
         if (this.SelectionChanged != null)
         {
+            var empl = this.SelectedBuildings.Sum(this.MapModel.GetEmployees);
             var roadLength = this.SelectedBuildings.Count(building => building.BuildingType is MapBuildingType.Road or MapBuildingType.Plaza);
             var house2x2Count = this.SelectedBuildings.Count(building => building.BuildingType is MapBuildingType.House2);
             var args = new MapSelectionChangeEventArgs
             {
+                SelectedEmpl = empl,
                 SelectedRoadLength = roadLength,
                 Selected2x2HouseCount = house2x2Count,
             };

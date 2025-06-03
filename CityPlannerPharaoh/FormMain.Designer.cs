@@ -83,10 +83,20 @@
             openFileDialogImport = new OpenFileDialog();
             statusStripMain = new StatusStrip();
             toolStripLabelCoords = new ToolStripStatusLabel();
+            toolStripTotalEmplLabel = new ToolStripStatusLabel();
+            toolStripTotalEmpl = new ToolStripStatusLabel();
+            toolStripSelectedEmplLabel = new ToolStripStatusLabel();
+            toolStripSelectedEmpl = new ToolStripStatusLabel();
             toolStripStatusLabelRoadLabel = new ToolStripStatusLabel();
             toolStripLabelRoadLength = new ToolStripStatusLabel();
             toolStripStatusLabelHousesLabel = new ToolStripStatusLabel();
             toolStrip2x2HouseCount = new ToolStripStatusLabel();
+            toolStripStatusSelection = new ToolStripStatusLabel();
+            toolStripStatusTotal = new ToolStripStatusLabel();
+            toolStripTotalWork23Label = new ToolStripStatusLabel();
+            toolStripTotalWork23 = new ToolStripStatusLabel();
+            toolStripTotalPopLabel = new ToolStripStatusLabel();
+            toolStripTotalPop = new ToolStripStatusLabel();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
             toolStripTop.SuspendLayout();
@@ -276,6 +286,7 @@
             tool1.IsClearBuilding = false;
             tool1.Terrain = null;
             mapControl.Tool = tool1;
+            mapControl.GlobalStatsChanged += mapControl_GlobalStatsChanged;
             mapControl.SelectionChanged += mapControl_SelectionChanged;
             mapControl.UndoStackChanged += mapControl_UndoStackChanged;
             mapControl.MouseCoordsChanged += mapControl_MouseCoordsChanged;
@@ -518,7 +529,7 @@
             // 
             // statusStripMain
             // 
-            statusStripMain.Items.AddRange(new ToolStripItem[] { toolStripLabelCoords, toolStripStatusLabelRoadLabel, toolStripLabelRoadLength, toolStripStatusLabelHousesLabel, toolStrip2x2HouseCount });
+            statusStripMain.Items.AddRange(new ToolStripItem[] { toolStripLabelCoords, toolStripStatusTotal, toolStripTotalPopLabel, toolStripTotalPop, toolStripTotalWork23Label, toolStripTotalWork23, toolStripTotalEmplLabel, toolStripTotalEmpl, toolStripStatusSelection, toolStripSelectedEmplLabel, toolStripSelectedEmpl, toolStripStatusLabelRoadLabel, toolStripLabelRoadLength, toolStripStatusLabelHousesLabel, toolStrip2x2HouseCount });
             statusStripMain.Location = new Point(0, 813);
             statusStripMain.Name = "statusStripMain";
             statusStripMain.Size = new Size(1232, 24);
@@ -531,11 +542,37 @@
             toolStripLabelCoords.Size = new Size(70, 19);
             toolStripLabelCoords.Text = "x:999, y:999";
             // 
+            // toolStripTotalEmplLabel
+            // 
+            toolStripTotalEmplLabel.Name = "toolStripTotalEmplLabel";
+            toolStripTotalEmplLabel.Size = new Size(37, 19);
+            toolStripTotalEmplLabel.Text = "empl:";
+            // 
+            // toolStripTotalEmpl
+            // 
+            toolStripTotalEmpl.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Top | ToolStripStatusLabelBorderSides.Right | ToolStripStatusLabelBorderSides.Bottom;
+            toolStripTotalEmpl.Name = "toolStripTotalEmpl";
+            toolStripTotalEmpl.Size = new Size(17, 19);
+            toolStripTotalEmpl.Text = "0";
+            // 
+            // toolStripSelectedEmplLabel
+            // 
+            toolStripSelectedEmplLabel.Name = "toolStripSelectedEmplLabel";
+            toolStripSelectedEmplLabel.Size = new Size(37, 19);
+            toolStripSelectedEmplLabel.Text = "empl:";
+            // 
+            // toolStripSelectedEmpl
+            // 
+            toolStripSelectedEmpl.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Top | ToolStripStatusLabelBorderSides.Right | ToolStripStatusLabelBorderSides.Bottom;
+            toolStripSelectedEmpl.Name = "toolStripSelectedEmpl";
+            toolStripSelectedEmpl.Size = new Size(17, 19);
+            toolStripSelectedEmpl.Text = "0";
+            // 
             // toolStripStatusLabelRoadLabel
             // 
             toolStripStatusLabelRoadLabel.Name = "toolStripStatusLabelRoadLabel";
-            toolStripStatusLabelRoadLabel.Size = new Size(80, 19);
-            toolStripStatusLabelRoadLabel.Text = "selected road:";
+            toolStripStatusLabelRoadLabel.Size = new Size(34, 19);
+            toolStripStatusLabelRoadLabel.Text = "road:";
             // 
             // toolStripLabelRoadLength
             // 
@@ -547,8 +584,8 @@
             // toolStripStatusLabelHousesLabel
             // 
             toolStripStatusLabelHousesLabel.Name = "toolStripStatusLabelHousesLabel";
-            toolStripStatusLabelHousesLabel.Size = new Size(113, 19);
-            toolStripStatusLabelHousesLabel.Text = "selected 2x2 houses:";
+            toolStripStatusLabelHousesLabel.Size = new Size(67, 19);
+            toolStripStatusLabelHousesLabel.Text = "2x2 houses:";
             // 
             // toolStrip2x2HouseCount
             // 
@@ -556,6 +593,50 @@
             toolStrip2x2HouseCount.Name = "toolStrip2x2HouseCount";
             toolStrip2x2HouseCount.Size = new Size(17, 19);
             toolStrip2x2HouseCount.Text = "0";
+            // 
+            // toolStripStatusSelection
+            // 
+            toolStripStatusSelection.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Right;
+            toolStripStatusSelection.BorderStyle = Border3DStyle.Etched;
+            toolStripStatusSelection.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            toolStripStatusSelection.Name = "toolStripStatusSelection";
+            toolStripStatusSelection.Size = new Size(61, 19);
+            toolStripStatusSelection.Text = "selected:";
+            // 
+            // toolStripStatusTotal
+            // 
+            toolStripStatusTotal.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Right;
+            toolStripStatusTotal.BorderStyle = Border3DStyle.Etched;
+            toolStripStatusTotal.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            toolStripStatusTotal.Name = "toolStripStatusTotal";
+            toolStripStatusTotal.Size = new Size(40, 19);
+            toolStripStatusTotal.Text = "total:";
+            // 
+            // toolStripTotalWork23Label
+            // 
+            toolStripTotalWork23Label.Name = "toolStripTotalWork23Label";
+            toolStripTotalWork23Label.Size = new Size(66, 19);
+            toolStripTotalWork23Label.Text = "work(23%):";
+            // 
+            // toolStripTotalWork23
+            // 
+            toolStripTotalWork23.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Top | ToolStripStatusLabelBorderSides.Right | ToolStripStatusLabelBorderSides.Bottom;
+            toolStripTotalWork23.Name = "toolStripTotalWork23";
+            toolStripTotalWork23.Size = new Size(17, 19);
+            toolStripTotalWork23.Text = "0";
+            // 
+            // toolStripTotalPopLabel
+            // 
+            toolStripTotalPopLabel.Name = "toolStripTotalPopLabel";
+            toolStripTotalPopLabel.Size = new Size(31, 19);
+            toolStripTotalPopLabel.Text = "pop:";
+            // 
+            // toolStripTotalPop
+            // 
+            toolStripTotalPop.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Top | ToolStripStatusLabelBorderSides.Right | ToolStripStatusLabelBorderSides.Bottom;
+            toolStripTotalPop.Name = "toolStripTotalPop";
+            toolStripTotalPop.Size = new Size(17, 19);
+            toolStripTotalPop.Text = "0";
             // 
             // FormMain
             // 
@@ -643,5 +724,15 @@
         private ToolStripStatusLabel toolStripLabelRoadLength;
         private ToolStripStatusLabel toolStripStatusLabelHousesLabel;
         private ToolStripStatusLabel toolStrip2x2HouseCount;
+        private ToolStripStatusLabel toolStripTotalEmplLabel;
+        private ToolStripStatusLabel toolStripTotalEmpl;
+        private ToolStripStatusLabel toolStripSelectedEmplLabel;
+        private ToolStripStatusLabel toolStripSelectedEmpl;
+        private ToolStripStatusLabel toolStripStatusSelection;
+        private ToolStripStatusLabel toolStripStatusTotal;
+        private ToolStripStatusLabel toolStripTotalPopLabel;
+        private ToolStripStatusLabel toolStripTotalPop;
+        private ToolStripStatusLabel toolStripTotalWork23Label;
+        private ToolStripStatusLabel toolStripTotalWork23;
     }
 }

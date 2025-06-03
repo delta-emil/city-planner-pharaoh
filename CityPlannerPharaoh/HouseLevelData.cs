@@ -1,4 +1,5 @@
-﻿namespace CityPlannerPharaoh;
+﻿
+namespace CityPlannerPharaoh;
 
 public enum Difficulty
 {
@@ -104,6 +105,46 @@ public static class HouseLevelData
 
         new(6, 5, 2, -1),
         new(6, 5, 2, -1),
+    ];
+
+    public static readonly int[] MaxPopulation1x1 =
+    [
+        0,
+        5,
+        7,
+        9,
+        11,
+        13,
+        15,
+        16,
+        17,
+        18,
+        19,
+    ];
+
+    public static readonly int[] MaxPopulation =
+    [
+        0,
+        20,
+        28,
+        36,
+        44,
+        52,
+        60,
+        64,
+        68,
+        72,
+        76,
+        80,
+        84,
+        88,
+        92,
+        100,
+        108,
+        116,
+        124,
+        184,
+        200,
     ];
 
     public static readonly string[] LabelsShort =
