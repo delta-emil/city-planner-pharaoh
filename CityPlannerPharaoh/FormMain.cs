@@ -404,6 +404,11 @@ public partial class FormMain : Form
         this.mapControl.BuildingsCopy();
     }
 
+    private void btnPasteBuildings_Click(object sender, EventArgs e)
+    {
+        this.mapControl.BuildingsPasteGhost();
+    }
+
     #endregion
 
     private void mapControl_GlobalStatsChanged(object sender, MapGlobalStatsChangeEventArgs e)
@@ -633,6 +638,8 @@ public partial class FormMain : Form
             {
                 this.mapControl.Tool = new Tool();
             }
+            this.mapControl.ClearBuildingsToPaste();
+
             e.Handled = true;
             e.SuppressKeyPress = true;
         }
@@ -647,6 +654,10 @@ public partial class FormMain : Form
         else if (e.KeyCode == Keys.X && ModifierKeys == Keys.Control)
         {
             this.mapControl.BuildingsCut();
+        }
+        else if (e.KeyCode == Keys.V && ModifierKeys == Keys.Control)
+        {
+            this.mapControl.BuildingsPasteGhost();
         }
         else if (e.KeyCode == Keys.Z && ModifierKeys == Keys.Control)
         {

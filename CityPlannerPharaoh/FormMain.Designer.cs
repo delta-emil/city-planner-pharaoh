@@ -64,7 +64,6 @@
             toolStripSeparator6 = new ToolStripSeparator();
             btnCutBuildings = new ToolStripButton();
             btnCopyBuildings = new ToolStripButton();
-            toolStripLabelPasteBuildings = new ToolStripLabel();
             toolStripSeparator3 = new ToolStripSeparator();
             btnUndo = new ToolStripButton();
             btnRedo = new ToolStripButton();
@@ -83,20 +82,21 @@
             openFileDialogImport = new OpenFileDialog();
             statusStripMain = new StatusStrip();
             toolStripLabelCoords = new ToolStripStatusLabel();
+            toolStripStatusTotal = new ToolStripStatusLabel();
+            toolStripTotalPopLabel = new ToolStripStatusLabel();
+            toolStripTotalPop = new ToolStripStatusLabel();
+            toolStripTotalWork23Label = new ToolStripStatusLabel();
+            toolStripTotalWork23 = new ToolStripStatusLabel();
             toolStripTotalEmplLabel = new ToolStripStatusLabel();
             toolStripTotalEmpl = new ToolStripStatusLabel();
+            toolStripStatusSelection = new ToolStripStatusLabel();
             toolStripSelectedEmplLabel = new ToolStripStatusLabel();
             toolStripSelectedEmpl = new ToolStripStatusLabel();
             toolStripStatusLabelRoadLabel = new ToolStripStatusLabel();
             toolStripLabelRoadLength = new ToolStripStatusLabel();
             toolStripStatusLabelHousesLabel = new ToolStripStatusLabel();
             toolStrip2x2HouseCount = new ToolStripStatusLabel();
-            toolStripStatusSelection = new ToolStripStatusLabel();
-            toolStripStatusTotal = new ToolStripStatusLabel();
-            toolStripTotalWork23Label = new ToolStripStatusLabel();
-            toolStripTotalWork23 = new ToolStripStatusLabel();
-            toolStripTotalPopLabel = new ToolStripStatusLabel();
-            toolStripTotalPop = new ToolStripStatusLabel();
+            btnPasteBuildings = new ToolStripButton();
             toolStripMain.SuspendLayout();
             canvas.SuspendLayout();
             toolStripTop.SuspendLayout();
@@ -294,7 +294,7 @@
             // toolStripTop
             // 
             toolStripTop.AutoSize = false;
-            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, btnFilterDesireFull, btnFilterSimpleHouseDesire, toolStripSeparator6, btnCutBuildings, btnCopyBuildings, toolStripLabelPasteBuildings, toolStripSeparator3, btnUndo, btnRedo, toolStripSeparator4, ddDifficulty, toolStripSeparator5, btnGlyph });
+            toolStripTop.Items.AddRange(new ToolStripItem[] { btnFileNew, btnNewFromGameSave, btnFileOpen, btnFileSave, btnFileSaveAs, toolStripSeparator1, btnFilterBuildings, btnFilterDesire, btnFilterDesireFull, btnFilterSimpleHouseDesire, toolStripSeparator6, btnCutBuildings, btnCopyBuildings, btnPasteBuildings, toolStripSeparator3, btnUndo, btnRedo, toolStripSeparator4, ddDifficulty, toolStripSeparator5, btnGlyph });
             toolStripTop.Location = new Point(0, 0);
             toolStripTop.Name = "toolStripTop";
             toolStripTop.Size = new Size(1232, 25);
@@ -411,12 +411,6 @@
             btnCopyBuildings.Size = new Size(39, 22);
             btnCopyBuildings.Text = "Copy";
             btnCopyBuildings.Click += btnCopyBuildings_Click;
-            // 
-            // toolStripLabelPasteBuildings
-            // 
-            toolStripLabelPasteBuildings.Name = "toolStripLabelPasteBuildings";
-            toolStripLabelPasteBuildings.Size = new Size(114, 22);
-            toolStripLabelPasteBuildings.Text = "(right-click to paste)";
             // 
             // toolStripSeparator3
             // 
@@ -542,6 +536,41 @@
             toolStripLabelCoords.Size = new Size(70, 19);
             toolStripLabelCoords.Text = "x:999, y:999";
             // 
+            // toolStripStatusTotal
+            // 
+            toolStripStatusTotal.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Right;
+            toolStripStatusTotal.BorderStyle = Border3DStyle.Etched;
+            toolStripStatusTotal.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            toolStripStatusTotal.Name = "toolStripStatusTotal";
+            toolStripStatusTotal.Size = new Size(40, 19);
+            toolStripStatusTotal.Text = "total:";
+            // 
+            // toolStripTotalPopLabel
+            // 
+            toolStripTotalPopLabel.Name = "toolStripTotalPopLabel";
+            toolStripTotalPopLabel.Size = new Size(31, 19);
+            toolStripTotalPopLabel.Text = "pop:";
+            // 
+            // toolStripTotalPop
+            // 
+            toolStripTotalPop.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Top | ToolStripStatusLabelBorderSides.Right | ToolStripStatusLabelBorderSides.Bottom;
+            toolStripTotalPop.Name = "toolStripTotalPop";
+            toolStripTotalPop.Size = new Size(17, 19);
+            toolStripTotalPop.Text = "0";
+            // 
+            // toolStripTotalWork23Label
+            // 
+            toolStripTotalWork23Label.Name = "toolStripTotalWork23Label";
+            toolStripTotalWork23Label.Size = new Size(66, 19);
+            toolStripTotalWork23Label.Text = "work(23%):";
+            // 
+            // toolStripTotalWork23
+            // 
+            toolStripTotalWork23.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Top | ToolStripStatusLabelBorderSides.Right | ToolStripStatusLabelBorderSides.Bottom;
+            toolStripTotalWork23.Name = "toolStripTotalWork23";
+            toolStripTotalWork23.Size = new Size(17, 19);
+            toolStripTotalWork23.Text = "0";
+            // 
             // toolStripTotalEmplLabel
             // 
             toolStripTotalEmplLabel.Name = "toolStripTotalEmplLabel";
@@ -554,6 +583,15 @@
             toolStripTotalEmpl.Name = "toolStripTotalEmpl";
             toolStripTotalEmpl.Size = new Size(17, 19);
             toolStripTotalEmpl.Text = "0";
+            // 
+            // toolStripStatusSelection
+            // 
+            toolStripStatusSelection.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Right;
+            toolStripStatusSelection.BorderStyle = Border3DStyle.Etched;
+            toolStripStatusSelection.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            toolStripStatusSelection.Name = "toolStripStatusSelection";
+            toolStripStatusSelection.Size = new Size(61, 19);
+            toolStripStatusSelection.Text = "selected:";
             // 
             // toolStripSelectedEmplLabel
             // 
@@ -594,49 +632,13 @@
             toolStrip2x2HouseCount.Size = new Size(17, 19);
             toolStrip2x2HouseCount.Text = "0";
             // 
-            // toolStripStatusSelection
+            // btnPasteBuildings
             // 
-            toolStripStatusSelection.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Right;
-            toolStripStatusSelection.BorderStyle = Border3DStyle.Etched;
-            toolStripStatusSelection.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            toolStripStatusSelection.Name = "toolStripStatusSelection";
-            toolStripStatusSelection.Size = new Size(61, 19);
-            toolStripStatusSelection.Text = "selected:";
-            // 
-            // toolStripStatusTotal
-            // 
-            toolStripStatusTotal.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Right;
-            toolStripStatusTotal.BorderStyle = Border3DStyle.Etched;
-            toolStripStatusTotal.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            toolStripStatusTotal.Name = "toolStripStatusTotal";
-            toolStripStatusTotal.Size = new Size(40, 19);
-            toolStripStatusTotal.Text = "total:";
-            // 
-            // toolStripTotalWork23Label
-            // 
-            toolStripTotalWork23Label.Name = "toolStripTotalWork23Label";
-            toolStripTotalWork23Label.Size = new Size(66, 19);
-            toolStripTotalWork23Label.Text = "work(23%):";
-            // 
-            // toolStripTotalWork23
-            // 
-            toolStripTotalWork23.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Top | ToolStripStatusLabelBorderSides.Right | ToolStripStatusLabelBorderSides.Bottom;
-            toolStripTotalWork23.Name = "toolStripTotalWork23";
-            toolStripTotalWork23.Size = new Size(17, 19);
-            toolStripTotalWork23.Text = "0";
-            // 
-            // toolStripTotalPopLabel
-            // 
-            toolStripTotalPopLabel.Name = "toolStripTotalPopLabel";
-            toolStripTotalPopLabel.Size = new Size(31, 19);
-            toolStripTotalPopLabel.Text = "pop:";
-            // 
-            // toolStripTotalPop
-            // 
-            toolStripTotalPop.BorderSides = ToolStripStatusLabelBorderSides.Left | ToolStripStatusLabelBorderSides.Top | ToolStripStatusLabelBorderSides.Right | ToolStripStatusLabelBorderSides.Bottom;
-            toolStripTotalPop.Name = "toolStripTotalPop";
-            toolStripTotalPop.Size = new Size(17, 19);
-            toolStripTotalPop.Text = "0";
+            btnPasteBuildings.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            btnPasteBuildings.Name = "btnPasteBuildings";
+            btnPasteBuildings.Size = new Size(39, 22);
+            btnPasteBuildings.Text = "Paste";
+            btnPasteBuildings.Click += btnPasteBuildings_Click;
             // 
             // FormMain
             // 
@@ -688,7 +690,6 @@
         private SaveFileDialog saveFileDialog;
         private ToolStripButton btnCopyBuildings;
         private ToolStripButton btnCutBuildings;
-        private ToolStripLabel toolStripLabelPasteBuildings;
         private ToolStripSeparator toolStripSeparator3;
         private ToolStripButton btnFood;
         private ToolStripButton btnIndustry;
@@ -734,5 +735,6 @@
         private ToolStripStatusLabel toolStripTotalPop;
         private ToolStripStatusLabel toolStripTotalWork23Label;
         private ToolStripStatusLabel toolStripTotalWork23;
+        private ToolStripButton btnPasteBuildings;
     }
 }

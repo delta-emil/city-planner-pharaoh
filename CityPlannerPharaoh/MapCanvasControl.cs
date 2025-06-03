@@ -119,6 +119,7 @@ public class MapCanvasControl : Control
 
     public MapModel MapModel { get; private set; }
     public HashSet<MapBuilding> SelectedBuildings { get; }
+    public HashSet<MapBuilding>? BuildingsToPaste { get; private set; }
 
     private readonly UndoStack<MapModel> undoStack;
 
@@ -477,12 +478,18 @@ public class MapCanvasControl : Control
             }
 
             var (cellX, cellY) = GetCellCoordidates(e);
-            this.ApplyTool(e, cellX, cellY, isMove: false);
+            if (this.BuildingsToPaste != null)
+            {
+                this.BuildingsPastePlaceGhost(cellX, cellY);
+            }
+            else
+            {
+                this.ApplyTool(e, cellX, cellY, isMove: false);
+            }
         }
         else if (e.Button == MouseButtons.Right)
         {
-            var (cellX, cellY) = GetCellCoordidates(e);
-            this.BuildingsPaste(cellX, cellY);
+            // TODO: hold to scroll?
         }
         else if (e.Button == MouseButtons.Middle)
         {
@@ -550,27 +557,34 @@ public class MapCanvasControl : Control
     {
         var (cellX, cellY) = GetCellCoordidates(e);
 
-        if (this.Tool.BuildingType != null)
+        if (this.BuildingsToPaste != null)
         {
-            var buildingType = this.Tool.BuildingType.Value;
-
-            var (width, height) = buildingType.GetSize();
-
-            var newGhostRect = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, width * CellSideLength, height * CellSideLength);
-            if (this.ghostsBoundingRect == null || !this.ghostsBoundingRect.Equals(newGhostRect))
-            {
-                var repaintRect = RectUnion(this.ghostsBoundingRect, newGhostRect);
-
-                var isValid = this.MapModel.CanAddBuilding(cellX, cellY, buildingType, subBuildings: null);
-                this.UpdateGhostLocation(newGhostRect, isValid);
-                
-                Invalidate(repaintRect);
-            }
+            this.UpdateBuildingDestinationGhost(this.BuildingsToPaste, cellX, cellY, zeroOffsetIsValid: true);
         }
-
-        if (this.Capture)
+        else
         {
-            this.ApplyTool(e, cellX, cellY, isMove: true);
+            if (this.Tool.BuildingType != null)
+            {
+                var buildingType = this.Tool.BuildingType.Value;
+
+                var (width, height) = buildingType.GetSize();
+
+                var newGhostRect = new Rectangle(cellX * CellSideLength, cellY * CellSideLength, width * CellSideLength, height * CellSideLength);
+                if (this.ghostsBoundingRect == null || !this.ghostsBoundingRect.Equals(newGhostRect))
+                {
+                    var repaintRect = RectUnion(this.ghostsBoundingRect, newGhostRect);
+
+                    var isValid = this.MapModel.CanAddBuilding(cellX, cellY, buildingType, subBuildings: null);
+                    this.UpdateGhostLocation(newGhostRect, isValid);
+
+                    Invalidate(repaintRect);
+                }
+            }
+
+            if (this.Capture)
+            {
+                this.ApplyTool(e, cellX, cellY, isMove: true);
+            }
         }
 
         if (this.MouseCoordsChanged != null)
@@ -712,57 +726,8 @@ public class MapCanvasControl : Control
                     this.selectionDragEndCell = newEndCell;
                     var offsetX = this.selectionDragEndCell.x - this.selectionDragStartCell.x;
                     var offsetY = this.selectionDragEndCell.y - this.selectionDragStartCell.y;
-                    
-                    var repaintRect = this.ghostsBoundingRect;
-                    this.ClearGhost();
 
-                    if (offsetX != 0 || offsetY != 0)
-                    {
-                        this.moveValid = true;
-                        foreach (var building in this.SelectedBuildings)
-                        {
-                            var buildingCopy = building.GetCopy();
-                            buildingCopy.MoveLocation(deltaX: offsetX, deltaY: offsetY);
-
-                            var isValid = this.MapModel.CanAddBuilding(buildingCopy.Left, buildingCopy.Top, buildingCopy.BuildingType, buildingCopy.SubBuildings, this.SelectedBuildings);
-                            this.moveValid &= isValid;
-
-                            if (buildingCopy.BuildingType.IgnoreMainBuilding())
-                            {
-                                foreach (var subBuilding in buildingCopy.GetSubBuildings())
-                                {
-                                    var (width, height) = subBuilding.BuildingType.GetSize();
-                                    var newGhostRect = new Rectangle(
-                                        subBuilding.Left * CellSideLength,
-                                        subBuilding.Top * CellSideLength,
-                                        width * CellSideLength,
-                                        height * CellSideLength);
-                                    UpdateGhostLocation(newGhostRect, isValid, append: true);
-                                    repaintRect = RectUnion(repaintRect, newGhostRect);
-                                }
-                            }
-                            else
-                            {
-                                var (width, height) = buildingCopy.BuildingType.GetSize();
-                                var newGhostRect = new Rectangle(
-                                    buildingCopy.Left * CellSideLength,
-                                    buildingCopy.Top * CellSideLength,
-                                    width * CellSideLength,
-                                    height * CellSideLength);
-                                UpdateGhostLocation(newGhostRect, isValid, append: true);
-                                repaintRect = RectUnion(repaintRect, newGhostRect);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        this.moveValid = false;
-                    }
-
-                    if (repaintRect != null)
-                    {
-                        this.Invalidate(repaintRect.Value);
-                    }
+                    this.moveValid = this.UpdateBuildingDestinationGhost(this.SelectedBuildings, offsetX, offsetY, zeroOffsetIsValid: false);
                 }
             }
         }
@@ -807,6 +772,63 @@ public class MapCanvasControl : Control
                 this.Invalidate();
             }
         }
+    }
+
+    private bool UpdateBuildingDestinationGhost(HashSet<MapBuilding> buildingsToPlace, int offsetX, int offsetY, bool zeroOffsetIsValid)
+    {
+        var repaintRect = this.ghostsBoundingRect;
+        this.ClearGhost();
+
+        bool isPlaceValid;
+        if (zeroOffsetIsValid || offsetX != 0 || offsetY != 0)
+        {
+            isPlaceValid = true;
+            foreach (var building in buildingsToPlace)
+            {
+                var buildingCopy = building.GetCopy();
+                buildingCopy.MoveLocation(deltaX: offsetX, deltaY: offsetY);
+
+                var isValid = this.MapModel.CanAddBuilding(buildingCopy.Left, buildingCopy.Top, buildingCopy.BuildingType, buildingCopy.SubBuildings, buildingsToPlace);
+                isPlaceValid &= isValid;
+
+                if (buildingCopy.BuildingType.IgnoreMainBuilding())
+                {
+                    foreach (var subBuilding in buildingCopy.GetSubBuildings())
+                    {
+                        var (width, height) = subBuilding.BuildingType.GetSize();
+                        var newGhostRect = new Rectangle(
+                            subBuilding.Left * CellSideLength,
+                            subBuilding.Top * CellSideLength,
+                            width * CellSideLength,
+                            height * CellSideLength);
+                        this.UpdateGhostLocation(newGhostRect, isValid, append: true);
+                        repaintRect = RectUnion(repaintRect, newGhostRect);
+                    }
+                }
+                else
+                {
+                    var (width, height) = buildingCopy.BuildingType.GetSize();
+                    var newGhostRect = new Rectangle(
+                        buildingCopy.Left * CellSideLength,
+                        buildingCopy.Top * CellSideLength,
+                        width * CellSideLength,
+                        height * CellSideLength);
+                    this.UpdateGhostLocation(newGhostRect, isValid, append: true);
+                    repaintRect = RectUnion(repaintRect, newGhostRect);
+                }
+            }
+        }
+        else
+        {
+            isPlaceValid = false;
+        }
+
+        if (repaintRect != null)
+        {
+            this.Invalidate(repaintRect.Value);
+        }
+
+        return isPlaceValid;
     }
 
     private void ApplySingleClickSelection(MouseEventArgs e)
@@ -872,7 +894,11 @@ public class MapCanvasControl : Control
 
     private (int x, int y) GetCellCoordidates(MouseEventArgs e)
     {
-        var clientLocation = e.Location;
+        return GetCellCoordidates(e.Location);
+    }
+
+    private (int x, int y) GetCellCoordidates(Point clientLocation)
+    {
         var cellX = clientLocation.X / CellSideLength;
         var cellY = clientLocation.Y / CellSideLength;
         return (cellX, cellY);
@@ -1032,7 +1058,7 @@ public class MapCanvasControl : Control
         }
     }
 
-    private void BuildingsPaste(int cellX, int cellY)
+    public void BuildingsPasteGhost()
     {
         var clipboardBuildings = ExternalHelper.GetFromClipboardJson<List<MapBuilding>>(this);
         if (clipboardBuildings == null || clipboardBuildings.Count == 0)
@@ -1040,8 +1066,27 @@ public class MapCanvasControl : Control
             return;
         }
 
-        var newBuildings = new List<MapBuilding>(clipboardBuildings.Count);
-        foreach (var building in clipboardBuildings)
+        if (!this.Tool.IsEmpty)
+        {
+            this.Tool = new Tool();
+        }
+
+        this.BuildingsToPaste = [.. clipboardBuildings];
+
+        Point mousePosInControl = this.PointToClient(Cursor.Position);
+        var (cellX, cellY) = this.GetCellCoordidates(mousePosInControl);
+        this.UpdateBuildingDestinationGhost(this.BuildingsToPaste, cellX, cellY, zeroOffsetIsValid: true);
+    }
+
+    private void BuildingsPastePlaceGhost(int cellX, int cellY)
+    {
+        if (this.BuildingsToPaste == null)
+        {
+            return;
+        }
+
+        var newBuildings = new List<MapBuilding>(this.BuildingsToPaste.Count);
+        foreach (var building in this.BuildingsToPaste)
         {
             var newBuilding = building.GetCopy();
             newBuilding.MoveLocation(deltaX: cellX, deltaY: cellY);
@@ -1057,7 +1102,24 @@ public class MapCanvasControl : Control
             this.MapModel.AddBuildingAfterCheck(newBuilding);
         }
 
-        this.OnBuildingsChanged();
+        if (this.SelectedBuildings.Count > 0)
+        {
+            this.SelectedBuildings.Clear();
+            this.OnSelectionChanged();
+        }
+
+        this.ClearBuildingsToPaste();
+    }
+
+    public void ClearBuildingsToPaste()
+    {
+        if (this.BuildingsToPaste == null)
+        {
+            return;
+        }
+
+        this.ClearGhost();
+        this.BuildingsToPaste = null;
         this.Invalidate();
     }
 
