@@ -497,7 +497,7 @@ public class MapCanvasControl : Control
             var mapBuilding = this.MapModel.Cells[cellX, cellY].Building;
             if (mapBuilding != null)
             {
-                this.Tool = new Tool { BuildingType = mapBuilding.BuildingType };
+                this.Tool = new Tool { BuildingType = mapBuilding.BuildingType, HouseLevel = mapBuilding.MaxHouseLevel };
             }
         }
     }
