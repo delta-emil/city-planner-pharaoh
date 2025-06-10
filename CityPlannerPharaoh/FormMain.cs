@@ -414,7 +414,7 @@ public partial class FormMain : Form
     private void mapControl_GlobalStatsChanged(object sender, MapGlobalStatsChangeEventArgs e)
     {
         this.toolStripTotalPop.Text = e.Pop.ToString();
-        this.toolStripTotalWork23.Text = ((int)(e.Pop * 0.23)).ToString();
+        this.toolStripTotalWork23.Text = ((int)((e.Pop - e.PopScribe) * 0.23)).ToString();
         this.toolStripTotalEmpl.Text = e.Empl.ToString();
     }
 

@@ -1129,11 +1129,21 @@ public class MapCanvasControl : Control
     {
         if (this.GlobalStatsChanged != null)
         {
-            var pop = this.MapModel.Buildings.Sum(building => building.GetMaxPopulation());
+            int pop = 0, scribes = 0;
+            foreach (var building in this.MapModel.Buildings)
+            {
+                var buildingPop = building.GetMaxPopulation();
+                pop += buildingPop;
+                if (building.BuildingType is MapBuildingType.House3 or MapBuildingType.House4)
+                {
+                    scribes += buildingPop;
+                }
+            }
             var empl = this.MapModel.Buildings.Sum(this.MapModel.GetEmployees);
             var args = new MapGlobalStatsChangeEventArgs
             {
                 Pop = pop,
+                PopScribe = scribes,
                 Empl = empl,
             };
             this.GlobalStatsChanged(this, args);
