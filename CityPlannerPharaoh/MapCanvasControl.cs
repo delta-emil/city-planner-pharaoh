@@ -302,21 +302,39 @@ public class MapCanvasControl : Control
             graphics.DrawRectangle(borderPen, borderRect);
         }
 
-        bool isFarm = false;
+        bool isFarmOnMeadow = false;
+        bool isFarmOnMeadowFarmland = false;
+        bool isFarmInvalid = false;
 
         foreach (var (cellModel, cellX, cellY) in this.MapModel.EnumerateInsideBuildingWithCoords(building))
         {
             Brush? brushToApply = null;
+
+            if (building.BuildingType == MapBuildingType.Farm)
+            {
+                switch (cellModel.Terrain)
+                {
+                    case MapTerrain.Sand:
+                    case MapTerrain.Grass:
+                        isFarmOnMeadow = true;
+                        break;
+                    case MapTerrain.SandFarmland:
+                    case MapTerrain.GrassFarmland:
+                        isFarmOnMeadow = true;
+                        isFarmOnMeadowFarmland = true;
+                        brushToApply = this.farmMeadowBrush;
+                        break;
+                    case MapTerrain.Floodpain:
+                        brushToApply = this.farmMeadowBrush;
+                        break;
+                    default:
+                        isFarmInvalid = true;
+                        break;
+                }
+            }
             if (cellModel.TooCloseToVoidToBuild)
             {
                 brushToApply = this.tooCloseToVoidToBuildBrush;
-            }
-            else if (building.BuildingType == MapBuildingType.Farm
-                && cellModel.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland or MapTerrain.Floodpain)
-            {
-                brushToApply = this.farmMeadowBrush;
-
-                isFarm = true;
             }
                 
             if (brushToApply != null)
@@ -340,9 +358,24 @@ public class MapCanvasControl : Control
             var textSize = graphics.MeasureString(text, this.smallFont);
 
             var textBrushToUse = this.textBrush;
-            if (isFarm && this.MapModel.IsFarmIrrigated(building))
+            if (building.BuildingType == MapBuildingType.Farm)
             {
-                textBrushToUse = this.farmIrrigatedTextBrush;
+                if (!isFarmInvalid)
+                {
+                    if (isFarmOnMeadow && !isFarmOnMeadowFarmland)
+                    {
+                        isFarmInvalid = !this.MapModel.DoesMeadowFarmHaveAdjacentFarmland(building);
+                    }
+                }
+
+                if (isFarmInvalid)
+                {
+                    textBrushToUse = this.incorrectTextBrush;
+                }
+                else if (this.MapModel.IsFarmIrrigated(building))
+                {
+                    textBrushToUse = this.farmIrrigatedTextBrush;
+                }
             }
             else if (this.MapModel.IsMissingRequiredWater(building)
                 || this.MapModel.IsMissingRequiredCrossroad(building))

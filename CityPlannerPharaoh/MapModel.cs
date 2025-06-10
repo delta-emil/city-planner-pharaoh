@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Text.Json.Serialization;
+using System.Windows.Forms;
 
 namespace CityPlannerPharaoh;
 
@@ -540,6 +541,21 @@ public class MapModel
                 {
                     return true;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    internal bool DoesMeadowFarmHaveAdjacentFarmland(MapBuilding farm)
+    {
+        // 4 tiles to the N tile of the farm
+        var size = farm.BuildingType.GetSize();
+        foreach (var (cell, _, _, _) in EnumerateAroundBuildingToRange(farm.Left, farm.Top, width: size.width, height: size.height, range: 1, includingInside: false))
+        {
+            if (cell.Terrain is MapTerrain.GrassFarmland or MapTerrain.SandFarmland)
+            {
+                return true;
             }
         }
 
